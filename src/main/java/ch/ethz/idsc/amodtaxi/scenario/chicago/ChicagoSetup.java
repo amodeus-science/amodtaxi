@@ -10,14 +10,14 @@ import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
 
 /* package */ enum ChicagoSetup {
     ;
-    
+
     public static void in(File workingDir) throws Exception {
         ChicagoGeoInformation.setup();
         /** copy relevant files containing settings for scenario generation */
         File resourcesDir = new File(Locate.repoFolder(CreateChicagoScenario.class, "amodtaxi"), "resources/chicagoScenario");
         CopyFiles.now(resourcesDir.getAbsolutePath(), workingDir.getAbsolutePath(), //
                 Arrays.asList(new String[] { ScenarioLabels.avFile, ScenarioLabels.config, //
-                        ScenarioLabels.pt2MatSettings, ScenarioLabels.LPFile}),
+                        ScenarioLabels.pt2MatSettings, ScenarioLabels.LPFile }),
                 true);
         /** AmodeusOptions.properties is not replaced as it might be changed by user during
          * scenario generation process. */

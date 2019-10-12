@@ -4,7 +4,6 @@ package ch.ethz.idsc.amodtaxi.linkspeed.batch;
 import java.io.File;
 import java.util.Objects;
 
-import ch.ethz.idsc.amodtaxi.linkspeed.batch.TrafficDelayEstimate;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;

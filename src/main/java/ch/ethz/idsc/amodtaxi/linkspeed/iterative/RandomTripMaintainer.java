@@ -74,14 +74,14 @@ import ch.ethz.idsc.tensor.Tensors;
     public Scalar getRatioCost() {
         return costFunction.apply(lastRatios.getNewest(checkHorizon));
     }
-    
-    public int numTrips(){
-        return numTrips;        
+
+    public int numTrips() {
+        return numTrips;
     }
-    
-    public Tensor getRatios(){
+
+    public Tensor getRatios() {
         Tensor ratios = Tensors.empty();
-        lastRatios.getNewest(checkHorizon).stream().forEach(s->ratios.append(s));
-        return ratios;       
+        lastRatios.getNewest(checkHorizon).stream().forEach(s -> ratios.append(s));
+        return ratios;
     }
 }

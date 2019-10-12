@@ -9,7 +9,6 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStampConverted;
 
-
 public enum TaxiStampConvertedSF implements TaxiStampConverted {
     INSTANCE;
 

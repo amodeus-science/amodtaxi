@@ -2,7 +2,6 @@
 package ch.ethz.idsc.amodtaxi.tripfilter;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.matsim.api.core.v01.network.Network;
 
@@ -17,9 +16,7 @@ import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import ch.ethz.idsc.tensor.io.Export;
 import ch.ethz.idsc.tensor.red.Mean;
-
 
 /** This filter calculates the min-time-path in the network without traffic.
  * Then, only trips are kept which:
@@ -60,7 +57,7 @@ public class TripNetworkFilter extends AbstractConsciousFilter {
 
         /** evaluating criteria */
         boolean slowerThanNetwork = Scalars.lessEquals(compare.nwPathDurationRatio, RealScalar.ONE);
-        if (slowerThanNetwork) 
+        if (slowerThanNetwork)
             ++numslowerThanNetwork;
         boolean belowMaxDelay = Scalars.lessEquals(trip.duration.subtract(compare.pathTime), maxDelay);
         if (belowMaxDelay)
@@ -74,13 +71,11 @@ public class TripNetworkFilter extends AbstractConsciousFilter {
         boolean hasRealPath = compare.path.links.size() > 1;
         if (hasRealPath)
             ++numhasRealPath;
-        
-        
-        if(!slowerThanNetwork){
+
+        if (!slowerThanNetwork) {
             ratios.append(compare.nwPathDurationRatio);
             durations.append(compare.duration);
         }
-        
 
         /** return true if all ok */
         return slowerThanNetwork && belowMaxDelay && fasterThanMinSpeed && longerThanMinDistance && hasRealPath;

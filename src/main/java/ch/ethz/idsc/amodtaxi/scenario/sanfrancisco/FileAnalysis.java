@@ -22,7 +22,6 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
-
 /* package */ class FileAnalysis {
     private final String fileName;
     private final SortedMap<LocalDateTime, TaxiStamp> sortedEntries;

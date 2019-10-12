@@ -28,8 +28,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         }
         return outputDirectory;
     }
-    
-    
+
     public static <T> T getMinVal(Collection<FileAnalysis> col, Function<FileAnalysis, T> eval) {
         try {
             return sortedVals(col, eval).first();

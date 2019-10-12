@@ -9,7 +9,6 @@ import ch.ethz.idsc.amodeus.util.io.CopyFiles;
 import ch.ethz.idsc.amodeus.util.io.Locate;
 import ch.ethz.idsc.amodtaxi.scenario.Pt2MatsimXML;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
-import ch.ethz.idsc.amodtaxi.scenario.chicago.ChicagoGeoInformation;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
 /* package */ class StaticHelper {

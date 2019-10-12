@@ -41,9 +41,8 @@ public abstract class TripFleetConverter {
     protected final TaxiTripsReader tripsReader;
     protected final MatsimAmodeusDatabase db;
     protected final QuadTree<Link> qt;
-    
+
     private File finalTripsFile = null;
-    
 
     public TripFleetConverter(ScenarioOptions scenarioOptions, Network network, //
             TaxiTripFilter primaryFilter, TripBasedModifier tripModifier, //
@@ -82,7 +81,7 @@ public abstract class TripFleetConverter {
          * other modifications should be done in the third step */
         File preparedFile = generalModifier.modify(newTripFile);
         Stream<TaxiTrip> stream = tripsReader.getTripStream(preparedFile);
-        
+
         /** filtering of trips, e.g., removal of 0 [s] trips */
         Stream<TaxiTrip> filteredStream = primaryFilter.filterStream(stream);
         String fileName = FilenameUtils.getBaseName(preparedFile.getPath()) + "_filtered." + //
@@ -106,10 +105,10 @@ public abstract class TripFleetConverter {
                 new TripPopulationCreator(processingDir, configFull, network, db, //
                         DATE_TIME_FORMATTER, qt, simulationDate, timeConvert, finalFilters);
         populationCreator.process(modifiedTripsFile);
-        finalTripsFile = populationCreator.getFinalTripFile();        
+        finalTripsFile = populationCreator.getFinalTripFile();
     }
-    
-    public File getFinalTripFile(){
+
+    public File getFinalTripFile() {
         return finalTripsFile;
     }
 
