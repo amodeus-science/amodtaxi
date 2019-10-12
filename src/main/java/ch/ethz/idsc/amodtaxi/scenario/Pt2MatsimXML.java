@@ -10,7 +10,8 @@ import org.jdom2.Element;
 
 import ch.ethz.idsc.amodeus.matsim.xml.XmlCustomModifier;
 
-public class Pt2MatsimXML {
+public enum Pt2MatsimXML {
+    ;
 
     public static void toLocalFileSystem(File xmlFile, String systemSpecificPath) throws Exception {
 

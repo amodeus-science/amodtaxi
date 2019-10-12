@@ -22,7 +22,7 @@ public class Scenario {
 
     }
 
-    // --
+    // ---
 
     private final File dataDir;
     private final File tripFile;
