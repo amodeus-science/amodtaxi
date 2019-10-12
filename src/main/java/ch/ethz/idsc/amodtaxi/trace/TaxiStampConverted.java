@@ -6,6 +6,6 @@ import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 
 public interface TaxiStampConverted {
     // TODO doc
-    public TaxiStamp from(List<String> dataFileRow, AmodeusTimeConvert timeConvert);
+    TaxiStamp from(List<String> dataFileRow, AmodeusTimeConvert timeConvert);
 
 }

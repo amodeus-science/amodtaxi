@@ -17,6 +17,6 @@ public interface TaxiDataModifier {
      *         with a {@link TaxiTripFilter} and not with classes implementing this interface.
      * 
      * @throws Exception */
-    public File modify(File taxiData) throws Exception;
+    File modify(File taxiData) throws Exception;
 
 }

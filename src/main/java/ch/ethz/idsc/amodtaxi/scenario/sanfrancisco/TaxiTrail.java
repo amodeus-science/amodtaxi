@@ -1,3 +1,4 @@
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 
 import java.time.LocalDate;
@@ -18,20 +19,20 @@ public interface TaxiTrail {
     /** part 1: filling with data
      * 
      * @param list of data file for a certain time */
-    public void insert(List<String> list);
+    void insert(List<String> list);
 
     /** part 2: processing of the data */
-    public void processFilledTrail() throws Exception;
+    void processFilledTrail() throws Exception;
 
     /** part 3: access functions */
-    public LocalDateTime getMaxTime();
+    LocalDateTime getMaxTime();
 
-    public NavigableMap<LocalDateTime, TaxiStamp> getTaxiStamps();
+    NavigableMap<LocalDateTime, TaxiStamp> getTaxiStamps();
 
-    public String getID();
+    String getID();
 
     /** @return {@link Collection} of all {@link TaxiTrip}s with
      *         pickup taking place on {@link LocalDate} @param localDate */
-    public Collection<TaxiTrip> allTripsBeginningOn(LocalDate localDate);
+    Collection<TaxiTrip> allTripsBeginningOn(LocalDate localDate);
 
 }

@@ -1,3 +1,4 @@
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 
 import java.io.BufferedWriter;
@@ -67,7 +68,7 @@ import ch.ethz.idsc.tensor.sca.N;
         Tensor plotWaitingTimes = Tensors.empty();
         for (FileAnalysis fileAnalysis : filesAnalysis) {
             if (Objects.nonNull(fileAnalysis.getplotWaitingTimes()))
-                fileAnalysis.getplotWaitingTimes().flatten(0).forEach(s -> plotWaitingTimes.append(s));
+                fileAnalysis.getplotWaitingTimes().stream().forEach(s -> plotWaitingTimes.append(s));
         }
 
         // GlobalAssert.that(maxWaitingTimes.length() == numRequests);
