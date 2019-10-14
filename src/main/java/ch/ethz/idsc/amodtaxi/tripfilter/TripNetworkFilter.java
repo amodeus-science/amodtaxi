@@ -31,6 +31,7 @@ public class TripNetworkFilter extends AbstractConsciousFilter {
     private final Scalar maxDelay;
     private final Scalar minSpeed;
     private final Scalar minDistance;
+    private final boolean checkSlowerNetwork;
 
     // ---
     private int numslowerThanNetwork = 0;
@@ -42,11 +43,12 @@ public class TripNetworkFilter extends AbstractConsciousFilter {
     private Tensor durations = Tensors.empty();
 
     public TripNetworkFilter(Network network, MatsimAmodeusDatabase db, //
-            Scalar minSpeed, Scalar maxDelay, Scalar minDistance) {
+            Scalar minSpeed, Scalar maxDelay, Scalar minDistance, boolean checkSlowerNetwork) {
         calc = new ShortestDurationCalculator(network, db);
         this.maxDelay = maxDelay;
         this.minSpeed = minSpeed;
         this.minDistance = minDistance;
+        this.checkSlowerNetwork = checkSlowerNetwork;
     }
 
     @Override
@@ -56,7 +58,7 @@ public class TripNetworkFilter extends AbstractConsciousFilter {
         DurationCompare compare = new DurationCompare(trip, calc);
 
         /** evaluating criteria */
-        boolean slowerThanNetwork = Scalars.lessEquals(compare.nwPathDurationRatio, RealScalar.ONE);
+        boolean slowerThanNetwork = checkSlowerNetwork ? Scalars.lessEquals(compare.nwPathDurationRatio, RealScalar.ONE) : true;
         if (slowerThanNetwork)
             ++numslowerThanNetwork;
         boolean belowMaxDelay = Scalars.lessEquals(trip.duration.subtract(compare.pathTime), maxDelay);
@@ -90,7 +92,6 @@ public class TripNetworkFilter extends AbstractConsciousFilter {
         System.out.println("Faster than min speed:    " + numfasterThanMinSpeed + " / " + numTested());
         System.out.println("Longer than min distance: " + numlongerThanMinDistance + " / " + numTested());
         System.out.println("Have real path:           " + numhasRealPath + " / " + numTested());
-        System.out.println("ratios mean:              " + Mean.of(ratios));
         try {
             SaveUtils.saveFile(ratios, "ratios", new File("/home/clruch/data/TaxiComparison_SFScenario"));
             UnitSaveUtils.saveFile(durations, "durations", new File("/home/clruch/data/TaxiComparison_SFScenario"));

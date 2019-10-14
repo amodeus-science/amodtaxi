@@ -35,10 +35,11 @@ import ch.ethz.idsc.tensor.Scalar;
     private final Network network;
     private final File configFile;
     private final Config configFull;
-    private final int maxIter = 100;
+    private final int maxIter = 100000; // 10000 need 1 hour
     private DayTaxiRecord dayTaxiRecord;
     private ScenarioOptions simOptions;
-    private final TaxiTripFilter taxiTripFilter;
+    private final TaxiTripFilter speedEstimationTripFilter;
+    private final TaxiTripFilter populationTripFilter;
 
     private final QuadTree<Link> qt;
     private File outputDirectory;
@@ -48,13 +49,15 @@ import ch.ethz.idsc.tensor.Scalar;
 
     public StandaloneFleetConverterSF(File workingDirectory, DayTaxiRecord dayTaxiRecord, //
             MatsimAmodeusDatabase db, Network network, Scalar TIME_STEP, //
-            AmodeusTimeConvert timeConvert, TaxiTripFilter taxiTripFilter) throws Exception {
+            AmodeusTimeConvert timeConvert, TaxiTripFilter taxiTripFilter,//
+            TaxiTripFilter populationTripFilter) throws Exception {
         this.workingDirectory = workingDirectory;
         this.dayTaxiRecord = dayTaxiRecord;
         this.db = db;
         this.TIME_STEP = TIME_STEP;
         this.timeConvert = timeConvert;
-        this.taxiTripFilter = taxiTripFilter;
+        this.speedEstimationTripFilter = taxiTripFilter;
+        this.populationTripFilter = populationTripFilter;
         simOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
         configFile = new File(simOptions.getPreparerConfigName());
         GlobalAssert.that(configFile.exists());
@@ -78,24 +81,30 @@ import ch.ethz.idsc.tensor.Scalar;
         /** STEP 2: Find relevant trips */
         Collection<TaxiTrip> tripsAll = AllTaxiTrips.in(dayTaxiRecord).on(simulationDate);
 
-        /** STEP 3: Filter unwanted trips */
-        System.out.println("Trips before filtering: " + tripsAll.size());
-        List<TaxiTrip> trips = taxiTripFilter.filterStream(tripsAll.stream()).collect(Collectors.toList());
-        System.out.println("Trips after filtering:  " + trips.size());
-        taxiTripFilter.printSummary();
+        /** STEP 3: Filter trips which are unwanted for speed estimation (not meaningful durations) */
+        List<TaxiTrip> tripsSpeedEstimation = speedEstimationTripFilter.filterStream(tripsAll.stream()).collect(Collectors.toList());
+        speedEstimationTripFilter.printSummary();
 
-        /** STEP 4: Export final taxi trips */
-        ExportTaxiTrips.toFile(trips.stream(), new File(workingDirectory, "finalTrips.csv"));
+        /** STEP 4: Export final taxi trips and estimation trip population */
+        ExportTaxiTrips.toFile(tripsSpeedEstimation.stream(), new File(workingDirectory, "finalTrips.csv"));
+        AdamAndEve.create(workingDirectory, tripsSpeedEstimation, network, db, timeConvert, qt, simulationDate,"_speedEst");
+        
+        
 
+        
         // taxiTripFilter.
         // ClosestLinkSelect linkSelect = new ClosestLinkSelect(db, qt);
         // AverageNetworkSpeed speedFilter = new AverageNetworkSpeed(network, linkSelect, simulationDate, timeConvert);
         // List<TaxiTrip> trips = tripsAll.stream().filter(t -> speedFilter.isBelow(t, maxAverageSpeed)).collect(Collectors.toList());
 
-        /** STEP 4: Generate population.xml using the recordings */
-        AdamAndEve.create(workingDirectory, trips, network, db, timeConvert, qt, simulationDate);
+        /** STEP 5: Generate population.xml using the recordings */
+        System.out.println("Trips before filtering: " + tripsAll.size());
+        List<TaxiTrip> tripsForPopulation = populationTripFilter.filterStream(tripsAll.stream()).collect(Collectors.toList());
+        System.out.println("Trips after filtering:  " + tripsForPopulation.size());
+        populationTripFilter.printSummary();                
+        AdamAndEve.create(workingDirectory, tripsForPopulation, network, db, timeConvert, qt, simulationDate,"");
 
-        /** STEP 3: Generate the report */
+        /** STEP 6: Generate the report */
         try {
             Analysis analysis = Analysis.setup(simOptions, outputDirectory, network, db);
             analysis.run();
@@ -103,7 +112,7 @@ import ch.ethz.idsc.tensor.Scalar;
             System.err.println("could not produce report, analysis failed.");
             exception.printStackTrace();
         }
-        /** STEP 4: Create Link Speed Data File */
+        /** STEP 7: Create Link Speed Data File */
         try {
             // other tested options...
             // TaxiLinkSpeedEstimator lsCalc = new ConventionalLinkSpeedCalculator(db, dayTaxiRecord, simulationDate, network, timeConvert);
@@ -112,7 +121,7 @@ import ch.ethz.idsc.tensor.Scalar;
 
             // iterative
             IterativeLinkSpeedEstimator lsCalc = new IterativeLinkSpeedEstimator(maxIter);
-            lsCalc.compute(workingDirectory, network, db, trips);
+            lsCalc.compute(workingDirectory, network, db, tripsSpeedEstimation);
 
             File linkSpeedsFile = new File(simOptions.getLinkSpeedDataName() + "");
             LinkSpeedsExport.using(linkSpeedsFile, lsCalc);//

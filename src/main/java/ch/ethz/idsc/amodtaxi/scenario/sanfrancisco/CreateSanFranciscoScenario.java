@@ -77,13 +77,20 @@ public class CreateSanFranciscoScenario {
         for (LocalDate localDate : dates) {
             try {
                 /** compute scenario */
-                TaxiTripFilter finalTripFilter = new TaxiTripFilter();
+
+                TaxiTripFilter speedEstimationTripFilter = new TaxiTripFilter();
                 /** trips which are faster than the network freeflow speeds would allow are removed */
-                finalTripFilter.addFilter(new TripNetworkFilter(network, db, //
-                        Quantity.of(5.5, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m")));
+                speedEstimationTripFilter.addFilter(new TripNetworkFilter(network, db, //
+                        Quantity.of(5.5, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m"), true));
+
+                TaxiTripFilter finalPopulationTripFilter = new TaxiTripFilter();
+                /** trips which are faster than the network freeflow speeds would allow are removed */
+                finalPopulationTripFilter.addFilter(new TripNetworkFilter(network, db, //
+                        Quantity.of(2.5, "m*s^-1"), Quantity.of(7200, "s"), Quantity.of(200, "m"), false));
 
                 StandaloneFleetConverterSF sfc = new StandaloneFleetConverterSF(processingDir, //
-                        dayTaxiRecord, db, network, timeStep, timeConvert, finalTripFilter);
+                        dayTaxiRecord, db, network, timeStep, timeConvert, speedEstimationTripFilter, //
+                        finalPopulationTripFilter);
                 sfc.run(localDate);
 
                 /** copy scenario to new location */

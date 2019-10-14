@@ -142,7 +142,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         TaxiTripFilter finalTripFilter = new TaxiTripFilter();
         /** trips which are faster than the network freeflow speeds would allow are removed */
         finalTripFilter.addFilter(new TripNetworkFilter(network, db, //
-                Quantity.of(5.5, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m")));
+                Quantity.of(5.5, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m"), true));
 
         // TODO eventually remove, this did not improve the fit.
         // finalFilters.addFilter(new TripMaxSpeedFilter(network, db, ScenarioConstants.maxAllowedSpeed));

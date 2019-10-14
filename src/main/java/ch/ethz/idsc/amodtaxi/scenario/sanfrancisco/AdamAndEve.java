@@ -20,8 +20,10 @@ import ch.ethz.idsc.amodeus.util.io.GZHandler;
 
 public class AdamAndEve {
 
-    public static void create(File workingDirectory, Collection<TaxiTrip> trips, Network network, MatsimAmodeusDatabase db, //
-            AmodeusTimeConvert timeConvert, QuadTree<Link> quadTree, LocalDate simulationDate)//
+    public static void create(File workingDirectory, Collection<TaxiTrip> trips, Network network, //
+            MatsimAmodeusDatabase db, //
+            AmodeusTimeConvert timeConvert, QuadTree<Link> quadTree, LocalDate simulationDate, //
+            String nameAdd)//
             throws Exception {
 
         /** create a new {@link Population} */
@@ -33,8 +35,8 @@ public class AdamAndEve {
         Consistency.check(population);
 
         /** write created {@link Population} to file */
-        File populationFile = new File(workingDirectory, "population.xml");
-        File populationGzFile = new File(workingDirectory, "population.xml.gz");
+        File populationFile = new File(workingDirectory, "population" + nameAdd + ".xml");
+        File populationGzFile = new File(workingDirectory, "population" + nameAdd + ".xml.gz");
         System.out.println("INFO writing new population to:");
         System.out.println(populationFile.getPath());
         System.out.println(populationGzFile.getPath());
