@@ -75,3 +75,4 @@ fabric.properties
 
 # macos files
 .DS_Store
+/mvndeploy.sh

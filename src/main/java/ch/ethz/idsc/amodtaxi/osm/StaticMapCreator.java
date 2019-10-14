@@ -9,7 +9,7 @@ import org.matsim.pt2matsim.run.Osm2MultimodalNetwork;
 
 public class StaticMapCreator {
 
-    public static void now(File processingDir, String osmData, String amodeusFile,//
+    public static void now(File processingDir, String osmData, String amodeusFile, //
             String pt2MatsimSettingsName) throws FileNotFoundException, IOException {
 
         System.out.println("Downloading open street map data, this may take a while if not already downloaded...");

@@ -4,7 +4,6 @@ package ch.ethz.idsc.amodtaxi.tripmodif;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -115,7 +114,7 @@ public class OriginDestinationCentroidResampling implements TripModifier {
         uniqueLocations.add(taxiTrip.dropoffLoc);
     }
 
-    private VirtualNetwork<Link> getCentroidVirtualNetwork(Network network, FastLinkLookup fll, //
+    private static VirtualNetwork<Link> getCentroidVirtualNetwork(Network network, FastLinkLookup fll, //
             HashSet<Tensor> uniqueLocations) {
         Collection<Link> elements = (Collection<Link>) network.getLinks().values();
         Map<Node, HashSet<Link>> uElements = NodeAdjacencyMap.of(network);

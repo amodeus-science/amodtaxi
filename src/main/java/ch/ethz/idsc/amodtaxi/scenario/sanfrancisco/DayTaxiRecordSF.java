@@ -12,7 +12,6 @@ import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
 
-
 public class DayTaxiRecordSF implements DayTaxiRecord {
 
     protected final List<TaxiTrail> trails = new ArrayList<>();

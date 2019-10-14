@@ -7,8 +7,6 @@ import org.junit.Test;
 
 import ch.ethz.idsc.amodeus.util.io.Locate;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
-import ch.ethz.idsc.amodtaxi.scenario.chicago.ChicagoDataLoader;
-import ch.ethz.idsc.amodtaxi.scenario.chicago.CreateChicagoScenario;
 
 /** Tests if data for the creation of the Chicago taxi scenario is accessible from the
  * web API. */

@@ -17,7 +17,7 @@ public class RandomRemoverFilter extends AbstractConsciousFilter {
     }
 
     @Override
-    public boolean testInternal(TaxiTrip t) {        
+    public boolean testInternal(TaxiTrip t) {
         if (random.nextDouble() <= keepShare)
             return true;
         return false;

@@ -1,22 +1,25 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ch.ethz.idsc</groupId>
 	<artifactId>amodtaxi</artifactId>
-	<version>1.8.3</version>
+	<version>1.8.4</version>
 	<packaging>jar</packaging>
 
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<skipTests>false</skipTests>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<github.global.server>github</github.global.server>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>ch.ethz.idsc</groupId>
 			<artifactId>amodeus</artifactId>
-			<version>1.8.3</version>
+			<version>1.8.4</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -27,14 +30,6 @@
 	</dependencies>
 
 	<repositories>
-		<repository>
-			<id>tensor-mvn-repo</id>
-			<url>https://raw.github.com/idsc-frazzoli/tensor/mvn-repo/</url>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
-			</snapshots>
-		</repository>
 		<repository>
 			<id>amodeus-mvn-repo</id>
 			<url>https://raw.github.com/idsc-frazzoli/amodeus/mvn-repo/</url>
@@ -77,6 +72,40 @@
 				<configuration>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.8.1</version>
+				<configuration>
+					<altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.github.github</groupId>
+				<artifactId>site-maven-plugin</artifactId>
+				<version>0.11</version>
+				<configuration>
+					<message>Maven artifacts for ${project.version}</message>
+					<noJekyll>true</noJekyll>
+					<outputDirectory>${project.build.directory}/mvn-repo</outputDirectory>
+					<branch>refs/heads/mvn-repo</branch>
+					<merge>true</merge>
+					<includes>
+						<include>**/*</include>
+					</includes>
+					<repositoryName>amodtaxi</repositoryName>
+					<repositoryOwner>idsc-frazzoli</repositoryOwner>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>site</goal>
+						</goals>
+						<phase>deploy</phase>
+					</execution>
+				</executions>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -109,7 +138,7 @@
 						<transformer
 							implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
 					</transformers>
-					<!-- Exclude all signature files to avoid java.lang.SecurityException:
+					<!-- Exclude all signature files to avoid java.lang.SecurityException: 
 						Invalid signature file digest -->
 					<filters>
 						<filter>

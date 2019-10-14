@@ -47,7 +47,7 @@ public class SimContainerPopulator {
         /** initialize and add VehicleContainer */
         VehicleContainer vc = new VehicleContainer();
         vc.vehicleIndex = vehicleIndex;
-        vc.linkTrace = new int[]{linkIndex};
+        vc.linkTrace = new int[] { linkIndex };
         vc.roboTaxiStatus = taxiStamp.roboTaxiStatus;
         vc.destinationLinkIndex = linkIndex; // TODO this is just temporary, need to do properly
         GlobalAssert.that(Objects.nonNull(vc.roboTaxiStatus));
@@ -78,7 +78,7 @@ public class SimContainerPopulator {
         /** place vehicles on arbitrary link */
         VehicleContainer vc = new VehicleContainer();
         vc.vehicleIndex = vehicleIndex;
-        vc.linkTrace = new int[]{1};
+        vc.linkTrace = new int[] { 1 };
         vc.roboTaxiStatus = RoboTaxiStatus.STAY;
         GlobalAssert.that(Objects.nonNull(vc.roboTaxiStatus));
         simulationObject.vehicles.add(vc);

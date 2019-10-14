@@ -20,9 +20,7 @@ public class ChicagoOnlineTripBasedModifier extends TripBasedModifier {
         /** instead the TripStartTimeShiftResampling is used: */
         addModifier(new TripStartTimeShiftResampling(random, Quantity.of(900, "s")));
         addModifier(new OriginDestinationCentroidResampling(random, network, fll, vNetworkExportFile));
-        
-        
-        
+
     }
 
 }

@@ -20,10 +20,6 @@ import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTripCheck;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.linkspeed.TaxiLinkSpeedEstimator;
-import ch.ethz.idsc.amodtaxi.linkspeed.batch.FlowTrafficEstimation;
-import ch.ethz.idsc.amodtaxi.linkspeed.batch.LinkSpeedDataInterpolation;
-import ch.ethz.idsc.amodtaxi.linkspeed.batch.ProximityNeighborKernel;
-import ch.ethz.idsc.amodtaxi.linkspeed.batch.TrafficDelayEstimate;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
@@ -179,7 +175,7 @@ public class FlowTimeInvLinkSpeed implements TaxiLinkSpeedEstimator {
         // System.exit(1);
 
         /** Apply moving average filter to modify every link not solved in the previous step */
-        ProximityNeighborKernel filterKernel = new ProximityNeighborKernel(network, (Quantity) Quantity.of(2000, "m"));
+        ProximityNeighborKernel filterKernel = new ProximityNeighborKernel(network, Quantity.of(2000, "m"));
         LinkSpeedDataInterpolation interpolation = new LinkSpeedDataInterpolation(network, filterKernel, lsData, db);
     }
 

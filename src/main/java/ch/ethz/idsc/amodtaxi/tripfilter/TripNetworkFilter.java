@@ -2,7 +2,6 @@
 package ch.ethz.idsc.amodtaxi.tripfilter;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.matsim.api.core.v01.network.Network;
 
@@ -17,7 +16,6 @@ import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import ch.ethz.idsc.tensor.io.Export;
 import ch.ethz.idsc.tensor.red.Mean;
 
 /** This filter calculates the min-time-path in the network without traffic.

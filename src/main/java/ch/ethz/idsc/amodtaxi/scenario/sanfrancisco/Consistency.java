@@ -27,14 +27,14 @@ public enum Consistency {
 
         /** any step with RoboTaxiStauts==DWC must have a requeststatus driving */
         for (TaxiTrail taxiTrail : trails) {
-            for (@SuppressWarnings("unused") LocalDateTime time : taxiTrail.getTaxiStamps().keySet()) {
+            for (@SuppressWarnings("unused")
+            LocalDateTime time : taxiTrail.getTaxiStamps().keySet()) {
                 // TODO
                 // ---
             }
         }
     }
-    
-    
+
     public static void check(Population population) {
         /** leg departure times */
         for (Person person : population.getPersons().values()) {

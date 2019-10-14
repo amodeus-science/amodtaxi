@@ -14,7 +14,6 @@ public class ChicagoScenarioCreation {
         // TODO add some tests, e.g., running the scenario
         // CreateChicagoScenario.run(workingDir);
 
-
         StaticHelper.cleanUpTest(workingDir);
     }
 }
