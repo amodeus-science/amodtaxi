@@ -6,5 +6,5 @@ import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 public interface TaxiLinkSpeedEstimator {
 
     /** @return the {@link LinkSpeedDatacontainer} produced by the {@link TaxiLinkSpeedEstimator} */
-    public LinkSpeedDataContainer getLsData();
+    LinkSpeedDataContainer getLsData();
 }

@@ -3,20 +3,12 @@ package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 
 /* package */ enum ScenarioLabels {
     ;
-    // <<<<<<< HEAD
-    public static String avFile = "av.xml";
-    public static String config = "config_full.xml";
-    public static String pt2MatSettings = "pt2matsim_settings.xml";
-    public static String amodeusFile = "AmodeusOptions.properties";
-    public static String osmData = "map.osm";
-    public static String network = "network.xml";
-    // =======
-    // public static String avFile = "av.xml";
-    // public static String config = "config_full.xml";
+    public static final String avFile = "av.xml";
+    public static final String config = "config_full.xml";
+    public static final String pt2MatSettings = "pt2matsim_settings.xml";
     // public static String pt2MatSettings = "network_pt2matsim.xml";
-    // public static String amodeusFile = "AmodeusOptions.properties";
-    // public static String osmData = "map.osm";
-    // public static String network = "network.xml";
-    // >>>>>>> master
+    public static final String amodeusFile = "AmodeusOptions.properties";
+    public static final String osmData = "map.osm";
+    public static final String network = "network.xml";
 
 }

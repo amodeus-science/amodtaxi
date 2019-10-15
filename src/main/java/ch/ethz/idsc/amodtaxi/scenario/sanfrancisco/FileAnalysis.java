@@ -1,3 +1,4 @@
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 
 import java.io.File;
@@ -98,6 +99,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         return Objects.isNull(mapBounds) ? null : mapBounds.Get(3).number().doubleValue();
     }
 
+    // TODO AMODEUS V185 rename to getJourneyTimes
     public Tensor getjourneyTimes() {
         return journeyTimes;
     }
@@ -115,6 +117,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         return Tensors.of(emptyDistance, custrDistance, totalDistance);
     }
 
+    // TODO AMODEUS V185 rename to getPlotWaitingTimes
     public Tensor getplotWaitingTimes() {
         return plotWaitingTimes;
     }
@@ -139,6 +142,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         SaveUtils.saveFile(profile, "occProfile_" + fileName, workingDirectory);
     }
 
+    // TODO AMODEUS V185 return type Map<LocalDate, Tensor>
     public HashMap<LocalDate, Tensor> getDateSplitUp() {
         return dateSplitUp;
     }

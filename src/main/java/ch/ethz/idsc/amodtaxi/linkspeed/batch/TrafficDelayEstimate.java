@@ -10,6 +10,6 @@ public interface TrafficDelayEstimate {
      *         based on the @param deviation recorded in the data. The @param flowMatrix is a matrix of
      *         dimension nxm containing only 0 and 1. For every of the m recorded trips, it encodes
      *         on which of the n link/time segments the trip passes. */
-    public Tensor compute(Tensor flowMatrix, Tensor deviation);
+    Tensor compute(Tensor flowMatrix, Tensor deviation);
 
 }

@@ -32,7 +32,7 @@ import ch.ethz.idsc.tensor.Tensors;
 
     public static Set<String> get(FastLinkLookup fll) {
         Set<String> airportBoundaryLinks = new HashSet<>();
-        locations.flatten(0).forEach(location -> {
+        locations.stream().forEach(location -> {
             airportBoundaryLinks.add(fll.getLinkFromWGS84(TensorCoords.toCoord(location)).getId().toString());
         });
         return airportBoundaryLinks;
