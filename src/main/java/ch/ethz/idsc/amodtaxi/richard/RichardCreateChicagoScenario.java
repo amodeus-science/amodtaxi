@@ -90,6 +90,9 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
         new IterativeLinkSpeedEstimator(maxIter).compute(processingDir, network, db, trips);
 
+        
+        
+        
         FinishedScenario.copyToDir(workingDir.getAbsolutePath(), processingDir.getAbsolutePath(), //
                 destinDir.getAbsolutePath());
         cleanUp(workingDir);
