@@ -43,7 +43,7 @@
 			</parameterset>
 		</parameterset>
 		<parameterset type="scoring">
-			<param name="marginalUtilityOfFeederWaiting" value="-1.0" />
+			<param name="marginalUtilityOfWaiting" value="-1.0" />
 			<param name="stuckUtility" value="-1000.0" />
 			<param name="subpopulation" value="null" />
 		</parameterset>
