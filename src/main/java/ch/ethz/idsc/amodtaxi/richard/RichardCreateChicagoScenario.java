@@ -1,5 +1,5 @@
 /* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
-package ch.ethz.idsc.amodtaxi.scenario.chicago;
+package ch.ethz.idsc.amodtaxi.richard;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +33,11 @@ import ch.ethz.idsc.amodtaxi.readers.TaxiTripsReader;
 import ch.ethz.idsc.amodtaxi.scenario.FinishedScenario;
 import ch.ethz.idsc.amodtaxi.scenario.Scenario;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
+import ch.ethz.idsc.amodtaxi.scenario.chicago.ChicagoDataLoader;
+import ch.ethz.idsc.amodtaxi.scenario.chicago.ChicagoSetup;
+import ch.ethz.idsc.amodtaxi.scenario.chicago.InitialNetworkPreparer;
+import ch.ethz.idsc.amodtaxi.scenario.chicago.LocalDateConvert;
+import ch.ethz.idsc.amodtaxi.scenario.chicago.OnlineTripsReaderChicago;
 import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilter;
 import ch.ethz.idsc.amodtaxi.tripfilter.TripNetworkFilter;
 import ch.ethz.idsc.amodtaxi.tripmodif.CharRemovalModifier;
@@ -41,7 +46,7 @@ import ch.ethz.idsc.amodtaxi.tripmodif.TripBasedModifier;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
-/* package */ class CreateChicagoScenario {
+/* package */ class RichardCreateChicagoScenario {
 
     /** in @param args[0] working directory (empty directory), this main function will create
      * an AMoDeus scenario based on the Chicago taxi dataset available online.
@@ -51,7 +56,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
      * @throws Exception */
     public static void main(String[] args) throws Exception {
         File workingDir = new File(args[0]);
-        new CreateChicagoScenario(workingDir);
+        new RichardCreateChicagoScenario(workingDir);
     }
 
     // --
@@ -64,7 +69,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
     private MatsimAmodeusDatabase db = null;
     private final int maxIter = 500000;
 
-    private CreateChicagoScenario(File workingDir) throws Exception {
+    private RichardCreateChicagoScenario(File workingDir) throws Exception {
         this.workingDir = workingDir;
         ChicagoSetup.in(workingDir);
         processingDir = run();

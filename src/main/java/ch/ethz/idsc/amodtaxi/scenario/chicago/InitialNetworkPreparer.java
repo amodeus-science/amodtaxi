@@ -14,7 +14,7 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.network.LinkModes;
 import ch.ethz.idsc.amodtaxi.scenario.NetworkCutterUtils;
 
-/* package */ enum InitialNetworkPreparer {
+public enum InitialNetworkPreparer {
     ;
 
     public static Network run(File processingDir) {

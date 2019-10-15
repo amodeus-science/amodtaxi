@@ -13,7 +13,7 @@ import java.util.Properties;
 
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
-/* package */ enum ChicagoDataLoader {
+public enum ChicagoDataLoader {
     ;
 
     public static File from(File properties, File dir, int entryLimit) throws Exception {

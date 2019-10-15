@@ -4,7 +4,7 @@ package ch.ethz.idsc.amodtaxi.scenario.chicago;
 import java.text.ParseException;
 import java.time.LocalDate;
 
-/* package */ enum LocalDateConvert {
+public enum LocalDateConvert {
     ;
 
     public static LocalDate ofOptions(String dateString) throws ParseException {

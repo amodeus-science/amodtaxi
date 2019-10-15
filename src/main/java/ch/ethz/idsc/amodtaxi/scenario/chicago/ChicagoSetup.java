@@ -8,7 +8,7 @@ import ch.ethz.idsc.amodeus.util.io.Locate;
 import ch.ethz.idsc.amodtaxi.scenario.Pt2MatsimXML;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
 
-/* package */ enum ChicagoSetup {
+public enum ChicagoSetup {
     ;
 
     public static void in(File workingDir) throws Exception {
