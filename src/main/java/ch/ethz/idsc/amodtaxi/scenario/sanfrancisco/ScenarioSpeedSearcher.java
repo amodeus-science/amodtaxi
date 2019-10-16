@@ -2,7 +2,6 @@ package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 import org.matsim.api.core.v01.network.Link;

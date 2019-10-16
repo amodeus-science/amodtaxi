@@ -97,8 +97,8 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         /** download of open street map data to create scenario */
         System.out.println("Downloading open stret map data, this may take a while...");
         File osmFile = new File(workingDir, ScenarioLabels.osmData);
-        OsmLoader osm = new OsmLoader(new File(workingDir, ScenarioLabels.amodeusFile));
-        osm.saveIfNotAlreadyExists(osmFile);
+        OsmLoader osmLoader = OsmLoader.of(new File(workingDir, ScenarioLabels.amodeusFile));
+        osmLoader.saveIfNotAlreadyExists(osmFile);
         /** generate a network using pt2Matsim */
         if (!debug)
             Osm2MultimodalNetwork.run(workingDir.getAbsolutePath() + "/" + ScenarioLabels.pt2MatSettings);

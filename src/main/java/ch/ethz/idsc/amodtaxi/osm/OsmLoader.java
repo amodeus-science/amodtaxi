@@ -39,20 +39,6 @@ public class OsmLoader {
         checkBbox();
     }
 
-    // TODO AMODTAXI V185 remove and use static function "of" above
-    public OsmLoader(File propertiesFile) throws FileNotFoundException, IOException {
-        Properties props = new Properties();
-        props.load(new FileInputStream(propertiesFile));
-        GlobalAssert.that(propertiesFile.exists());
-        System.out.println(propertiesFile.getAbsolutePath());
-        Tensor boundBox = Tensors.fromString(props.getProperty("boundingBox"));
-        this.bbox = new double[] { boundBox.Get(0).number().doubleValue(), //
-                boundBox.Get(1).number().doubleValue(), //
-                boundBox.Get(2).number().doubleValue(), //
-                boundBox.Get(3).number().doubleValue() };
-        checkBbox();
-    }
-
     private void checkBbox() {
         GlobalAssert.that(bbox.length == 4);
         GlobalAssert.that(bbox[0] < bbox[2] && bbox[1] < bbox[3]);

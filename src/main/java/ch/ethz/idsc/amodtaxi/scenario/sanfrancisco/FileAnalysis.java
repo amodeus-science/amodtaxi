@@ -5,6 +5,7 @@ import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.SortedMap;
 
@@ -23,7 +24,7 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
-/* package */ class FileAnalysis {
+public class FileAnalysis {
     private final String fileName;
     private final SortedMap<LocalDateTime, TaxiStamp> sortedEntries;
     private boolean tracesInTimeFrame = false;
@@ -99,8 +100,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         return Objects.isNull(mapBounds) ? null : mapBounds.Get(3).number().doubleValue();
     }
 
-    // TODO AMODEUS V185 rename to getJourneyTimes
-    public Tensor getjourneyTimes() {
+    public Tensor getJourneyTimes() {
         return journeyTimes;
     }
 
@@ -117,8 +117,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         return Tensors.of(emptyDistance, custrDistance, totalDistance);
     }
 
-    // TODO AMODEUS V185 rename to getPlotWaitingTimes
-    public Tensor getplotWaitingTimes() {
+    public Tensor getPlotWaitingTimes() {
         return plotWaitingTimes;
     }
 
@@ -142,8 +141,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         SaveUtils.saveFile(profile, "occProfile_" + fileName, workingDirectory);
     }
 
-    // TODO AMODEUS V185 return type Map<LocalDate, Tensor>
-    public HashMap<LocalDate, Tensor> getDateSplitUp() {
+    public Map<LocalDate, Tensor> getDateSplitUp() {
         return dateSplitUp;
     }
 }

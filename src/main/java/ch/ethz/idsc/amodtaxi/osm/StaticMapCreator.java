@@ -18,8 +18,8 @@ public enum StaticMapCreator {
         File osmFile = new File(processingDir, osmData);
         File scenarioOptions = new File(processingDir, amodeusFile);
         Objects.requireNonNull(scenarioOptions);
-        OsmLoader osm = new OsmLoader(scenarioOptions);
-        osm.saveIfNotAlreadyExists(osmFile);
+        OsmLoader osmLoader = OsmLoader.of(scenarioOptions);
+        osmLoader.saveIfNotAlreadyExists(osmFile);
         /** generate a network using pt2Matsim */
         // TODO only recreate if not existing
         String pt2MatsimSettings = processingDir.getAbsolutePath() + "/" + pt2MatsimSettingsName;
