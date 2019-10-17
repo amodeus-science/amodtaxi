@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ch.ethz.idsc</groupId>
 	<artifactId>amodtaxi</artifactId>
-	<version>1.8.5</version>
+	<version>1.8.6</version>
 	<packaging>jar</packaging>
 
 	<properties>
@@ -19,7 +19,7 @@
 		<dependency>
 			<groupId>ch.ethz.idsc</groupId>
 			<artifactId>amodeus</artifactId>
-			<version>1.8.5</version>
+			<version>1.8.6</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -105,61 +105,22 @@
 					</execution>
 				</executions>
 			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.1.1</version>
-				<configuration>
-					<transformers>
-						<transformer
-							implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-							<mainClass>amod.demo.ScenarioStandalone</mainClass>
-							<manifestEntries>
-								<Main-Class>amod.demo.ScenarioStandalone</Main-Class>
-								<Specification-Title>Java Advanced Imaging Image I/O Tools</Specification-Title>
-								<Specification-Version>1.1</Specification-Version>
-								<Specification-Vendor>Sun Microsystems, Inc.</Specification-Vendor>
-								<Implementation-Title>com.sun.media.imageio</Implementation-Title>
-								<Implementation-Version>1.1</Implementation-Version>
-								<Implementation-Vendor>Sun Microsystems, Inc.</Implementation-Vendor>
-								<Extension-Name>com.sun.media.imageio</Extension-Name>
-							</manifestEntries>
-						</transformer>
-						<!-- This bit sets the main class for the executable jar as you otherwise -->
-						<!-- would with the assembly plugin -->
-						<transformer
-							implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-							<manifestEntries>
-								<Main-Class>amod.demo.ScenarioStandalone</Main-Class>
-							</manifestEntries>
-						</transformer>
-						<!-- This bit merges the various GeoTools META-INF/services files -->
-						<transformer
-							implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-					</transformers>
-					<!-- Exclude all signature files to avoid java.lang.SecurityException: 
-						Invalid signature file digest -->
-					<filters>
-						<filter>
-							<artifact>*:*</artifact>
-							<excludes>
-								<exclude>META-INF/*.SF</exclude>
-								<exclude>META-INF/*.DSA</exclude>
-								<exclude>META-INF/*.RSA</exclude>
-							</excludes>
-						</filter>
-					</filters>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-shade-plugin</artifactId> 
+				<version>3.1.1</version> <configuration> <transformers> <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer"> 
+				<mainClass>amod.demo.ScenarioStandalone</mainClass> <manifestEntries> <Main-Class>amod.demo.ScenarioStandalone</Main-Class> 
+				<Specification-Title>Java Advanced Imaging Image I/O Tools</Specification-Title> 
+				<Specification-Version>1.1</Specification-Version> <Specification-Vendor>Sun 
+				Microsystems, Inc.</Specification-Vendor> <Implementation-Title>com.sun.media.imageio</Implementation-Title> 
+				<Implementation-Version>1.1</Implementation-Version> <Implementation-Vendor>Sun 
+				Microsystems, Inc.</Implementation-Vendor> <Extension-Name>com.sun.media.imageio</Extension-Name> 
+				</manifestEntries> </transformer> <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer"> 
+				<manifestEntries> <Main-Class>amod.demo.ScenarioStandalone</Main-Class> </manifestEntries> 
+				</transformer> <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" 
+				/> </transformers> <filters> <filter> <artifact>*:*</artifact> <excludes> 
+				<exclude>META-INF/*.SF</exclude> <exclude>META-INF/*.DSA</exclude> <exclude>META-INF/*.RSA</exclude> 
+				</excludes> </filter> </filters> </configuration> <executions> <execution> 
+				<phase>package</phase> <goals> <goal>shade</goal> </goals> </execution> </executions> 
+				</plugin> -->
 		</plugins>
 	</build>
 </project>
