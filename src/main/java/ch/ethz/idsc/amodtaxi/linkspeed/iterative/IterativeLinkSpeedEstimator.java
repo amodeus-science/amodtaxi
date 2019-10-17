@@ -24,6 +24,7 @@ import ch.ethz.idsc.amodtaxi.linkspeed.TaxiLinkSpeedEstimator;
 import ch.ethz.idsc.amodtaxi.scenario.chicago.ChicagoGeoInformation;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
+import ch.ethz.idsc.tensor.io.HomeDirectory;
 
 public class IterativeLinkSpeedEstimator implements TaxiLinkSpeedEstimator {
 
@@ -82,8 +83,9 @@ public class IterativeLinkSpeedEstimator implements TaxiLinkSpeedEstimator {
 
     public static void main(String[] args) throws IOException {
         ChicagoGeoInformation.setup();
-        File processingDir = new File("/home/clruch/data/TaxiComparison_ChicagoScCr/Scenario");
-        File finalTripsFile = new File("/home/clruch/data/TaxiComparison_ChicagoScCr/Scenario/"//
+
+        File processingDir = HomeDirectory.file("data/TaxiComparison_ChicagoScCr/Scenario");
+        File finalTripsFile = HomeDirectory.file("data/TaxiComparison_ChicagoScCr/Scenario/"//
                 + "tripData/Taxi_Trips_2019_07_19_prepared_filtered_modified_final.csv");
 
         /** creating finding network and Matsimamodeusdatabase */

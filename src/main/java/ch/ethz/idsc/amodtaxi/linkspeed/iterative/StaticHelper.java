@@ -73,7 +73,6 @@ import ch.ethz.idsc.tensor.img.ColorDataIndexed;
                     xLabel, DiagramSettings.WIDTH, DiagramSettings.HEIGHT, colorDataIndexed, //
                     Tensors.vector(0, 20));
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
