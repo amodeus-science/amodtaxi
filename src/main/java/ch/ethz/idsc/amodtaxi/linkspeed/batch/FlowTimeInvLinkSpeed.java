@@ -176,7 +176,7 @@ public class FlowTimeInvLinkSpeed implements TaxiLinkSpeedEstimator {
 
         /** Apply moving average filter to modify every link not solved in the previous step */
         ProximityNeighborKernel filterKernel = new ProximityNeighborKernel(network, Quantity.of(2000, "m"));
-        LinkSpeedDataInterpolation interpolation = new LinkSpeedDataInterpolation(network, filterKernel, lsData, db);
+        new LinkSpeedDataInterpolation(network, filterKernel, lsData, db);
     }
 
     @Override

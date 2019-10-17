@@ -1,3 +1,4 @@
+/* amodtaxi - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.linkspeed.create;
 
 import java.io.File;
@@ -11,6 +12,7 @@ import org.gnu.glpk.glp_smcp;
 
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.io.HomeDirectory;
 
 /* package */ class SolveInitialDelete {
 
@@ -81,7 +83,7 @@ import ch.ethz.idsc.tensor.Tensors;
             System.out.println("The problem could not be solved");
         }
 
-        File file = new File("/home/clruch/Desktop/debugLP.lp");
+        File file = HomeDirectory.Desktop("debugLP.lp");
         GLPK.glp_write_lp(lp, null, file.getAbsolutePath());
 
     }

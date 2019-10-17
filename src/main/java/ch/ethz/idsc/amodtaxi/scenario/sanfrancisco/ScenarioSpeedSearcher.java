@@ -1,7 +1,6 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,6 +8,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
+import ch.ethz.idsc.tensor.io.HomeDirectory;
 
 public class ScenarioSpeedSearcher {
 
@@ -17,7 +17,7 @@ public class ScenarioSpeedSearcher {
         // File processingDir = new File("/home/clruch/data/TaxiComparison_SFScenario");
         // Network network = InitialNetworkPreparerSF.run(processingDir);
 
-        Network network = NetworkLoader.fromNetworkFile(new File("/home/clruch/data/TaxiComparison_SFScenario/network.xml"));
+        Network network = NetworkLoader.fromNetworkFile(HomeDirectory.file("data/TaxiComparison_SFScenario/network.xml"));
 
         Map<Double, Link> speeds = new HashMap<>();
 

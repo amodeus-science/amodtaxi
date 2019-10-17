@@ -25,8 +25,8 @@ import ch.ethz.idsc.tensor.Tensor;
     private final TreeMap<LocalDateTime, TaxiStamp> sortedStamps = new TreeMap<>();
     private HashSet<LocalDate> localDates = new HashSet<>();
     private final String fileName;
-    private LocalDateTime beginKey;
-    private LocalDateTime endKey;
+    // private LocalDateTime beginKey;
+    // private LocalDateTime endKey;
     private HashMap<LocalDate, Tensor> dateSplitUp = new HashMap<>();
     private final AmodeusTimeConvert timeConvert;
 
@@ -39,11 +39,10 @@ import ch.ethz.idsc.tensor.Tensor;
     private void read(File trailFile) throws Exception {
 
         /** read file */
-        // FileInputStream fis = new FileInputStream(trailFile);
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(new ReverseLineInputStream(trailFile)))) {
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new ReverseLineInputStream(trailFile)))) {
 
             String line = null;
-            while ((line = in.readLine()) != null) {
+            while ((line = bufferedReader.readLine()) != null) {
                 List<String> csvRow = CSVUtils.csvLineToList(line, " ");
                 TaxiStamp stamp = TaxiStampConvertedSF.INSTANCE.from(csvRow, timeConvert);
 
@@ -53,7 +52,6 @@ import ch.ethz.idsc.tensor.Tensor;
             }
 
         }
-        // fis.close();
     }
 
     public TreeMap<LocalDateTime, TaxiStamp> getAllEntries() {

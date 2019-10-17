@@ -23,6 +23,12 @@ import ch.ethz.idsc.tensor.Scalar;
  * @author clruch */
 public class LinkSpeedDataInterpolation {
 
+    // TODO JPH AMODTAXI 186 make constructor obsolete
+    public static void apply(Network network, NeighborKernel filterKernel, //
+            LinkSpeedDataContainer lsData, MatsimAmodeusDatabase db) {
+        new LinkSpeedDataInterpolation(network, filterKernel, lsData, db);
+    }
+
     private final NeighborKernel kernel;
     private final Network network;
     private final LinkSpeedDataContainer lsData;

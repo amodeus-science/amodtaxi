@@ -1,8 +1,6 @@
 /* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.tripfilter;
 
-import java.io.File;
-
 import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.amodeus.analysis.SaveUtils;
@@ -16,6 +14,7 @@ import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.io.HomeDirectory;
 
 /** This filter calculates the min-time-path in the network without traffic.
  * Then, only trips are kept which:
@@ -92,10 +91,10 @@ public class TripNetworkFilter extends AbstractConsciousFilter {
         System.out.println("Longer than min distance: " + numlongerThanMinDistance + " / " + numTested());
         System.out.println("Have real path:           " + numhasRealPath + " / " + numTested());
         try {
-            SaveUtils.saveFile(ratios, "ratios", new File("/home/clruch/data/TaxiComparison_SFScenario"));
-            UnitSaveUtils.saveFile(durations, "durations", new File("/home/clruch/data/TaxiComparison_SFScenario"));
+
+            SaveUtils.saveFile(ratios, "ratios", HomeDirectory.file("data/TaxiComparison_SFScenario"));
+            UnitSaveUtils.saveFile(durations, "durations", HomeDirectory.file("data/TaxiComparison_SFScenario"));
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

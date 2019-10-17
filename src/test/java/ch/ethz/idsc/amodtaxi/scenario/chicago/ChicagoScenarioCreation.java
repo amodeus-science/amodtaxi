@@ -1,4 +1,4 @@
-/* amod - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
+/* amodtaxi - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.scenario.chicago;
 
 import java.io.File;
