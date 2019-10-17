@@ -27,7 +27,7 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
     private final AmodeusTimeConvert timeConvert;
     private final MatsimAmodeusDatabase db;
     private final FastLinkLookup qt;
-    private final String taxiId;
+    // private final String taxiId;
     private Map<TaxiStamp, Collection<RequestContainer>> reqContainers = new HashMap<>();
 
     public RequestInserter(AmodeusTimeConvert timeConvert, MatsimAmodeusDatabase db, //
@@ -35,7 +35,8 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
         this.timeConvert = timeConvert;
         this.db = db;
         this.qt = qt;
-        this.taxiId = taxiId;
+        // TODO taxi id is not used
+        // this.taxiId = taxiId;
     }
 
     /** Function computes all required {@link RequestContainer}s from the inserted

@@ -30,7 +30,8 @@ public enum GLPKLinOptDelayCalculator implements TrafficDelayEstimate {
         List<Integer> dims = Dimensions.of(flowMatrix);
         int numRoads = dims.get(1);
         int numTrips = dims.get(0);
-        double pRoad = 1.0;
+        // TODO pRoad is not used
+        // double pRoad = 1.0;
         double pSlack = 10000.0;
         System.out.println("Dimensions: ");
         System.out.println("Roads: " + numRoads);

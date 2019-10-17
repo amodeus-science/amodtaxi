@@ -2,7 +2,6 @@
 package ch.ethz.idsc.amodtaxi.scenario.chicago;
 
 import java.io.File;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -155,7 +154,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         return processingdir;
     }
 
-    private static void cleanUp(File workingDir) throws IOException {
+    private static void cleanUp(File workingDir) {
         /** delete unneeded files */
         // DeleteDirectory.of(new File(workingDir, "Scenario"), 2, 14);
         // DeleteDirectory.of(new File(workingDir, ScenarioLabels.amodeusFile), 0, 1);
