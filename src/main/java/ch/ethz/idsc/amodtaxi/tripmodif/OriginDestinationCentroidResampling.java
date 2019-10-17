@@ -117,7 +117,7 @@ public class OriginDestinationCentroidResampling implements TripModifier {
     private static VirtualNetwork<Link> getCentroidVirtualNetwork(Network network, FastLinkLookup fll, //
             HashSet<Tensor> uniqueLocations) {
         Collection<Link> elements = (Collection<Link>) network.getLinks().values();
-        Map<Node, HashSet<Link>> uElements = NodeAdjacencyMap.of(network);
+        Map<Node, Set<Link>> uElements = NodeAdjacencyMap.of(network);
 
         /** generate the link centroids based on the unique locations */
         List<Link> centroids = new ArrayList<>();
