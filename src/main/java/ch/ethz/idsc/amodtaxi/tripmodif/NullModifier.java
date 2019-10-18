@@ -10,7 +10,6 @@ public enum NullModifier implements TaxiDataModifier {
 
     @Override
     public File modify(File taxiData) throws Exception {
-
         /** fast previous version, do again */
         File outFile = new File(taxiData.getAbsolutePath().replace(".csv", "_modified.csv"));
         FileUtils.copyFile(taxiData, outFile);
