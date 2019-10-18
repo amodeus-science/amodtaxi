@@ -16,6 +16,7 @@ import org.matsim.core.utils.collections.QuadTree;
 
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
+import ch.ethz.idsc.amodtaxi.scenario.FileAnalysis;
 
 /* package */ enum ScenarioDataHelper {
     ;

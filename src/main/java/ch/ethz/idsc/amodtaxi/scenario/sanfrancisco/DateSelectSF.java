@@ -7,7 +7,7 @@ import java.util.Collection;
 
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
-/* package */ enum DateSelect {
+/* package */ enum DateSelectSF {
     ;
 
     /** @return Collection of all {@link LocalDate} for wich data is recorded in the San Francisco taxi dataset,

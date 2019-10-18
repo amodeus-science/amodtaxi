@@ -6,7 +6,7 @@ import java.util.SortedMap;
 
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 
-/* package */ enum NumberOfRequests {
+public enum NumberOfRequests {
     ;
 
     /** @return number of requests found in @param sortedEntries, a request

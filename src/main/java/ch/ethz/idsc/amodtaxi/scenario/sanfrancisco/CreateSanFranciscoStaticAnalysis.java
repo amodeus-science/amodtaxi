@@ -12,7 +12,7 @@ import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.io.MultiFileReader;
 
-public class CreateSanFranciscoStaticAnalysis {
+/* package */ class CreateSanFranciscoStaticAnalysis {
 
     private static final int numTraceFiles = 536;// 536;
     private static final AmodeusTimeConvert timeConvert = new AmodeusTimeConvert(ZoneId.of("America/Los_Angeles"));

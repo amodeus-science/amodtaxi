@@ -1,5 +1,5 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
-package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
+package ch.ethz.idsc.amodtaxi.scenario;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -17,6 +17,8 @@ import org.matsim.core.utils.collections.QuadTree;
 import ch.ethz.idsc.amodeus.analysis.SaveUtils;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import ch.ethz.idsc.amodeus.util.math.SI;
+import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.NumberOfRequests;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
@@ -38,9 +40,9 @@ public class FileAnalysis {
     private Tensor mapBounds = null;
     private Tensor minMaxJourneyTime = null;
 
-    private Scalar custrDistance = Quantity.of(0, "m");
-    private Scalar totalDistance = Quantity.of(0, "m");
-    private Scalar emptyDistance = Quantity.of(0, "m");
+    private Scalar custrDistance = Quantity.of(0, SI.METER);
+    private Scalar totalDistance = Quantity.of(0, SI.METER);
+    private Scalar emptyDistance = Quantity.of(0, SI.METER);
 
     private Tensor plotWaitingTimes = null;
 
@@ -63,7 +65,7 @@ public class FileAnalysis {
                 custrDistance = dh.getCustrDistance();
                 totalDistance = dh.getTotlDistance();
                 emptyDistance = dh.getEmptyDistance();
-                plotWaitingTimes = PlotWaitingTimes.in(sortedEntries);
+                // plotWaitingTimes = PlotWaitingTimes.in(sortedEntries);
                 GlobalAssert.that(journeyTimes.length() == numRequests);
                 minMaxJourneyTime = JourneyTimeRange.in(journeyTimes);
             }
