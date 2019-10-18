@@ -12,7 +12,7 @@ import ch.ethz.idsc.amodtaxi.trace.CsvFleetReaderInterface;
 import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
 import ch.ethz.idsc.amodtaxi.util.CSVUtils;
 
-public class CsvFleetReaderSF implements CsvFleetReaderInterface {
+/* package */ class CsvFleetReaderSF implements CsvFleetReaderInterface {
 
     protected final DayTaxiRecord dayTaxiRecord;
 

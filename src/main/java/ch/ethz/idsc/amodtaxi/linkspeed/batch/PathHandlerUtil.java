@@ -12,6 +12,7 @@ import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.LocalDateTimes;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
@@ -29,7 +30,7 @@ public enum PathHandlerUtil {
         GlobalAssert.that(LocalDateTimes.lessEquals(simulationDate.atStartOfDay(), taxiTrip.pickupDate));
         GlobalAssert.that(LocalDateTimes.lessEquals(simulationDate.atStartOfDay(), taxiTrip.dropoffDate));
         GlobalAssert.that(LocalDateTimes.lessEquals(taxiTrip.pickupDate, taxiTrip.dropoffDate));
-        GlobalAssert.that(Scalars.lessEquals(Quantity.of(0, "s"), taxiTrip.duration));
+        GlobalAssert.that(Scalars.lessEquals(Quantity.of(0, SI.SECOND), taxiTrip.duration));
         Link pickupLink = fll.getLinkFromWGS84(TensorCoords.toCoord(taxiTrip.pickupLoc));
         Link dropOffLink = fll.getLinkFromWGS84(TensorCoords.toCoord(taxiTrip.dropoffLoc));
         Objects.requireNonNull(pickupLink);

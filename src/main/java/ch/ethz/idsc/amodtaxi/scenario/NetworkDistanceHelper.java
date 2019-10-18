@@ -1,5 +1,5 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
-package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
+package ch.ethz.idsc.amodtaxi.scenario;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -12,15 +12,16 @@ import org.matsim.core.utils.collections.QuadTree;
 
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.util.geo.ClosestLinkSelect;
+import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
 /* package */ class NetworkDistanceHelper {
 
-    private Scalar custrDistance = Quantity.of(0, "m");
-    private Scalar totalDistance = Quantity.of(0, "m");
-    private Scalar emptyDistance = Quantity.of(0, "m");
+    private Scalar custrDistance = Quantity.of(0, SI.METER);
+    private Scalar totalDistance = Quantity.of(0, SI.METER);
+    private Scalar emptyDistance = Quantity.of(0, SI.METER);
 
     public NetworkDistanceHelper(SortedMap<LocalDateTime, TaxiStamp> sortedEntries, //
             MatsimAmodeusDatabase db, LeastCostPathCalculator lcpc, QuadTree<Link> qt) {
@@ -45,8 +46,8 @@ import ch.ethz.idsc.tensor.qty.Quantity;
                 for (Link link : shortest.links)
                     distance += link.getLength();
 
-                totalDistance = totalDistance.add(Quantity.of(distance, "m"));
-                emptyDistance = emptyDistance.add(Quantity.of(distance, "m"));
+                totalDistance = totalDistance.add(Quantity.of(distance, SI.METER));
+                emptyDistance = emptyDistance.add(Quantity.of(distance, SI.METER));
 
                 linkStart = currLink;
             }
@@ -57,8 +58,8 @@ import ch.ethz.idsc.tensor.qty.Quantity;
                 for (Link link : shortest.links)
                     distance += link.getLength();
 
-                totalDistance = totalDistance.add(Quantity.of(distance, "m"));
-                custrDistance = custrDistance.add(Quantity.of(distance, "m"));
+                totalDistance = totalDistance.add(Quantity.of(distance, SI.METER));
+                custrDistance = custrDistance.add(Quantity.of(distance, SI.METER));
 
                 linkStart = currLink;
             }

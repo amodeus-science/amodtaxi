@@ -4,8 +4,6 @@ package ch.ethz.idsc.amodtaxi.trace;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.TaxiTrail;
-
 /** A {@link DayTaxiRecord} contains the {@link TaxiTrail} of all taxis in the dataset, first
  * fill with data using the insert function, then postprocess. Every trail is postprocessed independently.
  * 

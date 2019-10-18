@@ -7,6 +7,7 @@ import java.util.Collection;
 
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
+import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
 
 public class AllTaxiTrips {
 

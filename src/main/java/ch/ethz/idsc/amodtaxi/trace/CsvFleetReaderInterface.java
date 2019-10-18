@@ -3,6 +3,7 @@ package ch.ethz.idsc.amodtaxi.trace;
 
 import java.io.File;
 
+@FunctionalInterface
 public interface CsvFleetReaderInterface {
 
     /** @param file a csv file with taxi journey information

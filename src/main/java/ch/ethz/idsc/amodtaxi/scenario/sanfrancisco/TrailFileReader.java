@@ -9,7 +9,9 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.NavigableMap;
 import java.util.Objects;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -18,12 +20,13 @@ import ch.ethz.idsc.amodeus.util.LocalDateTimes;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 import ch.ethz.idsc.amodtaxi.util.CSVUtils;
+import ch.ethz.idsc.amodtaxi.util.ReverseLineInputStream;
 import ch.ethz.idsc.tensor.Tensor;
 
 /* package */ class TrailFileReader {
 
-    private final TreeMap<LocalDateTime, TaxiStamp> sortedStamps = new TreeMap<>();
-    private HashSet<LocalDate> localDates = new HashSet<>();
+    private final NavigableMap<LocalDateTime, TaxiStamp> sortedStamps = new TreeMap<>();
+    private Set<LocalDate> localDates = new HashSet<>();
     private final String fileName;
     // private LocalDateTime beginKey;
     // private LocalDateTime endKey;
@@ -54,7 +57,7 @@ import ch.ethz.idsc.tensor.Tensor;
         }
     }
 
-    public TreeMap<LocalDateTime, TaxiStamp> getAllEntries() {
+    public NavigableMap<LocalDateTime, TaxiStamp> getAllEntries() {
         return sortedStamps;
     }
 
@@ -135,7 +138,7 @@ import ch.ethz.idsc.tensor.Tensor;
         return current;
     }
 
-    public HashSet<LocalDate> getLocalDates() {
+    public Set<LocalDate> getLocalDates() {
         return localDates;
     }
 

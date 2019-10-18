@@ -12,8 +12,9 @@ import ch.ethz.idsc.amodeus.net.IdIntegerDatabase;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
+import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
 
-public class DayTaxiRecordSF implements DayTaxiRecord {
+/* package */ class DayTaxiRecordSF implements DayTaxiRecord {
 
     protected final List<TaxiTrail> trails = new ArrayList<>();
     private final IdIntegerDatabase vehicleIdIntegerDatabase = new IdIntegerDatabase();

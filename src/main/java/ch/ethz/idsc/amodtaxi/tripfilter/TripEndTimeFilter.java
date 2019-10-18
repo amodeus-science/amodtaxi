@@ -3,6 +3,7 @@ package ch.ethz.idsc.amodtaxi.tripfilter;
 
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.qty.Quantity;
@@ -11,7 +12,7 @@ public class TripEndTimeFilter extends AbstractConsciousFilter {
     private final Scalar maxEndTime;
 
     public TripEndTimeFilter(Scalar maxEndTime) {
-        GlobalAssert.that(Scalars.lessEquals(Quantity.of(0, "s"), maxEndTime));
+        GlobalAssert.that(Scalars.lessEquals(Quantity.of(0, SI.SECOND), maxEndTime));
         this.maxEndTime = maxEndTime;
     }
 
@@ -23,7 +24,7 @@ public class TripEndTimeFilter extends AbstractConsciousFilter {
                 t.pickupDate.getMinute() * 60.0 + t.pickupDate.getSecond();
 
         // end time
-        Scalar endTime = Quantity.of(secStart, "s").add(t.duration);
+        Scalar endTime = Quantity.of(secStart, SI.SECOND).add(t.duration);
 
         // trips which end after the maximum end time are rejected
         boolean afterEnd = Scalars.lessEquals(endTime, maxEndTime);

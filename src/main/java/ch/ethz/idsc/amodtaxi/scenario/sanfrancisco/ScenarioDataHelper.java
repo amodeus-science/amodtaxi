@@ -16,40 +16,41 @@ import org.matsim.core.utils.collections.QuadTree;
 
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
+import ch.ethz.idsc.amodtaxi.scenario.FileAnalysis;
 
+// TODO is this generic? if yes, move to super package
 /* package */ enum ScenarioDataHelper {
     ;
 
     /* package */ static Integer processLocalDate(LocalDate localDate, Collection<TrailFileReader> readers, //
-            File saveDirectory, MatsimAmodeusDatabase db, Network network, LeastCostPathCalculator lcpc, QuadTree<Link> qt, //
+            File saveDirectory, MatsimAmodeusDatabase db, Network network, //
+            LeastCostPathCalculator leastCostPathCalculator, QuadTree<Link> quadTree, //
             AmodeusTimeConvert timeConvert) throws Exception {
 
         Integer totalRquests = 0;
 
         /** prepare folder to save information */
-        File saveSubDir = null;
-        if (localDate.equals(LocalDate.MAX))
-            saveSubDir = new File(saveDirectory, (("AllFiles")));
-        else
-            saveSubDir = new File(saveDirectory, ((localDate.toString())));
+        File saveSubDir = localDate.equals(LocalDate.MAX) //
+                ? new File(saveDirectory, "AllFiles")
+                : new File(saveDirectory, localDate.toString());
         saveSubDir.mkdir();
 
         /** write the analyzed information */
-        try (BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(saveSubDir + "/info"))))) {
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(saveSubDir, "info"))))) {
 
             /** process all files for the localDate */
             Collection<FileAnalysis> filesAnalysis = new ArrayList<>();
             for (TrailFileReader reader : readers) {
                 System.out.println("Analyzing trail file " + reader.getFileName());
                 FileAnalysis fA = new FileAnalysis(reader.getEntriesFor(localDate), //
-                        db, network, lcpc, qt, reader.getFileName(), reader.getDateSplitUp());
+                        db, network, leastCostPathCalculator, quadTree, reader.getFileName(), reader.getDateSplitUp());
                 filesAnalysis.add(fA);
                 totalRquests += fA.getNumRequests();
             }
 
             /** saving aggregate information */
-            out.write("analzyed " + readers.size() + " files\n");
-            SaveInfo.of(filesAnalysis, out, saveSubDir, timeConvert);
+            bufferedWriter.write("analzyed " + readers.size() + " files\n");
+            SaveInfo.of(filesAnalysis, bufferedWriter, saveSubDir, timeConvert);
         }
         return totalRquests;
     }

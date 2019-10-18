@@ -1,5 +1,5 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
-package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
+package ch.ethz.idsc.amodtaxi.scenario;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -7,6 +7,7 @@ import java.util.SortedMap;
 
 import ch.ethz.idsc.amodeus.util.Duration;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
@@ -38,14 +39,14 @@ import ch.ethz.idsc.tensor.qty.Quantity;
                 Scalar journeyTime = !timePrev.equals(journeyStart) ? //
                         Duration.between(journeyStart, timePrev) : //
                         Duration.between(journeyStart, time);
-                GlobalAssert.that(Scalars.lessEquals(Quantity.of(0, "s"), journeyTime));
+                GlobalAssert.that(Scalars.lessEquals(Quantity.of(0, SI.SECOND), journeyTime));
                 journeyTimes.append(journeyTime);
                 journeyStart = null;
             }
             if (occ && time == sortedEntries.lastKey()) {/** recordings end */
                 GlobalAssert.that(Objects.nonNull(journeyStart));
                 Scalar journeyTime = Duration.between(journeyStart, time);
-                GlobalAssert.that(Scalars.lessEquals(Quantity.of(0, "s"), journeyTime));
+                GlobalAssert.that(Scalars.lessEquals(Quantity.of(0, SI.SECOND), journeyTime));
                 journeyTimes.append(journeyTime);
                 journeyStart = null;
             }
