@@ -5,6 +5,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 import ch.ethz.idsc.amodeus.taxitrip.ShortestDurationCalculator;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
+import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
@@ -24,8 +25,8 @@ public class DurationCompare {
 
     public DurationCompare(TaxiTrip trip, ShortestDurationCalculator calc) {
         path = calc.computePath(trip);
-        pathTime = Quantity.of(path.travelTime, "s");
-        pathDist = Quantity.of(path.links.stream().mapToDouble(l -> l.getLength()).sum(), "m");
+        pathTime = Quantity.of(path.travelTime, SI.SECOND);
+        pathDist = Quantity.of(path.links.stream().mapToDouble(l -> l.getLength()).sum(), SI.METER);
         duration = trip.duration;
         nwPathDurationRatio = pathTime.divide(duration);
     }

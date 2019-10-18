@@ -19,6 +19,7 @@ import ch.ethz.idsc.amodeus.util.io.CopyFiles;
 import ch.ethz.idsc.amodeus.util.io.Locate;
 import ch.ethz.idsc.amodeus.util.io.MultiFileReader;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
+import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodtaxi.osm.StaticMapCreator;
 import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
 import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilter;
@@ -32,7 +33,7 @@ public class CreateSanFranciscoScenario {
     private static final int numTraceFiles = 536;// maximum taxis are: 536;
     private static final AmodeusTimeConvert timeConvert = new AmodeusTimeConvert(ZoneId.of("America/Los_Angeles"));
     private static final ReferenceFrame referenceFrame = SanFranciscoReferenceFrames.SANFRANCISCO;
-    private static final Scalar timeStep = Quantity.of(10, "s");
+    private static final Scalar timeStep = Quantity.of(10, SI.SECOND);
 
     public static void main(String[] args) throws Exception {
         File dataDir = new File(args[0]);

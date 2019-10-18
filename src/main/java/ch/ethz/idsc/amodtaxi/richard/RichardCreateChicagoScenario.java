@@ -25,6 +25,7 @@ import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.io.CopyFiles;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodtaxi.fleetconvert.ChicagoOnlineTripFleetConverter;
 import ch.ethz.idsc.amodtaxi.linkspeed.iterative.IterativeLinkSpeedEstimator;
 import ch.ethz.idsc.amodtaxi.osm.OsmLoader;
@@ -147,7 +148,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         TaxiTripFilter finalTripFilter = new TaxiTripFilter();
         /** trips which are faster than the network freeflow speeds would allow are removed */
         finalTripFilter.addFilter(new TripNetworkFilter(network, db, //
-                Quantity.of(5.5, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m"), true));
+                Quantity.of(5.5, "m*s^-1"), Quantity.of(3600, SI.SECOND), Quantity.of(200, SI.METER), true));
 
         // TODO eventually remove, this did not improve the fit.
         // finalFilters.addFilter(new TripMaxSpeedFilter(network, db, ScenarioConstants.maxAllowedSpeed));

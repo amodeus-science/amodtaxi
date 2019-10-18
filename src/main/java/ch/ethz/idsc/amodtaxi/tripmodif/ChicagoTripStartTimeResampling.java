@@ -7,6 +7,7 @@ import java.util.Random;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.LocalDateTimes;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
@@ -60,11 +61,11 @@ public class ChicagoTripStartTimeResampling implements TripModifier {
      *         the maximum possible shift in seconds such that the trip still ends in the
      *         same interval than originally */
     private static Scalar maxShift(Scalar duration) {
-        GlobalAssert.that(Scalars.lessEquals(Quantity.of(0, "s"), duration));
+        GlobalAssert.that(Scalars.lessEquals(Quantity.of(0, SI.SECOND), duration));
         int durationSec = duration.number().intValue();
         int excess = durationSec - (durationSec / 900) * 900;
         int maxShift = 900 - excess;
-        return Quantity.of(maxShift, "s");
+        return Quantity.of(maxShift, SI.SECOND);
     }
 
     @Override

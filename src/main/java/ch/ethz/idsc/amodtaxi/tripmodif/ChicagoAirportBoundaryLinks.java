@@ -1,8 +1,10 @@
 /* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.tripmodif;
 
-import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.matsim.api.core.v01.network.Link;
 
 import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import ch.ethz.idsc.amodeus.net.TensorCoords;
@@ -16,25 +18,30 @@ import ch.ethz.idsc.tensor.Tensors;
 /* package */ enum ChicagoAirportBoundaryLinks {
     ;
 
-    private static final Tensor locations = Tensors.fromString("{" //
+    private static final Tensor LOCATIONS = Tensors.fromString("{" //
             // O'Hare International Airport
-            + "{-87.9077,42.0089}," //
-            + "{-87.89924,41.9793}," //
-            + "{-87.9125,41.9635}," //
-            + "{-87.9381,41.9822}," //
+            + "{-87.9077 ,42.0089 }," //
+            + "{-87.89924,41.9793 }," //
+            + "{-87.9125 ,41.9635 }," //
+            + "{-87.9381 ,41.9822 }," //
             // Midway International Airport
             + "{-87.75324,41.79337}," //
-            + "{-87.7415,41.7857}," //
-            + "{-87.7524,41.7783}," //
-            + "{-87.74704,41.79306 }," //
-            + "{-87.762,41.7872}" //
-            + "}");
+            + "{-87.7415 ,41.7857 }," //
+            + "{-87.7524 ,41.7783 }," //
+            + "{-87.74704,41.79306}," //
+            + "{-87.762  ,41.7872 }" //
+            + "}").unmodifiable();
 
-    public static Set<String> get(FastLinkLookup fll) {
-        Set<String> airportBoundaryLinks = new HashSet<>();
-        locations.stream().forEach(location -> {
-            airportBoundaryLinks.add(fll.getLinkFromWGS84(TensorCoords.toCoord(location)).getId().toString());
-        });
-        return airportBoundaryLinks;
+    public static Set<String> get(FastLinkLookup fastLinkLookup) {
+        return LOCATIONS.stream() //
+                .map(TensorCoords::toCoord) //
+                .map(fastLinkLookup::getLinkFromWGS84) //
+                .map(Link::getId) //
+                .map(Object::toString) //
+                .collect(Collectors.toSet());
+    }
+
+    /* package */ static Tensor locations() {
+        return LOCATIONS;
     }
 }

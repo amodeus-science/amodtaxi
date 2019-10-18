@@ -12,6 +12,7 @@ import java.util.Objects;
 import ch.ethz.idsc.amodeus.analysis.UnitSaveUtils;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
@@ -136,7 +137,7 @@ import ch.ethz.idsc.tensor.sca.N;
         out.write("max journey time: " + fileAnalysis.getMaxJourneyTime() + "\n");
 
         if (Objects.nonNull(fileAnalysis.getJourneyTimes()) && fileAnalysis.getJourneyTimes().length() > 0//
-                && Scalars.lessThan(Quantity.of(0, "s"), (Scalar) Total.of(fileAnalysis.getJourneyTimes()))) {
+                && Scalars.lessThan(Quantity.of(0, SI.SECOND), (Scalar) Total.of(fileAnalysis.getJourneyTimes()))) {
             out.write("mean journey time: " + N.DOUBLE.of(Mean.of(fileAnalysis.getJourneyTimes())) + "\n");
         } else {
             out.write("mean journey time: undefined" + "\n");
