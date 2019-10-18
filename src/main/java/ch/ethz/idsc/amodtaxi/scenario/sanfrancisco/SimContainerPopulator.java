@@ -18,16 +18,17 @@ import ch.ethz.idsc.amodeus.net.VehicleContainer;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
+import ch.ethz.idsc.tensor.io.Serialization;
 
 public class SimContainerPopulator {
 
     private final MatsimAmodeusDatabase db;
-    private final QuadTree<Link> qt;
+    private final QuadTree<Link> quadTree;
     private final AmodeusTimeConvert timeConvert;
 
-    public SimContainerPopulator(MatsimAmodeusDatabase db, QuadTree<Link> qt, AmodeusTimeConvert timeConvert) {
+    public SimContainerPopulator(MatsimAmodeusDatabase db, QuadTree<Link> quadTree, AmodeusTimeConvert timeConvert) {
         this.db = db;
-        this.qt = qt;
+        this.quadTree = quadTree;
         this.timeConvert = timeConvert;
     }
 
@@ -41,7 +42,7 @@ public class SimContainerPopulator {
 
         Coord position = db.referenceFrame.coords_fromWGS84().transform(taxiStamp.gps);
         GlobalAssert.that(Objects.nonNull(position));
-        Link center = qt.getClosest(position.getX(), position.getY());
+        Link center = quadTree.getClosest(position.getX(), position.getY());
         GlobalAssert.that(Objects.nonNull(center));
         int linkIndex = db.getLinkIndex(center);
 
@@ -63,7 +64,13 @@ public class SimContainerPopulator {
 
                     // LocalDateTimes.lessEquals(firstValidSubmissionTime, rc.submissionTime)) {
                     Integer globalIndex = globalReqIndex.add(vehicleIndex, rc.requestIndex);
-                    RequestContainer copy = RCDeepCopy.deepCopy(rc);
+
+                    RequestContainer copy;
+                    try {
+                        copy = Serialization.copy(rc);
+                    } catch (Exception e) {
+                        throw new RuntimeException();
+                    }
                     // System.out.println("copy submission time: " + copy.submissionTime);
                     // copy.submissionTime = timeConvert.toAmodeus((int) copy.submissionTime, localDate);
                     copy.requestIndex = globalIndex;

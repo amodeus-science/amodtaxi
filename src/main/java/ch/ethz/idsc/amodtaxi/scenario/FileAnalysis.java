@@ -4,7 +4,6 @@ package ch.ethz.idsc.amodtaxi.scenario;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.SortedMap;
@@ -30,7 +29,7 @@ public class FileAnalysis {
     private final String fileName;
     private final SortedMap<LocalDateTime, TaxiStamp> sortedEntries;
     private boolean tracesInTimeFrame = false;
-    private HashMap<LocalDate, Tensor> dateSplitUp = new HashMap<>();
+    private final Map<LocalDate, Tensor> dateSplitUp;
 
     /** analysis results */
     private int numRequests;
@@ -47,8 +46,8 @@ public class FileAnalysis {
     private Tensor plotWaitingTimes = null;
 
     public FileAnalysis(SortedMap<LocalDateTime, TaxiStamp> sortedEntries, MatsimAmodeusDatabase db, //
-            Network network, LeastCostPathCalculator lcpc, QuadTree<Link> qt, String fileName, //
-            HashMap<LocalDate, Tensor> dateSplitUp) throws Exception {
+            Network network, LeastCostPathCalculator leastCostPathCalculator, QuadTree<Link> quadTree, String fileName, //
+            Map<LocalDate, Tensor> dateSplitUp) throws Exception {
         this.fileName = fileName;
         this.dateSplitUp = dateSplitUp;
         this.sortedEntries = sortedEntries;
@@ -61,11 +60,11 @@ public class FileAnalysis {
                 this.maxTime = sortedEntries.lastKey();
                 mapBounds = LongLatRange.in(sortedEntries);
                 journeyTimes = JourneyTimes.in(sortedEntries);
-                NetworkDistanceHelper dh = new NetworkDistanceHelper(sortedEntries, db, lcpc, qt);
+                NetworkDistanceHelper dh = new NetworkDistanceHelper(sortedEntries, db, leastCostPathCalculator, quadTree);
                 custrDistance = dh.getCustrDistance();
                 totalDistance = dh.getTotlDistance();
                 emptyDistance = dh.getEmptyDistance();
-                // plotWaitingTimes = PlotWaitingTimes.in(sortedEntries);
+                plotWaitingTimes = Tensors.empty(); // PlotWaitingTimes.in(sortedEntries);
                 GlobalAssert.that(journeyTimes.length() == numRequests);
                 minMaxJourneyTime = JourneyTimeRange.in(journeyTimes);
             }

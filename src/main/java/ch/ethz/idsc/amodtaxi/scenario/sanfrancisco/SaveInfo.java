@@ -36,9 +36,9 @@ import ch.ethz.idsc.tensor.sca.N;
         }
 
         /** distances */
-        Scalar custrDistance = Quantity.of(0, "m");
-        Scalar totalDistance = Quantity.of(0, "m");
-        Scalar emptyDistance = Quantity.of(0, "m");
+        Scalar custrDistance = Quantity.of(0, SI.METER);
+        Scalar totalDistance = Quantity.of(0, SI.METER);
+        Scalar emptyDistance = Quantity.of(0, SI.METER);
         for (FileAnalysis fileAnalysis : filesAnalysis) {
             emptyDistance = emptyDistance.add(fileAnalysis.distances().Get(0));
             custrDistance = custrDistance.add(fileAnalysis.distances().Get(1));

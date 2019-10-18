@@ -26,15 +26,15 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 
     private final AmodeusTimeConvert timeConvert;
     private final MatsimAmodeusDatabase db;
-    private final FastLinkLookup qt;
+    private final FastLinkLookup fastLinkLookup;
     // private final String taxiId;
     private Map<TaxiStamp, Collection<RequestContainer>> reqContainers = new HashMap<>();
 
     public RequestInserter(AmodeusTimeConvert timeConvert, MatsimAmodeusDatabase db, //
-            FastLinkLookup qt, String taxiId) {
+            FastLinkLookup fastLinkLookup, String taxiId) {
         this.timeConvert = timeConvert;
         this.db = db;
-        this.qt = qt;
+        this.fastLinkLookup = fastLinkLookup;
         // TODO taxi id is not used
         // this.taxiId = taxiId;
     }
@@ -44,7 +44,8 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
      * if its arrival is on the next day!
      * 
      * @throws Exception */
-    public void insert(NavigableMap<LocalDateTime, TaxiStamp> timeTaxiStamps, //
+    public void insert( //
+            NavigableMap<LocalDateTime, TaxiStamp> timeTaxiStamps, //
             Collection<TaxiTrip> taxiTrips) throws Exception {
         // Collection<TaxiTrip> taxiTrips = TaxiTripFinder.in(timeTaxiStamps, taxiId);
         System.err.println("found " + taxiTrips.size() + " taxi trips.");
@@ -69,14 +70,14 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 
             /** from link */
             Coord position = db.referenceFrame.coords_fromWGS84().transform(timeTaxiStamps.get(taxiTrip.pickupDate).gps);
-            int fromLinkIndex = qt.getLinkIndexFromXY(position);
+            int fromLinkIndex = fastLinkLookup.getLinkIndexFromXY(position);
 
             /** to link */
             LocalDateTime lastDriveTimeSTep = timeTaxiStamps.lowerKey(taxiTrip.dropoffDate);
             Coord positionEnd = db.referenceFrame.coords_fromWGS84().transform(timeTaxiStamps.get(lastDriveTimeSTep).gps);
-            int toLinkIndex = qt.getLinkIndexFromXY(positionEnd);
+            int toLinkIndex = fastLinkLookup.getLinkIndexFromXY(positionEnd);
 
-            RequestContainerFactory rcf = new RequestContainerFactory(//
+            RequestContainerFactory requestContainerFactory = new RequestContainerFactory(//
                     taxiTrip.localId, fromLinkIndex, toLinkIndex, //
                     submissionTime, timeConvert);
 
@@ -88,7 +89,7 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
             statii.add(RequestStatus.PICKUP);
             for (RequestStatus status : statii) {
                 if (Objects.nonNull(reqTimes.get(status))) {
-                    RequestContainer container = rcf.create(status, submissionDay);
+                    RequestContainer container = requestContainerFactory.create(status, submissionDay);
                     addContainer(timeTaxiStamps.get(reqTimes.get(status)), container);
                 }
             }
@@ -96,13 +97,13 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
             /** add request containers while driving */
             LocalDateTime time = taxiTrip.pickupDate;
             do {
-                RequestContainer container = rcf.create(RequestStatus.DRIVING, submissionDay);
+                RequestContainer container = requestContainerFactory.create(RequestStatus.DRIVING, submissionDay);
                 addContainer(timeTaxiStamps.get(time), container);
                 time = timeTaxiStamps.higherKey(time);
             } while (Objects.nonNull(time) && LocalDateTimes.lessEquals(time, taxiTrip.dropoffDate));
 
             /** add request containers after driving */
-            RequestContainer container = rcf.create(RequestStatus.DROPOFF, submissionDay);
+            RequestContainer container = requestContainerFactory.create(RequestStatus.DROPOFF, submissionDay);
             addContainer(timeTaxiStamps.get(taxiTrip.dropoffDate), container);
         }
 
