@@ -19,7 +19,8 @@ import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.geo.ClosestLinkSelect;
 import ch.ethz.idsc.amodeus.util.io.GZHandler;
 
-public class AdamAndEve {
+public enum AdamAndEve {
+    ;
 
     public static void create(File workingDirectory, Collection<TaxiTrip> trips, Network network, //
             MatsimAmodeusDatabase db, //
