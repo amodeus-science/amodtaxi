@@ -16,7 +16,7 @@ public enum ChicagoSetup {
         /** copy relevant files containing settings for scenario generation */
         File resourcesDir = new File(Locate.repoFolder(CreateChicagoScenario.class, "amodtaxi"), "resources/chicagoScenario");
         CopyFiles.now(resourcesDir.getAbsolutePath(), workingDir.getAbsolutePath(), //
-                Arrays.asList(new String[] { ScenarioLabels.avFile, ScenarioLabels.config, //
+                Arrays.asList(new String[] { ScenarioLabels.config, //
                         ScenarioLabels.pt2MatSettings, ScenarioLabels.LPFile }),
                 true);
         /** AmodeusOptions.properties is not replaced as it might be changed by user during

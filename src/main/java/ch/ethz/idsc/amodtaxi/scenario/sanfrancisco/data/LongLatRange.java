@@ -1,4 +1,4 @@
-package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
+package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.data;
 
 import java.util.SortedMap;
 import java.util.TreeSet;

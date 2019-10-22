@@ -1,13 +1,19 @@
 package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.NoSuchElementException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Objects;
-import java.util.TreeSet;
-import java.util.function.Function;
 
+import ch.ethz.idsc.amodeus.dispatcher.core.RequestStatus;
+import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxiStatus;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
 /* package */ enum StaticHelper {
@@ -29,32 +35,58 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         return outputDirectory;
     }
 
-    public static <T> T getMinVal(Collection<FileAnalysis> col, Function<FileAnalysis, T> eval) {
-        try {
-            return sortedVals(col, eval).first();
-        } catch (NoSuchElementException ex) {
-            return null;
-        }
-    }
 
-    public static <T> T getMaxVal(Collection<FileAnalysis> col, Function<FileAnalysis, T> eval) {
-        try {
-            return sortedVals(col, eval).last();
-        } catch (NoSuchElementException ex) {
-            return null;
-        }
-    }
+    public static int getDropOffTime(int timeDriveStart, NavigableMap<Integer, TaxiStamp> sortedMap) {
+        GlobalAssert.that(sortedMap.get(timeDriveStart).roboTaxiStatus.equals(RoboTaxiStatus.DRIVEWITHCUSTOMER));
+        boolean endJourney = false;
+        int dropOffTime = sortedMap.lastKey(); // default value
+        int time = sortedMap.higherKey(timeDriveStart);
+        while (!endJourney && time < sortedMap.lastKey()) {
 
-    private static <T> TreeSet<T> sortedVals(Collection<FileAnalysis> col, Function<FileAnalysis, T> eval) {
-        GlobalAssert.that(col.size() > 0);
-        TreeSet<T> vals = new TreeSet<>();
-        for (FileAnalysis fA : col) {
-            T t = eval.apply(fA);
-            if (Objects.nonNull(t)) {
-                vals.add(t);
+            /** check if journey ends */
+            if (!sortedMap.get(time).roboTaxiStatus.equals(RoboTaxiStatus.DRIVEWITHCUSTOMER)) {
+                dropOffTime = time;
+                break;
             }
+            time = sortedMap.higherKey(time);
         }
-        return vals;
+        return dropOffTime;
     }
 
+    /** returns a Map<RequestStatus, Integer> for as many time steps as available
+     * assuming that every RequestStatus takes just one time step, example: two
+     * time steps in sortedMap before timeDriveStart (=t0) yields:
+     * <REQUESTED,null>, <ASSIGNED,null>, <PICKUPDRIVE, t0-2> , <PICKUP,t0-1> */
+    public static Map<RequestStatus, LocalDateTime> getRequestTimes(//
+            LocalDateTime timeDriveStart, NavigableMap<LocalDateTime, TaxiStamp> sortedMap) {
+
+        Map<RequestStatus, LocalDateTime> map = new LinkedHashMap<>();
+        map.put(RequestStatus.REQUESTED, null);
+        map.put(RequestStatus.ASSIGNED, null);
+        map.put(RequestStatus.PICKUPDRIVE, null);
+        map.put(RequestStatus.PICKUP, null);
+
+        LocalDateTime time = timeDriveStart;
+        List<LocalDateTime> times = new ArrayList<>();
+        int iter = 0;
+        while (Objects.nonNull(sortedMap.lowerKey(time)) && iter < 4) {
+            times.add(sortedMap.lowerKey(time));
+            time = sortedMap.lowerKey(time);
+            ++iter;
+        }
+
+        List<RequestStatus> reverseOrderedKeys = new ArrayList<>(map.keySet());
+        Collections.reverse(reverseOrderedKeys);
+        int i = 0;
+        for (RequestStatus rqs : reverseOrderedKeys) {
+            if (i < times.size()) {
+                map.put(rqs, times.get(i));
+            }
+            ++i;
+        }
+        map.put(RequestStatus.DRIVING, timeDriveStart);
+        return map;
+    }
+
+    
 }

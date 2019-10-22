@@ -40,7 +40,7 @@ import ch.ethz.idsc.amodtaxi.scenario.chicago.LocalDateConvert;
 import ch.ethz.idsc.amodtaxi.scenario.chicago.OnlineTripsReaderChicago;
 import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilter;
 import ch.ethz.idsc.amodtaxi.tripfilter.TripNetworkFilter;
-import ch.ethz.idsc.amodtaxi.tripmodif.CharRemovalModifier;
+import ch.ethz.idsc.amodtaxi.tripmodif.ChicagoFormatModifier;
 import ch.ethz.idsc.amodtaxi.tripmodif.ChicagoOnlineTripBasedModifier;
 import ch.ethz.idsc.amodtaxi.tripmodif.TripBasedModifier;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
@@ -153,8 +153,8 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         // TODO eventually remove, this did not improve the fit.
         // finalFilters.addFilter(new TripMaxSpeedFilter(network, db, ScenarioConstants.maxAllowedSpeed));
         ChicagoOnlineTripFleetConverter converter = //
-                new ChicagoOnlineTripFleetConverter(scenarioOptions, network, primaryFilter, tripModifier, //
-                        new CharRemovalModifier("\""), finalTripFilter, tripsReader);
+                new ChicagoOnlineTripFleetConverter(scenarioOptions, network,  tripModifier, //
+                        new ChicagoFormatModifier(), finalTripFilter, tripsReader);
         finalTripsFile = Scenario.create(workingDir, tripFile, //
                 converter, workingDir, processingdir, simulationDate, timeConvert);
         return processingdir;

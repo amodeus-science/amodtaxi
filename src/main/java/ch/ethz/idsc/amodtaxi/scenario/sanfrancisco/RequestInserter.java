@@ -50,7 +50,7 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
         for (TaxiTrip taxiTrip : taxiTrips) {
 
             Map<RequestStatus, LocalDateTime> reqTimes = //
-                    StaticHelper1.getRequestTimes(taxiTrip.pickupDate, timeTaxiStamps);
+                    StaticHelper.getRequestTimes(taxiTrip.pickupDate, timeTaxiStamps);
 
             /** basic setup of RequestContainer */
             LocalDateTime submissionTime = reqTimes.get(RequestStatus.REQUESTED);

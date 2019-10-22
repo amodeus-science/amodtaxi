@@ -81,12 +81,12 @@ public class CreateSanFranciscoScenario {
                 TaxiTripFilter speedEstimationTripFilter = new TaxiTripFilter();
                 /** trips which are faster than the network freeflow speeds would allow are removed */
                 speedEstimationTripFilter.addFilter(new TripNetworkFilter(network, db, //
-                        Quantity.of(5.5, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m"), true));
+                        Quantity.of(2.235200008, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m"), true));
 
                 TaxiTripFilter finalPopulationTripFilter = new TaxiTripFilter();
                 /** trips which are faster than the network freeflow speeds would allow are removed */
                 finalPopulationTripFilter.addFilter(new TripNetworkFilter(network, db, //
-                        Quantity.of(2.5, "m*s^-1"), Quantity.of(7200, "s"), Quantity.of(200, "m"), false));
+                        Quantity.of(2.235200008, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m"), false));
 
                 StandaloneFleetConverterSF sfc = new StandaloneFleetConverterSF(processingDir, //
                         dayTaxiRecord, db, network, timeStep, timeConvert, speedEstimationTripFilter, //

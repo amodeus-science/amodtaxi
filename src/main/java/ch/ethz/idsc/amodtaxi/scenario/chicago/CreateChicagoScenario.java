@@ -35,7 +35,7 @@ import ch.ethz.idsc.amodtaxi.scenario.Scenario;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
 import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilter;
 import ch.ethz.idsc.amodtaxi.tripfilter.TripNetworkFilter;
-import ch.ethz.idsc.amodtaxi.tripmodif.CharRemovalModifier;
+import ch.ethz.idsc.amodtaxi.tripmodif.ChicagoFormatModifier;
 import ch.ethz.idsc.amodtaxi.tripmodif.ChicagoOnlineTripBasedModifier;
 import ch.ethz.idsc.amodtaxi.tripmodif.TripBasedModifier;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
@@ -62,7 +62,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
     private File finalTripsFile;
     private Network network = null;
     private MatsimAmodeusDatabase db = null;
-    private final int maxIter = 500000;
+    private final int maxIter = 100000;
 
     private CreateChicagoScenario(File workingDir) throws Exception {
         this.workingDir = workingDir;
@@ -137,7 +137,6 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
         /** prepare for creation of scenario */
         TaxiTripsReader tripsReader = new OnlineTripsReaderChicago();
-        TaxiTripFilter primaryFilter = new TaxiTripFilter();
         TripBasedModifier tripModifier = new ChicagoOnlineTripBasedModifier(random, network, //
                 fll, new File(processingdir, "virtualNetworkChicago"));
         TaxiTripFilter finalTripFilter = new TaxiTripFilter();
@@ -145,11 +144,13 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         finalTripFilter.addFilter(new TripNetworkFilter(network, db, //
                 Quantity.of(5.5, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m"), true));
 
+
+        
         // TODO eventually remove, this did not improve the fit.
         // finalFilters.addFilter(new TripMaxSpeedFilter(network, db, ScenarioConstants.maxAllowedSpeed));
         ChicagoOnlineTripFleetConverter converter = //
-                new ChicagoOnlineTripFleetConverter(scenarioOptions, network, primaryFilter, tripModifier, //
-                        new CharRemovalModifier("\""), finalTripFilter, tripsReader);
+                new ChicagoOnlineTripFleetConverter(scenarioOptions, network,  tripModifier, //
+                        new ChicagoFormatModifier(), finalTripFilter, tripsReader);
         finalTripsFile = Scenario.create(workingDir, tripFile, //
                 converter, workingDir, processingdir, simulationDate, timeConvert);
         return processingdir;

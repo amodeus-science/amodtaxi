@@ -8,11 +8,12 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class CharRemovalModifier implements TaxiDataModifier {
-    private final String string;
+public class ChicagoFormatModifier implements TaxiDataModifier {
+    private final String removeMe = "\"";
+    private final String taxiCompanyNameOld = "Taxicab Insurance Agency, LLC";
+    private final String taxiCompanyNameNew = "Taxicab Insurance Agency LLC";
 
-    public CharRemovalModifier(String string) {
-        this.string = string;
+    public ChicagoFormatModifier() {
     }
 
     @Override
@@ -23,7 +24,9 @@ public class CharRemovalModifier implements TaxiDataModifier {
             System.out.println("INFO start data correction");
             bufferedReader.lines().forEachOrdered(line -> {
                 try {
-                    bufferedWriter.write(line.replace(string, ""));
+                    String lineNew = line.replace(removeMe, "");
+                    lineNew = lineNew.replace(taxiCompanyNameOld, taxiCompanyNameNew);
+                    bufferedWriter.write(lineNew);
                     bufferedWriter.newLine();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -36,7 +39,4 @@ public class CharRemovalModifier implements TaxiDataModifier {
         return outFile;
     }
 
-    public static void main(String[] args) {
-        System.out.println("\"");
-    }
 }

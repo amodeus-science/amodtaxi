@@ -38,9 +38,9 @@ public abstract class TaxiTripsReader {
     public Stream<TaxiTrip> getTripStream(File file) throws IOException {
         final AtomicInteger tripIds = new AtomicInteger(0);
         List<TaxiTrip> list = new LinkedList<>();
+        System.out.println("TaxiTripsReader, reading file: " + file.getAbsolutePath());
         CsvReader reader = new CsvReader(file, delim);
-        // TODO currently the headers in the "unreadable file" are in the wrong order
-        unreadable.add(reader.headers().stream().collect(Collectors.joining(",")));
+        unreadable.add(reader.sortedHeaders().stream().collect(Collectors.joining(",")));
         reader.rows(row -> {
             int tripId = tripIds.getAndIncrement();
             if (tripId % 1000 == 0)
@@ -55,7 +55,8 @@ public abstract class TaxiTripsReader {
                 Scalar durationDataset = getDuration(row);
                 if (Scalars.lessEquals(Quantity.of(0.1, SI.SECOND), //
                         durationDataset.subtract(durationCompute).abs()))
-                    System.err.println("Mismatch between duration recorded in data and computed duration," + //
+                    System.err.println("Mismatch between duration recorded in data" + //
+                    "and computed duration," + //
                     "computed duration using start and end time: " + //
                     pickupTime + " --> " + dropoffTime + " != " + durationDataset);
                 TaxiTrip trip = TaxiTrip.of(//
@@ -69,6 +70,7 @@ public abstract class TaxiTripsReader {
                         dropoffTime);
                 list.add(trip);
             } catch (Exception exception) {
+                exception.printStackTrace();
                 unreadable.add(row.toString());
             }
         });

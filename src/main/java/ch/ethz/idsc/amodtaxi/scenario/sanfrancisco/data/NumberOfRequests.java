@@ -1,4 +1,4 @@
-package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
+package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.data;
 
 import java.time.LocalDateTime;
 import java.util.SortedMap;
