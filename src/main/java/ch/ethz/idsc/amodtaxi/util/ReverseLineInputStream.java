@@ -1,4 +1,5 @@
-package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
+package ch.ethz.idsc.amodtaxi.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -6,9 +7,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 
+/** 3rd party code ? */
 public class ReverseLineInputStream extends InputStream {
 
-    RandomAccessFile in;
+    private final RandomAccessFile in;
 
     long currentLineStart = -1;
     long currentLineEnd = -1;

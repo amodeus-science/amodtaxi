@@ -7,7 +7,7 @@ import java.util.Map;
 
 import ch.ethz.idsc.amodeus.analysis.plot.ColorDataAmodeus;
 import ch.ethz.idsc.amodeus.analysis.plot.DiagramSettings;
-import ch.ethz.idsc.amodeus.analysis.plot.hist.HistogramPlot;
+import ch.ethz.idsc.amodeus.analysis.plot.HistogramPlot;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.io.SaveFormats;
@@ -73,7 +73,6 @@ import ch.ethz.idsc.tensor.img.ColorDataIndexed;
                     xLabel, DiagramSettings.WIDTH, DiagramSettings.HEIGHT, colorDataIndexed, //
                     Tensors.vector(0, 20));
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 

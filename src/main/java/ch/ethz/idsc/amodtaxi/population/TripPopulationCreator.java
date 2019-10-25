@@ -26,8 +26,8 @@ import ch.ethz.idsc.amodeus.taxitrip.PersonCreate;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTripParse;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
-import ch.ethz.idsc.amodeus.util.CsvReader;
 import ch.ethz.idsc.amodeus.util.geo.ClosestLinkSelect;
+import ch.ethz.idsc.amodeus.util.io.CsvReader;
 import ch.ethz.idsc.amodeus.util.io.GZHandler;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilter;
@@ -40,7 +40,6 @@ public class TripPopulationCreator {
     private final AmodeusTimeConvert timeConvert;
     private final Config config;
     private final Network network;
-    private final MatsimAmodeusDatabase db;
     private final File populationFile;
     private final File populationFileGz;
     private final TaxiTripFilter finalFilters;
@@ -55,7 +54,6 @@ public class TripPopulationCreator {
         this.timeConvert = timeConvert;
         this.config = config;
         this.network = network;
-        this.db = db;
         this.finalFilters = finalFilters;
         this.distCalc = new TaxiDistanceCalculator(processingDir, network, linkSelect);
         populationFile = new File(processingDir, fileName);

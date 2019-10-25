@@ -1,3 +1,4 @@
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 
 import java.io.File;
@@ -10,11 +11,13 @@ import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
 /* package */ enum ReadTraceFiles {
     ;
 
-    public static DayTaxiRecord in(FastLinkLookup qt, List<File> trcFls, //
+    public static DayTaxiRecord in( //
+            FastLinkLookup fastLinkLookup, //
+            List<File> trcFls, //
             MatsimAmodeusDatabase db) throws Exception {
         /** part 1: filling with data */
         // List<File> trailFilesComplete = (new MultiFileReader(dataDirectory, "new_")).getFolderFiles();
-        DayTaxiRecordSF dayTaxiRecord = new DayTaxiRecordSF(db, qt);
+        DayTaxiRecordSF dayTaxiRecord = new DayTaxiRecordSF(db, fastLinkLookup);
         CsvFleetReaderSF reader = new CsvFleetReaderSF(dayTaxiRecord);
 
         for (int taxiNum = 0; taxiNum < trcFls.size(); taxiNum++) {

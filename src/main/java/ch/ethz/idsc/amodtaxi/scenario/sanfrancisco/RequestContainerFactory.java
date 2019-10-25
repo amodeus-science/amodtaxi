@@ -1,3 +1,4 @@
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 
 import java.time.LocalDate;
@@ -30,12 +31,12 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
     }
 
     public RequestContainer create(RequestStatus status, LocalDate simulationDate) {
-        RequestContainer rc = new RequestContainer();
-        rc.requestIndex = requestIndex;
-        rc.fromLinkIndex = fromLinkIndex;
-        rc.toLinkIndex = toLinkIndex;
-        rc.submissionTime = timeConvert.ldtToAmodeus(submissionTime, simulationDate);
-        rc.requestStatus = new HashSet<>(Arrays.asList(status));
-        return rc;
+        RequestContainer requestContainer = new RequestContainer();
+        requestContainer.requestIndex = requestIndex;
+        requestContainer.fromLinkIndex = fromLinkIndex;
+        requestContainer.toLinkIndex = toLinkIndex;
+        requestContainer.submissionTime = timeConvert.ldtToAmodeus(submissionTime, simulationDate);
+        requestContainer.requestStatus = new HashSet<>(Arrays.asList(status));
+        return requestContainer;
     }
 }

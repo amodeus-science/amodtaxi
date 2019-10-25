@@ -10,6 +10,6 @@ import org.matsim.api.core.v01.network.Link;
  * at this link. */
 public interface NeighborKernel {
 
-    public Collection<Link> getNeighbors(Link link);
+    Collection<Link> getNeighbors(Link link);
 
 }

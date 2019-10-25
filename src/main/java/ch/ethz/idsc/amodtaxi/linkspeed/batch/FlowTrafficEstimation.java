@@ -1,14 +1,15 @@
 /* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.linkspeed.batch;
 
-import java.io.File;
 import java.util.Objects;
 
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.alg.VectorQ;
 import ch.ethz.idsc.tensor.io.Export;
+import ch.ethz.idsc.tensor.io.HomeDirectory;
 import ch.ethz.idsc.tensor.red.Mean;
 import ch.ethz.idsc.tensor.red.Norm;
 
@@ -45,17 +46,21 @@ public class FlowTrafficEstimation {
 
     private FlowTrafficEstimation(Tensor flowMatrix, Tensor freeTimes, Tensor trafficTimes, //
             TrafficDelayEstimate delayCalculator) throws Exception {
-        this.freeTimes = freeTimes;
-        this.trafficTimes = trafficTimes;
+
+        this.freeTimes = VectorQ.require(freeTimes);
+        this.trafficTimes = VectorQ.require(trafficTimes);
         this.flowMatrix = flowMatrix;
         Tensor deviation = trafficTimes.subtract(freeTimes);
 
         System.out.println("===");
         System.out.println("mean: " + Mean.of(deviation));
+        // TODO use on Tally[deviation.map(Sign.FUNCTION)]
+
         System.out.println(">0: " + deviation.flatten(-1).filter(s -> Scalars.lessThan(RealScalar.ZERO, (Scalar) s)).count());
         System.out.println("<0: " + deviation.flatten(-1).filter(s -> Scalars.lessThan((Scalar) s, RealScalar.ZERO)).count());
         System.out.println("=0: " + deviation.flatten(-1).filter(s -> s.equals(RealScalar.ZERO)).count());
-        Export.of(new File("/home/clruch/Downloads/dev.csv"), deviation);
+
+        Export.of(HomeDirectory.Downloads("dev.csv"), deviation);
         // System.out.println("deviation: " + deviation);
         System.out.println("===");
         // System.exit(1);
@@ -64,10 +69,8 @@ public class FlowTrafficEstimation {
     }
 
     public Scalar getError() {
-        if (Objects.isNull(trafficTravelTimeEstimates)) // very lengthy computation, to avoid repeat
-            trafficTravelTimeEstimates = freeTimes.add(flowMatrix.dot(trafficDelays)).unmodifiable();
         if (Objects.isNull(error)) // very lengthy computation, to avoid repeat
-            error = Norm._2.of(trafficTravelTimeEstimates.subtract(trafficTimes));
+            error = Norm._2.between(trafficTravelTimeEstimates(), trafficTimes);
         return error;
     }
 

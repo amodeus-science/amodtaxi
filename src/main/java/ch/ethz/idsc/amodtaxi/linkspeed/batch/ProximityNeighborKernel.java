@@ -28,7 +28,7 @@ public class ProximityNeighborKernel implements NeighborKernel {
         this.quadTree = FastQuadTree.of(network);
     }
 
-    @Override
+    @Override // from NeighborKernel
     public Collection<Link> getNeighbors(Link link) {
         double x1 = link.getCoord().getX();
         double y1 = link.getCoord().getY();

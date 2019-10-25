@@ -1,3 +1,4 @@
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.data;
 
 import java.io.File;
@@ -6,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -19,9 +21,10 @@ import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.math.CreateQuadTree;
 
+// TODO is this generic? if yes, move to super package
 public class TaxiData {
 
-    public HashMap<LocalDate, Integer> reqPerDay = new HashMap<>();
+    public Map<LocalDate, Integer> reqPerDay = new HashMap<>();
 
     public static TaxiData staticAnalyze(List<File> traceFiles, MatsimAmodeusDatabase db, //
             Network network, File saveDirectory, AmodeusTimeConvert timeConvert) //
@@ -41,7 +44,7 @@ public class TaxiData {
         }
 
         /** collect all {@link LocalDate}s that were found */
-        HashSet<LocalDate> localDates = new HashSet<>();
+        Set<LocalDate> localDates = new HashSet<>();
         localDates.add(LocalDate.MAX); // code for executing total of all dates ...
         readers.values().forEach(tfr -> localDates.addAll(tfr.getLocalDates()));
 
@@ -50,13 +53,13 @@ public class TaxiData {
                 .forEach(ld -> System.out.println(ld));
 
         /** analysis of the files per local date */
-        LeastCostPathCalculator lcpc = new FastAStarLandmarksFactory()//
+        LeastCostPathCalculator leastCostPathCalculator = new FastAStarLandmarksFactory()//
                 .createPathCalculator(network, new DistanceAsTravelDisutility(), //
                         new FreeSpeedTravelTime());
-        QuadTree<Link> qt = CreateQuadTree.of(network);
+        QuadTree<Link> quadTree = CreateQuadTree.of(network);
         for (LocalDate localDate : localDates) {
             Integer totReq = ScenarioDataHelper.processLocalDate(localDate, readers.values(), //
-                    saveDirectory, db, network, lcpc, qt, timeConvert);
+                    saveDirectory, db, network, leastCostPathCalculator, quadTree, timeConvert);
             reqPerDay.put(localDate, totReq);
         }
     }

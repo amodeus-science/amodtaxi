@@ -4,8 +4,8 @@ package ch.ethz.idsc.amodtaxi.scenario.chicago;
 import java.text.ParseException;
 import java.time.LocalDateTime;
 
-import ch.ethz.idsc.amodeus.util.CsvReader.Row;
 import ch.ethz.idsc.amodeus.util.LocalDateTimes;
+import ch.ethz.idsc.amodeus.util.io.CsvReader.Row;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;

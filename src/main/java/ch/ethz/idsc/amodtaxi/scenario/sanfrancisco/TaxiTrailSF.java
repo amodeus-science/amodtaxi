@@ -1,3 +1,4 @@
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 
 import java.time.LocalDate;
@@ -17,7 +18,9 @@ import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.LocalDateTimes;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import ch.ethz.idsc.amodtaxi.scenario.TaxiTripFinder;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
+import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
 
 public class TaxiTrailSF implements TaxiTrail {
 

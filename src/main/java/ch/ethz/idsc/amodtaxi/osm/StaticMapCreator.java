@@ -1,3 +1,4 @@
+/* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.osm;
 
 import java.io.File;
@@ -7,7 +8,8 @@ import java.util.Objects;
 
 import org.matsim.pt2matsim.run.Osm2MultimodalNetwork;
 
-public class StaticMapCreator {
+public enum StaticMapCreator {
+    ;
 
     public static void now(File processingDir, String osmData, String amodeusFile, //
             String pt2MatsimSettingsName) throws FileNotFoundException, IOException {
@@ -16,8 +18,8 @@ public class StaticMapCreator {
         File osmFile = new File(processingDir, osmData);
         File scenarioOptions = new File(processingDir, amodeusFile);
         Objects.requireNonNull(scenarioOptions);
-        OsmLoader osm = new OsmLoader(scenarioOptions);
-        osm.saveIfNotAlreadyExists(osmFile);
+        OsmLoader osmLoader = OsmLoader.of(scenarioOptions);
+        osmLoader.saveIfNotAlreadyExists(osmFile);
         /** generate a network using pt2Matsim */
         // TODO only recreate if not existing
         String pt2MatsimSettings = processingDir.getAbsolutePath() + "/" + pt2MatsimSettingsName;

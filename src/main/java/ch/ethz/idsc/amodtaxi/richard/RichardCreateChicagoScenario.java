@@ -2,7 +2,6 @@
 package ch.ethz.idsc.amodtaxi.richard;
 
 import java.io.File;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -26,6 +25,7 @@ import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.io.CopyFiles;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodtaxi.fleetconvert.ChicagoOnlineTripFleetConverter;
 import ch.ethz.idsc.amodtaxi.linkspeed.iterative.IterativeLinkSpeedEstimator;
 import ch.ethz.idsc.amodtaxi.osm.OsmLoader;
@@ -102,8 +102,8 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         /** download of open street map data to create scenario */
         System.out.println("Downloading open stret map data, this may take a while...");
         File osmFile = new File(workingDir, ScenarioLabels.osmData);
-        OsmLoader osm = new OsmLoader(new File(workingDir, ScenarioLabels.amodeusFile));
-        osm.saveIfNotAlreadyExists(osmFile);
+        OsmLoader osmLoader = OsmLoader.of(new File(workingDir, ScenarioLabels.amodeusFile));
+        osmLoader.saveIfNotAlreadyExists(osmFile);
         /** generate a network using pt2Matsim */
         if (!debug)
             Osm2MultimodalNetwork.run(workingDir.getAbsolutePath() + "/" + ScenarioLabels.pt2MatSettings);
@@ -148,7 +148,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         TaxiTripFilter finalTripFilter = new TaxiTripFilter();
         /** trips which are faster than the network freeflow speeds would allow are removed */
         finalTripFilter.addFilter(new TripNetworkFilter(network, db, //
-                Quantity.of(5.5, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m"), true));
+                Quantity.of(5.5, "m*s^-1"), Quantity.of(3600, SI.SECOND), Quantity.of(200, SI.METER), true));
 
         // TODO eventually remove, this did not improve the fit.
         // finalFilters.addFilter(new TripMaxSpeedFilter(network, db, ScenarioConstants.maxAllowedSpeed));
@@ -160,7 +160,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         return processingdir;
     }
 
-    private static void cleanUp(File workingDir) throws IOException {
+    private static void cleanUp(File workingDir) {
         /** delete unneeded files */
         // DeleteDirectory.of(new File(workingDir, "Scenario"), 2, 14);
         // DeleteDirectory.of(new File(workingDir, ScenarioLabels.amodeusFile), 0, 1);

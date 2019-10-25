@@ -1,7 +1,6 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 
-import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,27 +14,9 @@ import ch.ethz.idsc.amodeus.dispatcher.core.RequestStatus;
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxiStatus;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
-import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
-/* package */ enum StaticHelper {
+/* package */ enum StaticHelper1 {
     ;
-
-    public static File prepareFolder(File workingDirectory, File outputDirectory) throws Exception {
-        System.out.println("INFO working folder: " + workingDirectory.getAbsolutePath());
-        System.out.println(outputDirectory.getAbsolutePath());
-        System.out.println("WARN All files in the that folder will be deleted in:");
-        for (int i = 2; i > 0; i--) {
-            Thread.sleep(1000);
-            System.err.println(i + " seconds");
-        }
-        if (workingDirectory.exists()) {
-            if (outputDirectory.exists())
-                DeleteDirectory.of(outputDirectory, 5, 200000);
-            outputDirectory.mkdir();
-        }
-        return outputDirectory;
-    }
-
 
     public static int getDropOffTime(int timeDriveStart, NavigableMap<Integer, TaxiStamp> sortedMap) {
         GlobalAssert.that(sortedMap.get(timeDriveStart).roboTaxiStatus.equals(RoboTaxiStatus.DRIVEWITHCUSTOMER));
@@ -89,5 +70,4 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         return map;
     }
 
-    
 }

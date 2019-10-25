@@ -5,6 +5,7 @@ import java.io.File;
 
 import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilter;
 
+@FunctionalInterface
 public interface TaxiDataModifier {
 
     /** @return a new {@link File} containing taxi trip data, which is derived
@@ -17,6 +18,6 @@ public interface TaxiDataModifier {
      *         with a {@link TaxiTripFilter} and not with classes implementing this interface.
      * 
      * @throws Exception */
-    public File modify(File taxiData) throws Exception;
+    File modify(File taxiData) throws Exception;
 
 }

@@ -1,3 +1,4 @@
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 
 import java.util.HashMap;
@@ -7,7 +8,7 @@ import java.util.TreeSet;
 
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
-/* package */ class GlobalRequestIndex {
+public class GlobalRequestIndex {
     private int globalReqIndex = 0;
     private HashMap<VehReqPair, Integer> reqMap = new HashMap<>();
 

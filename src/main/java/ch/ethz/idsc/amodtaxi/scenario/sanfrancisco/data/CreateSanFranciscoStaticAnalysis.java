@@ -1,3 +1,4 @@
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.data;
 
 import java.io.File;
@@ -15,7 +16,7 @@ import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.SanFranciscoGeoInformation;
 import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.SanFranciscoReferenceFrames;
 import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.TraceFileChoice;
 
-public class CreateSanFranciscoStaticAnalysis {
+/* package */ class CreateSanFranciscoStaticAnalysis {
 
     private static final int numTraceFiles = 536;// 536;
     private static final AmodeusTimeConvert timeConvert = new AmodeusTimeConvert(ZoneId.of("America/Los_Angeles"));

@@ -19,23 +19,23 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 
 public class OsmLoader {
-    private final double[] bbox;
-
-    public OsmLoader(double minLong, double minLat, double maxLong, double maxLat) {
-        bbox = new double[] { minLong, minLat, maxLong, maxLat };
-        checkBbox();
-    }
-
-    public OsmLoader(File propertiesFile) throws FileNotFoundException, IOException {
+    public static OsmLoader of(File propertiesFile) throws FileNotFoundException, IOException {
         Properties props = new Properties();
         props.load(new FileInputStream(propertiesFile));
         GlobalAssert.that(propertiesFile.exists());
         System.out.println(propertiesFile.getAbsolutePath());
         Tensor boundBox = Tensors.fromString(props.getProperty("boundingBox"));
-        this.bbox = new double[] { boundBox.Get(0).number().doubleValue(), //
+        return new OsmLoader( //
+                boundBox.Get(0).number().doubleValue(), //
                 boundBox.Get(1).number().doubleValue(), //
                 boundBox.Get(2).number().doubleValue(), //
-                boundBox.Get(3).number().doubleValue() };
+                boundBox.Get(3).number().doubleValue());
+    }
+
+    private final double[] bbox;
+
+    public OsmLoader(double minLong, double minLat, double maxLong, double maxLat) {
+        bbox = new double[] { minLong, minLat, maxLong, maxLat };
         checkBbox();
     }
 

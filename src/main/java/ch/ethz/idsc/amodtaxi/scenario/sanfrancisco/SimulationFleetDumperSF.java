@@ -1,5 +1,4 @@
-//code by jph
-//v2 by andya
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 
 import java.io.BufferedWriter;
@@ -32,6 +31,7 @@ import ch.ethz.idsc.amodeus.util.LocalDateTimes;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
+import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
 import ch.ethz.idsc.tensor.Scalar;
 
 public class SimulationFleetDumperSF {

@@ -1,3 +1,4 @@
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 
 import java.io.File;
@@ -27,7 +28,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
 public class CreateSanFranciscoScenario {
 
-    private static final Collection<LocalDate> dates = DateSelect.specific(06, 04);
+    private static final Collection<LocalDate> dates = DateSelectSF.specific(06, 04);
     private static final int numTraceFiles = 536;// maximum taxis are: 536;
     private static final AmodeusTimeConvert timeConvert = new AmodeusTimeConvert(ZoneId.of("America/Los_Angeles"));
     private static final ReferenceFrame referenceFrame = SanFranciscoReferenceFrames.SANFRANCISCO;

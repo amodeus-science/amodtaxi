@@ -9,6 +9,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 import ch.ethz.idsc.amodeus.taxitrip.ShortestDurationCalculator;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
+import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.qty.Quantity;
@@ -28,7 +29,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         /** extract data from {@link TaxiTrip} */
         this.duration = taxiTrip.duration;
         /** extract data from free flow shortest path */
-        this.freeflowDuation = Quantity.of(fastest.travelTime, "s");
+        this.freeflowDuation = Quantity.of(fastest.travelTime, SI.SECOND);
 
         fastest.links.forEach(l -> travelledLinks.add(l));
 

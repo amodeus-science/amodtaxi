@@ -30,23 +30,23 @@ public class OriginDestinationCentroidResampling implements TripModifier {
 
     private final Random random;
     private final Network network;
-    private final FastLinkLookup fll;
+    private final FastLinkLookup fastLinkLookup;
     private final File vNetworkExportFile;
-    private final HashSet<Tensor> uniqueOrigins = new HashSet<>();
-    private final HashSet<Tensor> uniqueDestins = new HashSet<>();
-    private final HashSet<Tensor> uniqueLocations = new HashSet<>();
+    private final Set<Tensor> uniqueOrigins = new HashSet<>();
+    private final Set<Tensor> uniqueDestins = new HashSet<>();
+    private final Set<Tensor> uniqueLocations = new HashSet<>();
     private VirtualNetwork<Link> centroidVirtualNetwork;
     private final Set<String> airportBoundaryLinks;
 
     private boolean modificationStarted = false; // flag to detect start of modification process
 
     public OriginDestinationCentroidResampling(Random random, Network network, //
-            FastLinkLookup fll, File vNetworkExportFile) {
+            FastLinkLookup fastLinkLookup, File vNetworkExportFile) {
         this.random = random;
         this.network = network;
-        this.fll = fll;// new FastLinkLookup(network, db);
+        this.fastLinkLookup = fastLinkLookup;// new FastLinkLookup(network, db);
         this.vNetworkExportFile = vNetworkExportFile;
-        airportBoundaryLinks = ChicagoAirportBoundaryLinks.get(fll);
+        airportBoundaryLinks = ChicagoAirportBoundaryLinks.get(fastLinkLookup);
     }
 
     @Override
@@ -60,12 +60,12 @@ public class OriginDestinationCentroidResampling implements TripModifier {
             // small concentrated node
             for (Link link : network.getLinks().values()) {
                 if (airportBoundaryLinks.contains(link.getId().toString())) {
-                    uniqueLocations.add(fll.getWGS84fromLink(link));
+                    uniqueLocations.add(fastLinkLookup.getWGS84fromLink(link));
                 }
             }
 
             // do everything that needs to be done once the first time
-            centroidVirtualNetwork = getCentroidVirtualNetwork(network, fll, uniqueLocations);
+            centroidVirtualNetwork = getCentroidVirtualNetwork();
             try {
                 VirtualNetworkIO.toByte(vNetworkExportFile, centroidVirtualNetwork);
             } catch (IOException e) {
@@ -81,8 +81,8 @@ public class OriginDestinationCentroidResampling implements TripModifier {
         Tensor origin = originalTrip.pickupLoc;
         Tensor destin = originalTrip.dropoffLoc;
         // get origin /destination links
-        Link lOrigin = fll.getLinkFromWGS84(TensorCoords.toCoord(origin));
-        Link lDestin = fll.getLinkFromWGS84(TensorCoords.toCoord(destin));
+        Link lOrigin = fastLinkLookup.getLinkFromWGS84(TensorCoords.toCoord(origin));
+        Link lDestin = fastLinkLookup.getLinkFromWGS84(TensorCoords.toCoord(destin));
         // using virtual node of lOrigin / lDestin, randomly distribute in virtual Node
 
         // origin
@@ -95,11 +95,11 @@ public class OriginDestinationCentroidResampling implements TripModifier {
         int numDest = random.nextInt(destCentroidLinks.size());
         Link lDestinDist = destCentroidLinks.stream().skip(numDest).findFirst().get();
 
-        return TaxiTrip.of(//
+        return TaxiTrip.of( //
                 originalTrip.localId, //
                 originalTrip.taxiId, //
-                fll.getWGS84fromLink(lOriginDist), //
-                fll.getWGS84fromLink(lDestinDist), //
+                fastLinkLookup.getWGS84fromLink(lOriginDist), //
+                fastLinkLookup.getWGS84fromLink(lDestinDist), //
                 originalTrip.distance, //
                 originalTrip.waitTime, //
                 originalTrip.pickupDate, //
@@ -114,21 +114,23 @@ public class OriginDestinationCentroidResampling implements TripModifier {
         uniqueLocations.add(taxiTrip.dropoffLoc);
     }
 
-    private static VirtualNetwork<Link> getCentroidVirtualNetwork(Network network, FastLinkLookup fll, //
-            HashSet<Tensor> uniqueLocations) {
+    private VirtualNetwork<Link> getCentroidVirtualNetwork() {
+        @SuppressWarnings("unchecked")
         Collection<Link> elements = (Collection<Link>) network.getLinks().values();
-        Map<Node, HashSet<Link>> uElements = NodeAdjacencyMap.of(network);
+        Map<Node, Set<Link>> uElements = NodeAdjacencyMap.of(network);
 
         /** generate the link centroids based on the unique locations */
         List<Link> centroids = new ArrayList<>();
         uniqueLocations.stream().forEach(loc -> {
-            Link link = fll.getLinkFromWGS84(TensorCoords.toCoord(loc));
+            Link link = fastLinkLookup.getLinkFromWGS84(TensorCoords.toCoord(loc));
             centroids.add(link);
         });
 
         /** create the virtual network using the centroidvirtualNetworkCreator */
+
         CentroidVirtualNetworkCreator<Link, Node> vnc = new CentroidVirtualNetworkCreator<>(//
                 elements, centroids, TensorLocation::of, NetworkCreatorUtils::linkToID, uElements, true);
+
         return vnc.getVirtualNetwork();
 
     }

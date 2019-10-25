@@ -1,3 +1,4 @@
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ import org.matsim.api.core.v01.population.Population;
 
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
+import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
 
 public enum Consistency {
     ;

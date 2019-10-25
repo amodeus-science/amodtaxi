@@ -19,6 +19,7 @@ import ch.ethz.idsc.amodeus.taxitrip.ShortestDurationCalculator;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTripCheck;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodtaxi.linkspeed.TaxiLinkSpeedEstimator;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
@@ -30,7 +31,8 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 public class FlowTimeInvLinkSpeed implements TaxiLinkSpeedEstimator {
 
     private final LinkSpeedDataContainer lsData;
-    public final static Scalar dayDt = Quantity.of(3600, "s");
+    // TODO hourDt?
+    public final static Scalar dayDt = Quantity.of(3600, SI.SECOND);
 
     public FlowTimeInvLinkSpeed(Collection<TaxiTrip> records, Network network, //
             MatsimAmodeusDatabase db, TrafficDelayEstimate delayCalculator) throws Exception {
@@ -176,7 +178,7 @@ public class FlowTimeInvLinkSpeed implements TaxiLinkSpeedEstimator {
 
         /** Apply moving average filter to modify every link not solved in the previous step */
         ProximityNeighborKernel filterKernel = new ProximityNeighborKernel(network, Quantity.of(2000, "m"));
-        LinkSpeedDataInterpolation interpolation = new LinkSpeedDataInterpolation(network, filterKernel, lsData, db);
+        new LinkSpeedDataInterpolation(network, filterKernel, lsData, db);
     }
 
     @Override

@@ -1,3 +1,4 @@
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 
 import java.io.File;
@@ -18,7 +19,8 @@ import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.geo.ClosestLinkSelect;
 import ch.ethz.idsc.amodeus.util.io.GZHandler;
 
-public class AdamAndEve {
+public enum AdamAndEve {
+    ;
 
     public static void create(File workingDirectory, Collection<TaxiTrip> trips, Network network, //
             MatsimAmodeusDatabase db, //

@@ -7,6 +7,7 @@ import java.util.Random;
 import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.amodeus.net.FastLinkLookup;
+import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
 public class ChicagoOnlineTripBasedModifier extends TripBasedModifier {
@@ -18,7 +19,7 @@ public class ChicagoOnlineTripBasedModifier extends TripBasedModifier {
          * see class for detailed description */
         // addModifier(new ChicagoTripStartTimeResampling(random));
         /** instead the TripStartTimeShiftResampling is used: */
-        addModifier(new TripStartTimeShiftResampling(random, Quantity.of(900, "s")));
+        addModifier(new TripStartTimeShiftResampling(random, Quantity.of(900, SI.SECOND)));
         addModifier(new OriginDestinationCentroidResampling(random, network, fll, vNetworkExportFile));
 
     }

@@ -1,11 +1,13 @@
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.data;
+
 
 import java.time.LocalDateTime;
 import java.util.SortedMap;
 
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 
-/* package */ enum NumberOfRequests {
+public enum NumberOfRequests {
     ;
 
     /** @return number of requests found in @param sortedEntries, a request

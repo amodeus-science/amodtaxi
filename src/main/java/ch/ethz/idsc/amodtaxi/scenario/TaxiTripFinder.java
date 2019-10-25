@@ -1,4 +1,5 @@
-package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
+package ch.ethz.idsc.amodtaxi.scenario;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

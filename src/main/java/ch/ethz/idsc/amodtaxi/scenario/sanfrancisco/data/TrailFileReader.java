@@ -1,3 +1,4 @@
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.data;
 
 import java.io.BufferedReader;
@@ -8,26 +9,28 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.NavigableMap;
 import java.util.Objects;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.LocalDateTimes;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.ReverseLineInputStream;
 import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.TaxiStampConvertedSF;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 import ch.ethz.idsc.amodtaxi.util.CSVUtils;
+import ch.ethz.idsc.amodtaxi.util.ReverseLineInputStream;
 import ch.ethz.idsc.tensor.Tensor;
 
 /* package */ class TrailFileReader {
 
-    private final TreeMap<LocalDateTime, TaxiStamp> sortedStamps = new TreeMap<>();
-    private HashSet<LocalDate> localDates = new HashSet<>();
+    private final NavigableMap<LocalDateTime, TaxiStamp> sortedStamps = new TreeMap<>();
+    private Set<LocalDate> localDates = new HashSet<>();
     private final String fileName;
-    private LocalDateTime beginKey;
-    private LocalDateTime endKey;
+    // private LocalDateTime beginKey;
+    // private LocalDateTime endKey;
     private HashMap<LocalDate, Tensor> dateSplitUp = new HashMap<>();
     private final AmodeusTimeConvert timeConvert;
 
@@ -40,11 +43,10 @@ import ch.ethz.idsc.tensor.Tensor;
     private void read(File trailFile) throws Exception {
 
         /** read file */
-        // FileInputStream fis = new FileInputStream(trailFile);
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(new ReverseLineInputStream(trailFile)))) {
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new ReverseLineInputStream(trailFile)))) {
 
             String line = null;
-            while ((line = in.readLine()) != null) {
+            while ((line = bufferedReader.readLine()) != null) {
                 List<String> csvRow = CSVUtils.csvLineToList(line, " ");
                 TaxiStamp stamp = TaxiStampConvertedSF.INSTANCE.from(csvRow, timeConvert);
 
@@ -54,10 +56,9 @@ import ch.ethz.idsc.tensor.Tensor;
             }
 
         }
-        // fis.close();
     }
 
-    public TreeMap<LocalDateTime, TaxiStamp> getAllEntries() {
+    public NavigableMap<LocalDateTime, TaxiStamp> getAllEntries() {
         return sortedStamps;
     }
 
@@ -138,7 +139,7 @@ import ch.ethz.idsc.tensor.Tensor;
         return current;
     }
 
-    public HashSet<LocalDate> getLocalDates() {
+    public Set<LocalDate> getLocalDates() {
         return localDates;
     }
 

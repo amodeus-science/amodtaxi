@@ -20,7 +20,7 @@ public class TripBasedModifier implements TaxiDataModifier {
             modifiers.add(modifier);
     }
 
-    @Override
+    @Override // from TaxiDataModifier
     public File modify(File taxiData) throws IOException {
 
         /** gather all original trips */
@@ -28,19 +28,17 @@ public class TripBasedModifier implements TaxiDataModifier {
         ImportTaxiTrips.fromFile(taxiData).forEach(tt -> originals.add(tt));
 
         /** notify about all the taxi trips */
-        originals.forEach(tt -> {
-            for (TripModifier modifier : modifiers) {
-                modifier.notify(tt);
-            }
+        originals.forEach(taxiTrip -> {
+            for (TripModifier modifier : modifiers)
+                modifier.notify(taxiTrip);
         });
 
         /** let modifiers do modifications on each trip, then return */
         List<TaxiTrip> modified = new ArrayList<>();
-        originals.forEach(orig -> {
-            TaxiTrip changed = orig;
-            for (TripModifier modifier : modifiers) {
-                changed = modifier.modify(changed);
-            }
+        originals.forEach(taxiTrip -> {
+            TaxiTrip changed = taxiTrip;
+            for (TripModifier tripModifier : modifiers)
+                changed = tripModifier.modify(changed);
             modified.add(changed);
         });
         File outFile = new File(taxiData.getAbsolutePath().replace(".csv", "_modified.csv"));

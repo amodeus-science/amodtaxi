@@ -10,7 +10,6 @@ import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxiStatus;
 
 public class TaxiStamp {
 
-    // public int globalTime; /* unix epoch time in [s] */
     public LocalDateTime globalTime; /* unix epoch time in [s] */
     public RoboTaxiStatus roboTaxiStatus;
     public int requestIndex;
