@@ -90,11 +90,11 @@ public abstract class TripFleetConverter {
         Stream<TaxiTrip> filteredStream = primaryFilter.filterStream(allTrips.stream());
         List<TaxiTrip> primaryFiltered = filteredStream.collect(Collectors.toList());
         System.out.println("Primary filtered: " + primaryFiltered.size());
-        String fileName = FilenameUtils.getBaseName(preparedFile.getPath()) + "_filtered." + //
+        String filteredFileName = FilenameUtils.getBaseName(preparedFile.getPath()) + "_filtered." + //
                 FilenameUtils.getExtension(preparedFile.getPath());
         primaryFilter.printSummary();
 
-        File filteredFile = new File(preparedFile.getParentFile(), fileName);
+        File filteredFile = new File(preparedFile.getParentFile(), filteredFileName);
         ExportTaxiTrips.toFile(primaryFiltered.stream(), filteredFile);
         GlobalAssert.that(filteredFile.isFile());
 
@@ -114,6 +114,8 @@ public abstract class TripFleetConverter {
                         DATE_TIME_FORMATTER, qt, simulationDate, timeConvert, finalFilters);
         populationCreator.process(modifiedTripsFile);
         finalTripsFile = populationCreator.getFinalTripFile();
+        
+        System.exit(1);
     }
 
     public File getFinalTripFile() {

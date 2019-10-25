@@ -83,6 +83,7 @@ public class TripPopulationCreator {
         List<TaxiTrip> finalFilteredTrips = new ArrayList<>();
         Stream<TaxiTrip> filtered = finalFilters.filterStream(trips.stream());
 
+
         // create persons
         filtered.forEach(taxiTrip -> {
             Person person = PersonCreate.fromTrip(taxiTrip, taxiTrip.localId, populationFactory, //
@@ -91,6 +92,8 @@ public class TripPopulationCreator {
             distCalc.addTrip(taxiTrip);
             finalFilteredTrips.add(taxiTrip);
         });
+        
+
 
         // export finally used set of trips
         finalTripFile = new File(inFile.getAbsolutePath().replace(".csv", "_final.csv"));
@@ -112,6 +115,7 @@ public class TripPopulationCreator {
 
         // export taxi trip distance analysis
         distCalc.exportTotalDistance();
+        finalFilters.printSummary();
     }
 
     public File getFinalTripFile() {
