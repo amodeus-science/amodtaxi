@@ -1,5 +1,5 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
-package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
+package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.data;
 
 import java.io.File;
 import java.time.ZoneId;
@@ -11,6 +11,10 @@ import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.io.MultiFileReader;
+import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.InitialNetworkPreparerSF;
+import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.SanFranciscoGeoInformation;
+import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.SanFranciscoReferenceFrames;
+import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.TraceFileChoice;
 
 /* package */ class CreateSanFranciscoStaticAnalysis {
 

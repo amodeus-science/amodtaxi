@@ -2,9 +2,51 @@
 <!DOCTYPE config SYSTEM "./dtd/config_v2.dtd">
 
 <config>
-    <module name="av">
-        <param name="config" value="av.xml" />
-    </module>
+	<module name="av">
+		<param name="allowedLinkMode" value="car" />
+		<param name="enableDistanceAnalysis" value="false" />
+		<param name="numberOfParallelRouters" value="4" />
+		<param name="passengerAnalysisInterval" value="0" />
+		<param name="useAccessEgress" value="false" />
+		<param name="vehicleAnalysisInterval" value="0" />
+		<parameterset type="operator">
+			<param name="allowedLinkAttribute" value="null" />
+			<param name="cleanNetwork" value="false" />
+			<param name="id" value="default" />
+			<param name="predictRoutePrice" value="false" />
+			<param name="predictRouteTravelTime" value="true" />
+			<parameterset type="dispatcher">
+				<param name="type" value="DemandSupplyBalancingDispatcher" />
+				<param name="dispatchPeriod" value="10" />
+			</parameterset>
+			<parameterset type="generator">
+				<param name="numberOfVehicles" value="500" />
+				<param name="type" value="PopulationDensity" />
+				<param name="vehicleType" value="null" />
+			</parameterset>
+			<parameterset type="pricing">
+				<param name="pricePerKm" value="0.001" />
+				<param name="pricePerMin" value="0.0" />
+				<param name="pricePerTrip" value="3.0" />
+				<param name="spatialBillingInterval" value="1.0" />
+				<param name="temporalBillingInterval" value="1.0" />
+			</parameterset>
+			<parameterset type="router">
+				<param name="type" value="TaxiTravelTimeRouter" />
+			</parameterset>
+			<parameterset type="timing">
+				<param name="dropoffDurationPerPassenger" value="0.0" />
+				<param name="dropoffDurationPerStop" value="10.0" />
+				<param name="pickupDurationPerPassenger" value="0.0" />
+				<param name="pickupDurationPerStop" value="15.0" />
+			</parameterset>
+		</parameterset>
+		<parameterset type="scoring">
+			<param name="marginalUtilityOfWaiting" value="-1.0" />
+			<param name="stuckUtility" value="-1000.0" />
+			<param name="subpopulation" value="null" />
+		</parameterset>
+	</module>
 
 	<module name="network">
 		<param name="inputNetworkFile" value="network.xml.gz" />

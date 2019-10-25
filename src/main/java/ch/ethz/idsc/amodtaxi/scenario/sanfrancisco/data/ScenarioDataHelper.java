@@ -1,5 +1,5 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
-package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
+package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.data;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -31,8 +31,7 @@ import ch.ethz.idsc.amodtaxi.scenario.FileAnalysis;
 
         /** prepare folder to save information */
         File saveSubDir = localDate.equals(LocalDate.MAX) //
-                ? new File(saveDirectory, "AllFiles")
-                : new File(saveDirectory, localDate.toString());
+                ? new File(saveDirectory, "AllFiles") : new File(saveDirectory, localDate.toString());
         saveSubDir.mkdir();
 
         /** write the analyzed information */
@@ -50,7 +49,7 @@ import ch.ethz.idsc.amodtaxi.scenario.FileAnalysis;
 
             /** saving aggregate information */
             bufferedWriter.write("analzyed " + readers.size() + " files\n");
-            SaveInfo.of(filesAnalysis, bufferedWriter, saveSubDir, timeConvert);
+            // SaveInfo.of(filesAnalysis, bufferedWriter, saveSubDir, timeConvert);
         }
         return totalRquests;
     }

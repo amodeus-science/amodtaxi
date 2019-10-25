@@ -127,8 +127,10 @@ public class OriginDestinationCentroidResampling implements TripModifier {
         });
 
         /** create the virtual network using the centroidvirtualNetworkCreator */
-        CentroidVirtualNetworkCreator<Link, Node> vnc = new CentroidVirtualNetworkCreator<>( //
-                elements, centroids, TensorLocation::of, NetworkCreatorUtils::linkToID, uElements, false);
+
+        CentroidVirtualNetworkCreator<Link, Node> vnc = new CentroidVirtualNetworkCreator<>(//
+                elements, centroids, TensorLocation::of, NetworkCreatorUtils::linkToID, uElements, true);
+
         return vnc.getVirtualNetwork();
 
     }

@@ -14,10 +14,10 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
 public class ChicagoTripFleetConverter extends TripFleetConverter {
 
-    public ChicagoTripFleetConverter(ScenarioOptions scenarioOptions, Network network, TaxiTripFilter cleaner, //
+    public ChicagoTripFleetConverter(ScenarioOptions scenarioOptions, Network network, //
             TripBasedModifier corrector, TaxiDataModifier generalModifier, TaxiTripFilter finalFilters, //
             TaxiTripsReader tripsReader) {
-        super(scenarioOptions, network, cleaner, corrector, generalModifier, finalFilters, tripsReader);
+        super(scenarioOptions, network, corrector, generalModifier, finalFilters, tripsReader);
     }
 
     @Override

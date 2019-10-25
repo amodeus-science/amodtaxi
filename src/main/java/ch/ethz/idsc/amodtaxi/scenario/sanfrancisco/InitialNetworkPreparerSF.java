@@ -12,12 +12,12 @@ import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
 import ch.ethz.idsc.amodeus.util.io.GZHandler;
 import ch.ethz.idsc.amodeus.util.network.LinkModes;
 
-/* package */ enum InitialNetworkPreparerSF {
+public enum InitialNetworkPreparerSF {
     ;
 
     /** @param procDir directory in which the network generated with pt2Matsim is
      * @return */
-    /* package */ static Network run(File procDir) {
+    public static Network run(File procDir) {
 
         /** load the pt2matsim network */
         Network ntwrkpt2Matsim = NetworkLoader.fromNetworkFile(new File(procDir, "network_pt2matsim.xml"));

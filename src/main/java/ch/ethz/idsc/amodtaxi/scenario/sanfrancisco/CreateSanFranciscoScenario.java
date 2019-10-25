@@ -19,7 +19,6 @@ import ch.ethz.idsc.amodeus.util.io.CopyFiles;
 import ch.ethz.idsc.amodeus.util.io.Locate;
 import ch.ethz.idsc.amodeus.util.io.MultiFileReader;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
-import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodtaxi.osm.StaticMapCreator;
 import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
 import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilter;
@@ -27,14 +26,13 @@ import ch.ethz.idsc.amodtaxi.tripfilter.TripNetworkFilter;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
-/* package */ class CreateSanFranciscoScenario {
+public class CreateSanFranciscoScenario {
 
     private static final Collection<LocalDate> dates = DateSelectSF.specific(06, 04);
-    /** maximum taxis are 536 */
-    private static final int numTraceFiles = 536;
+    private static final int numTraceFiles = 536;// maximum taxis are: 536;
     private static final AmodeusTimeConvert timeConvert = new AmodeusTimeConvert(ZoneId.of("America/Los_Angeles"));
     private static final ReferenceFrame referenceFrame = SanFranciscoReferenceFrames.SANFRANCISCO;
-    private static final Scalar timeStep = Quantity.of(10, SI.SECOND);
+    private static final Scalar timeStep = Quantity.of(10, "s");
 
     public static void main(String[] args) throws Exception {
         File dataDir = new File(args[0]);
@@ -50,7 +48,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         /** copy taxi trace files */
         System.out.println("dataDir: " + dataDir.getAbsolutePath());
         List<File> taxiFiles = new MultiFileReader(new File(dataDir, "cabspottingdata"), "new_").getFolderFiles();
-        List<File> traceFiles = new TraceFileChoice(taxiFiles).random(numTraceFiles);
+        List<File> traceFiles = (new TraceFileChoice(taxiFiles)).random(numTraceFiles);
         // List<File> traceFiles = (new
         // TraceFileChoice(taxiFiles)).specified("equioc", "onvahe", "epkiapme",
         // "ippfeip");
@@ -84,12 +82,12 @@ import ch.ethz.idsc.tensor.qty.Quantity;
                 TaxiTripFilter speedEstimationTripFilter = new TaxiTripFilter();
                 /** trips which are faster than the network freeflow speeds would allow are removed */
                 speedEstimationTripFilter.addFilter(new TripNetworkFilter(network, db, //
-                        Quantity.of(5.5, SI.VELOCITY), Quantity.of(3600, SI.SECOND), Quantity.of(200, SI.METER), true));
+                        Quantity.of(2.235200008, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m"), true));
 
                 TaxiTripFilter finalPopulationTripFilter = new TaxiTripFilter();
                 /** trips which are faster than the network freeflow speeds would allow are removed */
                 finalPopulationTripFilter.addFilter(new TripNetworkFilter(network, db, //
-                        Quantity.of(2.5, SI.VELOCITY), Quantity.of(7200, SI.SECOND), Quantity.of(200, SI.METER), false));
+                        Quantity.of(2.235200008, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m"), false));
 
                 StandaloneFleetConverterSF sfc = new StandaloneFleetConverterSF(processingDir, //
                         dayTaxiRecord, db, network, timeStep, timeConvert, speedEstimationTripFilter, //

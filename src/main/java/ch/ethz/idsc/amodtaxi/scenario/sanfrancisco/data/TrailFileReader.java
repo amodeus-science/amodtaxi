@@ -1,5 +1,5 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
-package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
+package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.data;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,6 +18,7 @@ import java.util.TreeMap;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.LocalDateTimes;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.TaxiStampConvertedSF;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 import ch.ethz.idsc.amodtaxi.util.CSVUtils;
 import ch.ethz.idsc.amodtaxi.util.ReverseLineInputStream;

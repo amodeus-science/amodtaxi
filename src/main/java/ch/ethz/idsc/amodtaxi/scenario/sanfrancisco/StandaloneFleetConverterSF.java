@@ -1,4 +1,3 @@
-/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 
 import java.io.File;
@@ -36,7 +35,7 @@ import ch.ethz.idsc.tensor.Scalar;
     private final Network network;
     private final File configFile;
     private final Config configFull;
-    private final int maxIter = 100000; // 10000 need 1 hour
+    private final int maxIter = 100000; // 10'000 need 1 hour
     private DayTaxiRecord dayTaxiRecord;
     private ScenarioOptions simOptions;
     private final TaxiTripFilter speedEstimationTripFilter;
@@ -85,9 +84,10 @@ import ch.ethz.idsc.tensor.Scalar;
         /** STEP 3: Filter trips which are unwanted for speed estimation (not meaningful durations) */
         List<TaxiTrip> tripsSpeedEstimation = speedEstimationTripFilter.filterStream(tripsAll.stream()).collect(Collectors.toList());
         speedEstimationTripFilter.printSummary();
+        System.out.println("Trips for speed estimation: " + tripsSpeedEstimation.size());
 
         /** STEP 4: Export final taxi trips and estimation trip population */
-        ExportTaxiTrips.toFile(tripsSpeedEstimation.stream(), new File(workingDirectory, "finalTrips.csv"));
+        ExportTaxiTrips.toFile(tripsSpeedEstimation.stream(), new File(workingDirectory, "finalTripsEstimation.csv"));
         AdamAndEve.create(workingDirectory, tripsSpeedEstimation, network, db, timeConvert, qt, simulationDate, "_speedEst");
 
         // taxiTripFilter.
@@ -100,7 +100,9 @@ import ch.ethz.idsc.tensor.Scalar;
         List<TaxiTrip> tripsForPopulation = populationTripFilter.filterStream(tripsAll.stream()).collect(Collectors.toList());
         System.out.println("Trips after filtering:  " + tripsForPopulation.size());
         populationTripFilter.printSummary();
+
         AdamAndEve.create(workingDirectory, tripsForPopulation, network, db, timeConvert, qt, simulationDate, "");
+        ExportTaxiTrips.toFile(tripsForPopulation.stream(), new File(workingDirectory, "finalTripsPopulation.csv"));
 
         /** STEP 6: Generate the report */
         try {

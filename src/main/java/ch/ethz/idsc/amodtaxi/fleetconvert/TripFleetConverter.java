@@ -4,6 +4,8 @@ package ch.ethz.idsc.amodtaxi.fleetconvert;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
@@ -34,9 +36,9 @@ public abstract class TripFleetConverter {
 
     protected final ScenarioOptions scenarioOptions;
     protected final Network network;
-    protected final TaxiTripFilter primaryFilter;
-    protected final TripBasedModifier modifier;
-    protected final TaxiDataModifier generalModifier;
+    protected final TaxiTripFilter primaryFilter = new TaxiTripFilter();
+    protected final TripBasedModifier contentModifier;
+    protected final TaxiDataModifier formatModifier;
     protected final TaxiTripFilter finalFilters;
     protected final TaxiTripsReader tripsReader;
     protected final MatsimAmodeusDatabase db;
@@ -45,14 +47,13 @@ public abstract class TripFleetConverter {
     private File finalTripsFile = null;
 
     public TripFleetConverter(ScenarioOptions scenarioOptions, Network network, //
-            TaxiTripFilter primaryFilter, TripBasedModifier tripModifier, //
+            TripBasedModifier tripModifier, //
             TaxiDataModifier generalModifier, TaxiTripFilter finalFilters, //
             TaxiTripsReader tripsReader) {
         this.scenarioOptions = scenarioOptions;
         this.network = network;
-        this.primaryFilter = primaryFilter;
-        this.modifier = tripModifier;
-        this.generalModifier = generalModifier;
+        this.contentModifier = tripModifier;
+        this.formatModifier = generalModifier;
         this.finalFilters = finalFilters;
         this.tripsReader = tripsReader;
         ReferenceFrame referenceFrame = scenarioOptions.getLocationSpec().referenceFrame();
@@ -71,23 +72,30 @@ public abstract class TripFleetConverter {
 
         /** folder for processing stored files, the folder tripData contains
          * .csv versions of all processing steps for faster debugging. */
-        File newWorkingDir = new File(processingDir, "tripData");
-        newWorkingDir.mkdirs();
-        FileUtils.copyFileToDirectory(tripFile, newWorkingDir);
-        File newTripFile = new File(newWorkingDir, tripFile.getName());
+        File tripDataDir = new File(processingDir, "tripData");
+        tripDataDir.mkdirs();
+        FileUtils.copyFileToDirectory(tripFile, tripDataDir);
+        File newTripFile = new File(tripDataDir, tripFile.getName());
+        System.out.println("NewTripFile: " + newTripFile.getAbsolutePath());
         GlobalAssert.that(newTripFile.isFile());
 
         /** initial formal modifications, e.g., replacing certain characters,
          * other modifications should be done in the third step */
-        File preparedFile = generalModifier.modify(newTripFile);
+        File preparedFile = formatModifier.modify(newTripFile);
         Stream<TaxiTrip> stream = tripsReader.getTripStream(preparedFile);
+        List<TaxiTrip> allTrips = stream.collect(Collectors.toList());
+        System.out.println("Before primary filter: " + allTrips.size());
 
         /** filtering of trips, e.g., removal of 0 [s] trips */
-        Stream<TaxiTrip> filteredStream = primaryFilter.filterStream(stream);
-        String fileName = FilenameUtils.getBaseName(preparedFile.getPath()) + "_filtered." + //
+        Stream<TaxiTrip> filteredStream = primaryFilter.filterStream(allTrips.stream());
+        List<TaxiTrip> primaryFiltered = filteredStream.collect(Collectors.toList());
+        System.out.println("Primary filtered: " + primaryFiltered.size());
+        String filteredFileName = FilenameUtils.getBaseName(preparedFile.getPath()) + "_filtered." + //
                 FilenameUtils.getExtension(preparedFile.getPath());
-        File filteredFile = new File(preparedFile.getParentFile(), fileName);
-        ExportTaxiTrips.toFile(filteredStream, filteredFile);
+        primaryFilter.printSummary();
+
+        File filteredFile = new File(preparedFile.getParentFile(), filteredFileName);
+        ExportTaxiTrips.toFile(primaryFiltered.stream(), filteredFile);
         GlobalAssert.that(filteredFile.isFile());
 
         /** save unreadable trips for post-processing, checking */
@@ -97,7 +105,7 @@ public abstract class TripFleetConverter {
         tripsReader.saveUnreadable(unreadable);
 
         /** modifying the trip data, e.g., distributing in 15 minute steps. */
-        File modifiedTripsFile = modifier.modify(filteredFile);
+        File modifiedTripsFile = contentModifier.modify(filteredFile);
         GlobalAssert.that(modifiedTripsFile.isFile());
 
         /** creating population based on corrected, filtered file */
@@ -106,6 +114,8 @@ public abstract class TripFleetConverter {
                         DATE_TIME_FORMATTER, qt, simulationDate, timeConvert, finalFilters);
         populationCreator.process(modifiedTripsFile);
         finalTripsFile = populationCreator.getFinalTripFile();
+        
+        System.exit(1);
     }
 
     public File getFinalTripFile() {

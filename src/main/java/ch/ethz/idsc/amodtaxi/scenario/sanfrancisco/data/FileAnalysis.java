@@ -1,10 +1,9 @@
-/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
-package ch.ethz.idsc.amodtaxi.scenario;
+package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.data;
 
 import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Map;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.SortedMap;
 
@@ -16,8 +15,6 @@ import org.matsim.core.utils.collections.QuadTree;
 import ch.ethz.idsc.amodeus.analysis.SaveUtils;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.idsc.amodeus.util.math.SI;
-import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.data.NumberOfRequests;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
@@ -25,11 +22,11 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
-public class FileAnalysis {
+/* package */ class FileAnalysis {
     private final String fileName;
     private final SortedMap<LocalDateTime, TaxiStamp> sortedEntries;
     private boolean tracesInTimeFrame = false;
-    private final Map<LocalDate, Tensor> dateSplitUp;
+    private HashMap<LocalDate, Tensor> dateSplitUp = new HashMap<>();
 
     /** analysis results */
     private int numRequests;
@@ -39,15 +36,15 @@ public class FileAnalysis {
     private Tensor mapBounds = null;
     private Tensor minMaxJourneyTime = null;
 
-    private Scalar custrDistance = Quantity.of(0, SI.METER);
-    private Scalar totalDistance = Quantity.of(0, SI.METER);
-    private Scalar emptyDistance = Quantity.of(0, SI.METER);
+    private Scalar custrDistance = Quantity.of(0, "m");
+    private Scalar totalDistance = Quantity.of(0, "m");
+    private Scalar emptyDistance = Quantity.of(0, "m");
 
     private Tensor plotWaitingTimes = null;
 
     public FileAnalysis(SortedMap<LocalDateTime, TaxiStamp> sortedEntries, MatsimAmodeusDatabase db, //
-            Network network, LeastCostPathCalculator leastCostPathCalculator, QuadTree<Link> quadTree, String fileName, //
-            Map<LocalDate, Tensor> dateSplitUp) throws Exception {
+            Network network, LeastCostPathCalculator lcpc, QuadTree<Link> qt, String fileName, //
+            HashMap<LocalDate, Tensor> dateSplitUp) throws Exception {
         this.fileName = fileName;
         this.dateSplitUp = dateSplitUp;
         this.sortedEntries = sortedEntries;
@@ -60,11 +57,11 @@ public class FileAnalysis {
                 this.maxTime = sortedEntries.lastKey();
                 mapBounds = LongLatRange.in(sortedEntries);
                 journeyTimes = JourneyTimes.in(sortedEntries);
-                NetworkDistanceHelper dh = new NetworkDistanceHelper(sortedEntries, db, leastCostPathCalculator, quadTree);
+                NetworkDistanceHelper dh = new NetworkDistanceHelper(sortedEntries, db, lcpc, qt);
                 custrDistance = dh.getCustrDistance();
                 totalDistance = dh.getTotlDistance();
                 emptyDistance = dh.getEmptyDistance();
-                plotWaitingTimes = Tensors.empty(); // PlotWaitingTimes.in(sortedEntries);
+                plotWaitingTimes = PlotWaitingTimes.in(sortedEntries);
                 GlobalAssert.that(journeyTimes.length() == numRequests);
                 minMaxJourneyTime = JourneyTimeRange.in(journeyTimes);
             }
@@ -101,7 +98,7 @@ public class FileAnalysis {
         return Objects.isNull(mapBounds) ? null : mapBounds.Get(3).number().doubleValue();
     }
 
-    public Tensor getJourneyTimes() {
+    public Tensor getjourneyTimes() {
         return journeyTimes;
     }
 
@@ -118,7 +115,7 @@ public class FileAnalysis {
         return Tensors.of(emptyDistance, custrDistance, totalDistance);
     }
 
-    public Tensor getPlotWaitingTimes() {
+    public Tensor getplotWaitingTimes() {
         return plotWaitingTimes;
     }
 
@@ -142,7 +139,7 @@ public class FileAnalysis {
         SaveUtils.saveFile(profile, "occProfile_" + fileName, workingDirectory);
     }
 
-    public Map<LocalDate, Tensor> getDateSplitUp() {
+    public HashMap<LocalDate, Tensor> getDateSplitUp() {
         return dateSplitUp;
     }
 }
