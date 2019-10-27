@@ -7,8 +7,7 @@ import ch.ethz.idsc.amodtaxi.readers.TaxiTripsReader;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
-/* package */ abstract class ChicagoTripsReaderBasic //
-        extends TaxiTripsReader {
+/* package */ abstract class ChicagoTripsReaderBasic extends TaxiTripsReader {
 
     public ChicagoTripsReaderBasic(String delim) {
         super(delim);

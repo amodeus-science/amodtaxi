@@ -75,7 +75,5 @@ import ch.ethz.idsc.tensor.img.ColorDataIndexed;
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
-
 }

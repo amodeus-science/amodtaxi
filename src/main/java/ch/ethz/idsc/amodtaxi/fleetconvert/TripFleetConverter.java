@@ -31,8 +31,6 @@ import ch.ethz.idsc.amodtaxi.tripmodif.TaxiDataModifier;
 import ch.ethz.idsc.amodtaxi.tripmodif.TripBasedModifier;
 
 public abstract class TripFleetConverter {
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = //
-            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
     protected final ScenarioOptions scenarioOptions;
     protected final Network network;
@@ -111,10 +109,10 @@ public abstract class TripFleetConverter {
         /** creating population based on corrected, filtered file */
         TripPopulationCreator populationCreator = //
                 new TripPopulationCreator(processingDir, configFull, network, db, //
-                        DATE_TIME_FORMATTER, qt, simulationDate, timeConvert, finalFilters);
+                        qt, simulationDate, timeConvert, finalFilters);
         populationCreator.process(modifiedTripsFile);
         finalTripsFile = populationCreator.getFinalTripFile();
-        
+
         System.exit(1);
     }
 

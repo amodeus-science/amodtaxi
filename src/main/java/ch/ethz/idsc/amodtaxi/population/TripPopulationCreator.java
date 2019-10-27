@@ -47,7 +47,7 @@ public class TripPopulationCreator {
     private File finalTripFile;
 
     public TripPopulationCreator(File processingDir, Config config, Network network, //
-            MatsimAmodeusDatabase db, DateTimeFormatter dateFormat, QuadTree<Link> qt, //
+            MatsimAmodeusDatabase db, QuadTree<Link> qt, //
             LocalDate simualtionDate, AmodeusTimeConvert timeConvert, TaxiTripFilter finalFilters) {
         this.linkSelect = new ClosestLinkSelect(db, qt);
         this.simulationDate = simualtionDate;
