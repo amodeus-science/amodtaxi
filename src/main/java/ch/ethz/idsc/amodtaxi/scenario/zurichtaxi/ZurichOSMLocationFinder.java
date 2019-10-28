@@ -9,6 +9,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import java.io.StringReader;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+
 import javax.net.ssl.HttpsURLConnection;
 
 import ch.ethz.idsc.tensor.Tensor;
@@ -63,6 +69,8 @@ public class ZurichOSMLocationFinder {
 
         String https_url = urlBuilder(Arrays.asList("135", "pilkington", "avenue", "birmingham"));
         String returnString = NominatimHelper.queryInterface(https_url);
+        
+        XMLResponseHelper.extractFirstLatLong(returnString);
 
         System.out.println(returnString);
 
@@ -79,11 +87,28 @@ public class ZurichOSMLocationFinder {
                 queryInsert = queryInsert + elements.get(i);
         }
 
+        // BEFORE with XML
+//        String https_url = "https://nominatim.openstreetmap.org/search?q="//
+//                + queryInsert//
+//                // + "135+pilkington+avenue,+birmingham"//
+//                + "&format=xml&polygon=1&addressdetails=1";
+//        return https_url;
+        
+
+        
+        // NOW JSON
         String https_url = "https://nominatim.openstreetmap.org/search?q="//
                 + queryInsert//
                 // + "135+pilkington+avenue,+birmingham"//
-                + "&format=xml&polygon=1&addressdetails=1";
+                + "&format=geojson";
         return https_url;
+        
+//        
+//        17+Strada+Pictor+Alexandru+Romano%2C+Bukarest
+
+
+        
     }
+
 
 }
