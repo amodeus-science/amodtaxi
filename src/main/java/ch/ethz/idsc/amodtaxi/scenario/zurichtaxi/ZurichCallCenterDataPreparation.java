@@ -34,7 +34,8 @@ public class ZurichCallCenterDataPreparation {
         BufferedWriter writer = new BufferedWriter(new FileWriter(exportFile));
         List<CsvReader.Row> unreadable = new ArrayList<>();
         List<CsvReader.Row> readable = new ArrayList<>();
-        ZurichLocationFinder locationFinder = new ZurichLocationFinder(traceFile, delimTrace);
+        ZurichTraceLocationFinder locationFinder = new ZurichTraceLocationFinder(traceFile, delimTrace);
+        ZurichOSMLocationFinder osmLocationFinder = new ZurichOSMLocationFinder();
 
         Consumer<CsvReader.Row> process = r -> {
             try {
@@ -59,28 +60,22 @@ public class ZurichCallCenterDataPreparation {
 
                                     String fahrzeug = r.get("Kenng");
 
-                                    Tensor coordsStart = locationFinder.getCoords(fahrzeug, ldt3);
-                                    Tensor coordsEnd = locationFinder.getCoords(fahrzeug, ldt4);
+                                    String abfahrt = r.get("1. Abfahrtsadresse");
+                                    String zielAdd = r.get("Letzte Zieladresse");
 
-                                    // //
-                                    System.out.println(coordsStart);
-                                    System.out.println(coordsEnd);
-                                    // System.out.println("---");
-                                    //
+                                    Tensor coordsStartTrace = locationFinder.getCoords(fahrzeug, ldt3);
+                                    Tensor coordsEndTrace = locationFinder.getCoords(fahrzeug, ldt4);
+
+                                    Tensor coordsStartOSM = osmLocationFinder.getCoords(abfahrt);
+                                    Tensor coordsEndOSM = osmLocationFinder.getCoords(zielAdd);
+
                                     // write these to new file
                                     String line = r.toString();
-                                    if (Objects.nonNull(coordsStart) && Objects.nonNull(coordsEnd))
-                                        writer.write(line + "," + coordsStart.toString().replace(",", ";") + "," + coordsEnd.toString().replace(",", ";") + "\n");
-                                    
-                                    if (Objects.isNull(coordsStart) && Objects.nonNull(coordsEnd))
-                                        writer.write(line + "," + "undef" + "," + coordsEnd.toString().replace(",", ";") + "\n");
-                                    
-                                    if (Objects.nonNull(coordsStart) && Objects.isNull(coordsEnd))
-                                        writer.write(line + "," + coordsStart.toString().replace(",", ";") + "," + "undef" + "\n");
-                                    
-                                    if (Objects.isNull(coordsStart) && Objects.isNull(coordsEnd))
-                                        writer.write(line + "," + "undef" + "," + "undef" + "\n");
-                                    
+                                    line = line + addLocationIfFound(coordsStartTrace, coordsEndTrace);
+                                    line = line + addLocationIfFound(coordsStartOSM, coordsEndOSM);
+                                    line = line + "\n";
+                                    writer.write(line);
+
                                 }
                             }
                         }
@@ -96,7 +91,7 @@ public class ZurichCallCenterDataPreparation {
         };
 
         CsvReader reader = new CsvReader(originalFile, delim);
-        writer.write(reader.headerLine() + ",WGS84StartTrace" + ",WGS84EndTrace" + "\n");
+        writer.write(reader.headerLine() + ",WGS84StartTrace" + ",WGS84EndTrace" + ",WGS84OSMStart" + ",WGS84OSMEnd" + "\n");
         reader.rows(process);
         writer.close();
 
@@ -104,6 +99,21 @@ public class ZurichCallCenterDataPreparation {
         System.out.println("Example:" + unreadable.get(0));
         System.out.println("Readable rows: " + readable.size());
         System.out.println("Example:" + readable.get(0));
+
+    }
+
+    private static String addLocationIfFound(Tensor coordsStart, Tensor coordsEnd) {
+        if (Objects.nonNull(coordsStart) && Objects.nonNull(coordsEnd))
+            return ("," + coordsStart.toString().replace(",", ";") + "," + coordsEnd.toString().replace(",", ";"));
+
+        if (Objects.isNull(coordsStart) && Objects.nonNull(coordsEnd))
+            return ("," + "undef" + "," + coordsEnd.toString().replace(",", ";"));
+
+        if (Objects.nonNull(coordsStart) && Objects.isNull(coordsEnd))
+            return ("," + coordsStart.toString().replace(",", ";") + "," + "undef");
+
+        // both are null
+        return ("," + "undef" + "," + "undef");
 
     }
 

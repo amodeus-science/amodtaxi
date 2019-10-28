@@ -18,14 +18,14 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
-public class ZurichLocationFinder {
+public class ZurichTraceLocationFinder {
 
     private final HashMap<String, NavigableMap<LocalDateTime, CsvReader.Row>> tracemap = new HashMap<>();
     // maximum tolereated difference of the trace to be taken into consideration
     private final Scalar tDiffMax = Quantity.of(300, "s");
     private final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("d.M.yyyy H:mm:ss");
 
-    public ZurichLocationFinder(File traceFile, String delim) throws Exception {
+    public ZurichTraceLocationFinder(File traceFile, String delim) throws Exception {
 
         // rows are sorted according to the id of the vehicle
         // and according to the time of the trace recording
@@ -42,12 +42,10 @@ public class ZurichLocationFinder {
     }
 
     public Tensor getCoords(String vehicle, LocalDateTime ldt) {
-        System.out.println("0");
         if (tracemap.containsKey(vehicle)) {
             Entry<LocalDateTime, CsvReader.Row> closestRow = closestRow(vehicle, ldt);
             // time difference too large
             if (Scalars.lessThan(tDiffMax, Duration.abs(closestRow.getKey(), ldt))) {
-                System.out.println("1");
                 return null;
             }
             // compute coords from trace
@@ -55,7 +53,6 @@ public class ZurichLocationFinder {
             Double laenge = Double.parseDouble(closestRow.getValue().get("\"Laengengrad\""));
             return Tensors.vector(breite, laenge);
         }
-        System.out.println("2");
         return null;
     }
 
@@ -93,14 +90,5 @@ public class ZurichLocationFinder {
         // no entry at all
         return null;
     }
-    
-//    public static void main(String[] args){
-//        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("d.M.yyyy H:mm:ss");
-//        String toParse = "21.06.2017 04:15:43";
-////        String toParse = "06.09.2017 00:10:05";
-////        String toParse = "21.06.2017 00:10:05";
-//        LocalDateTime ldt = LocalDateTime.parse(toParse, dateFormat);
-//        
-//    }
 
 }
