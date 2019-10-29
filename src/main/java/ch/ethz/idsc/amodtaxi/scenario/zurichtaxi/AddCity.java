@@ -10,7 +10,7 @@ import java.util.List;
         List<String> knownCities = Arrays.asList("brugg", "zurich", "kloten", "steinach", "baeretswil", //
                 "gallen", "gossau", "zürich", "adliswil", "zollikon", "oberrieden", //
                 "schlieren", "uitikon", "lufingen", "wallisellen", "volketswil", //
-                "riet", "zumikon", "bassersdorf", "wiedikon");
+                "riet", "zumikon", "bassersdorf", "wiedikon","umiken");
 
         boolean noCity = true;
 

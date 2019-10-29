@@ -5,6 +5,7 @@ import org.json.JSONObject;
 
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import de.lmu.ifi.dbs.elki.application.jsmap.JSONBuffer.JSONException;
 
 public enum NominatimJSON {
     ;
@@ -22,9 +23,10 @@ public enum NominatimJSON {
             Tensor t1 = Tensors.vector(Double.parseDouble(str1), Double.parseDouble(str2));
 
             return t1;
-        } catch (Exception exception) {
-            exception.printStackTrace();
+        } catch (JSONException exception) {
+
         }
+        System.out.println("JSONException");
         return null;
     }
 

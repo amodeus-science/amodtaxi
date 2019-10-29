@@ -34,10 +34,30 @@ import ch.ethz.idsc.tensor.Tensors;
         locationMap.put(//
                 Arrays.asList("airport", "kloten"), //
                 Tensors.vector(8.562125, 47.450992));
-        
+
         locationMap.put(//
                 Arrays.asList("kloten", "vorfahrt"), //
                 Tensors.vector(8.562125, 47.450992));
+
+        locationMap.put(//
+                Arrays.asList("kloten", "hotelstrasse", "2780"), //
+                Tensors.vector(8.562125, 47.450992));
+
+        locationMap.put(//
+                Arrays.asList("busstation", "zwinglihaus", "zurich"), //
+                Tensors.vector(8.516810, 47.372000));
+
+        locationMap.put(//
+                Arrays.asList("bellerivestrasse/klausstrasse", "zurich"), //
+                Tensors.vector(8.549613, 47.358944));
+
+        locationMap.put(//
+                Arrays.asList("waidfussweg", "dorfstrasse/hoenggerstrasse", "zurich"), //
+                Tensors.vector(8.519481, 47.395162));
+
+        locationMap.put(//
+                Arrays.asList("8302", "kloten", "rondell-strasse"), //
+                Tensors.vector(8.564343, 47.453338));
 
     }
 
