@@ -1,4 +1,4 @@
-package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi;
+package ch.ethz.idsc.amodtaxi.nominatim;
 
 import java.net.URI;
 
@@ -8,6 +8,7 @@ import org.json.JSONTokener;
 import org.junit.Assert;
 import org.junit.Test;
 
+import ch.ethz.idsc.amodtaxi.nominatim.NominatimJSON;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 

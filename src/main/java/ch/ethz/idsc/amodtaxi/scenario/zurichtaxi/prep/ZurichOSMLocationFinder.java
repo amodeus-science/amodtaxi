@@ -1,4 +1,5 @@
-package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi;
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
+package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi.prep;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,9 +7,12 @@ import java.util.Objects;
 
 import org.json.JSONObject;
 
+import ch.ethz.idsc.amodtaxi.nominatim.NomatimURL;
+import ch.ethz.idsc.amodtaxi.nominatim.NominatimHelper;
+import ch.ethz.idsc.amodtaxi.nominatim.NominatimJSON;
 import ch.ethz.idsc.tensor.Tensor;
 
-public class ZurichOSMLocationFinder {
+/* package */ class ZurichOSMLocationFinder {
 
     private final FixedLocation fixedLocation = new FixedLocation();
     private int counter = 0;

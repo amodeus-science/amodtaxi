@@ -1,4 +1,5 @@
-package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi;
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
+package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi.prep;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -58,6 +59,10 @@ import ch.ethz.idsc.tensor.Tensors;
         locationMap.put(//
                 Arrays.asList("8302", "kloten", "rondell-strasse"), //
                 Tensors.vector(8.564343, 47.453338));
+
+        locationMap.put(//
+                Arrays.asList("hotel", "twenty", "five", "hours", "langstr"), //
+                Tensors.vector(8.528262, 47.380039));
 
     }
 

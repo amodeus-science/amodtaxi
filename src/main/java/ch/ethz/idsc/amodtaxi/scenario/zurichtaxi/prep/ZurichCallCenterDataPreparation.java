@@ -1,4 +1,5 @@
-package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi;
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
+package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi.prep;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -15,7 +16,7 @@ import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
-public class ZurichCallCenterDataPreparation {
+/* package */ class ZurichCallCenterDataPreparation {
 
     private File originalFile = new File("/home/clruch/Downloads/allTripsWithSemicolon.csv");
     private File exportFile = new File("/home/clruch/Downloads/tripsJune21.csv");

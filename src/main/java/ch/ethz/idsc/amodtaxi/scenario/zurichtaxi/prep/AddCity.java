@@ -1,4 +1,5 @@
-package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi;
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
+package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi.prep;
 
 import java.util.Arrays;
 import java.util.List;
@@ -10,7 +11,8 @@ import java.util.List;
         List<String> knownCities = Arrays.asList("brugg", "zurich", "kloten", "steinach", "baeretswil", //
                 "gallen", "gossau", "zürich", "adliswil", "zollikon", "oberrieden", //
                 "schlieren", "uitikon", "lufingen", "wallisellen", "volketswil", //
-                "riet", "zumikon", "bassersdorf", "wiedikon","umiken");
+                "riet", "zumikon", "bassersdorf", "wiedikon", "umiken", "hausen", //
+                "baden", "bonstetten", "windisch");
 
         boolean noCity = true;
 

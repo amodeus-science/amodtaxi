@@ -1,4 +1,5 @@
-package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi;
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
+package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi.prep;
 
 import java.io.File;
 import java.time.LocalDateTime;
@@ -18,7 +19,7 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
-public class ZurichTraceLocationFinder {
+/* package */ class ZurichTraceLocationFinder {
 
     private final HashMap<String, NavigableMap<LocalDateTime, CsvReader.Row>> tracemap = new HashMap<>();
     // maximum tolereated difference of the trace to be taken into consideration

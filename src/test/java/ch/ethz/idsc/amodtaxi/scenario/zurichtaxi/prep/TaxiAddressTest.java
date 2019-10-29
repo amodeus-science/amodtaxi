@@ -1,9 +1,11 @@
-package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi;
+package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi.prep;
 
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Test;;
+import org.junit.Test;
+
+import ch.ethz.idsc.amodtaxi.scenario.zurichtaxi.prep.TaxiAddress;;
 
 public class TaxiAddressTest {
 

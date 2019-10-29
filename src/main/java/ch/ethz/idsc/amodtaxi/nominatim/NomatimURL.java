@@ -1,10 +1,17 @@
-package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi;
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
+package ch.ethz.idsc.amodtaxi.nominatim;
 
 import java.util.List;
 
-/* package */ enum NomatimURL {
+public enum NomatimURL {
     ;
-    
+
+    /** @return a url to request a geo JSON from the nominatim API for the
+     *         query including the {@link List} of Strings @param elements, usage
+     *         example:
+     * 
+     *         String httpToQuery =
+     *         NominatimURL.build(Arrays.asList("135","pilkington","avenue","birmingham")); */
     public static String build(List<String> elements) {
         String queryInsert = "";
 
@@ -15,10 +22,9 @@ import java.util.List;
                 queryInsert = queryInsert + elements.get(i);
         }
 
-        // NOW JSON
+        // API to query geoJSON
         String https_url = "https://nominatim.openstreetmap.org/search?q="//
                 + queryInsert//
-                // + "135+pilkington+avenue,+birmingham"//
                 + "&format=geojson";
         return https_url;
 

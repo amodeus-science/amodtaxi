@@ -1,4 +1,5 @@
-package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi;
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
+package ch.ethz.idsc.amodtaxi.nominatim;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,7 +10,7 @@ import java.util.Objects;
 
 import javax.net.ssl.HttpsURLConnection;
 
-/* package */ enum NominatimHelper {
+public enum NominatimHelper {
     ;
 
     public static String queryInterface(String https_url) {
@@ -33,7 +34,7 @@ import javax.net.ssl.HttpsURLConnection;
         return returnString;
     }
 
-    public static String readInterfaceResponse(HttpsURLConnection con) {
+    private static String readInterfaceResponse(HttpsURLConnection con) {
         String allOfIt = "";
         if (Objects.nonNull(con)) {
             try {

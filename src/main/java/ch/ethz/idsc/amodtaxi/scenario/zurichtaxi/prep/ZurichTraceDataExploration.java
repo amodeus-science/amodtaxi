@@ -1,4 +1,5 @@
-package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi;
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
+package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi.prep;
 
 import java.io.File;
 import java.time.format.DateTimeFormatter;
@@ -10,7 +11,7 @@ import java.util.function.Consumer;
 import ch.ethz.idsc.amodeus.util.io.CsvReader;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
-public class ZurichTraceDataExploration {
+/* package */ class ZurichTraceDataExploration {
 
     public static void main(String[] args) throws Exception {
 

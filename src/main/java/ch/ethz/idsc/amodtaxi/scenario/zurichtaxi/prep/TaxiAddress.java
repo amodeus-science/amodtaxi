@@ -1,4 +1,5 @@
-package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi;
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
+package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi.prep;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,28 +14,22 @@ import java.util.List;
         // remove ";"
         copy = copy.replace(";", "");
 
-        // System.out.println("copy 1:<" + copy + ">");
-
         // remove "GPS"
         copy = copy.replace("gps", "");
 
-        // System.out.println("copy 2:<" + copy + ">");
-
-        // remove "GPS"
+        // remove "CH-"
         copy = copy.replace("ch-", "");
 
         // add city name if not present
         copy = AddCity.ifNeeded(copy);
 
-        // System.out.println("copy 3:<" + copy + ">");
-
         // remove duplicate spaces
         copy = RemoveDuplicate.spaces(copy);
+
+        // remove first space if present
         if (copy.toCharArray()[0] == ' ') {
             copy = copy.substring(1);
         }
-
-        // System.out.println("copy 4:<" + copy + ">");
 
         // split at spaces
         List<String> individualWords = Arrays.asList(copy.split(" "));
