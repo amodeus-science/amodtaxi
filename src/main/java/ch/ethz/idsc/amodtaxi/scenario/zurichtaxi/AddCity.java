@@ -9,8 +9,8 @@ import java.util.List;
     public static String ifNeeded(String original) {
         List<String> knownCities = Arrays.asList("brugg", "zurich", "kloten", "steinach", "baeretswil", //
                 "gallen", "gossau", "zürich", "adliswil", "zollikon", "oberrieden", //
-                "schlieren", "uitikon", "lufingen", "wallisellen", "volketswil",//
-                "riet","zumikon","bassersdorf");
+                "schlieren", "uitikon", "lufingen", "wallisellen", "volketswil", //
+                "riet", "zumikon", "bassersdorf", "wiedikon");
 
         boolean noCity = true;
 
