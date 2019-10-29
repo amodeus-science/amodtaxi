@@ -4,7 +4,6 @@ package ch.ethz.idsc.amodtaxi.population;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -81,7 +80,6 @@ public class TripPopulationCreator {
         List<TaxiTrip> finalFilteredTrips = new ArrayList<>();
         Stream<TaxiTrip> filtered = finalFilters.filterStream(trips.stream());
 
-
         // create persons
         filtered.forEach(taxiTrip -> {
             Person person = PersonCreate.fromTrip(taxiTrip, taxiTrip.localId, populationFactory, //
@@ -90,8 +88,6 @@ public class TripPopulationCreator {
             distCalc.addTrip(taxiTrip);
             finalFilteredTrips.add(taxiTrip);
         });
-        
-
 
         // export finally used set of trips
         finalTripFile = new File(inFile.getAbsolutePath().replace(".csv", "_final.csv"));

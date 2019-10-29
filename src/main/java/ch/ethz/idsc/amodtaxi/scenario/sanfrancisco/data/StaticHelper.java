@@ -8,7 +8,6 @@ import java.util.TreeSet;
 import java.util.function.Function;
 
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.data.FileAnalysis;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
 /* package */ enum StaticHelper {

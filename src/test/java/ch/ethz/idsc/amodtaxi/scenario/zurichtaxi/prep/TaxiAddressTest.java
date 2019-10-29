@@ -3,9 +3,7 @@ package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi.prep;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Test;
-
-import ch.ethz.idsc.amodtaxi.scenario.zurichtaxi.prep.TaxiAddress;;
+import org.junit.Test;;
 
 public class TaxiAddressTest {
 
@@ -20,11 +18,8 @@ public class TaxiAddressTest {
         Assert.assertTrue(prepared.get(2).equals("hotelstrasse"));
         Assert.assertTrue(prepared.get(3).equals("2780"));
 
-
-
     }
 
-    
     @Test
     public void test2() {
 
@@ -38,10 +33,5 @@ public class TaxiAddressTest {
         System.out.println(prepared);
 
     }
-
-    
-    
-    
-
 
 }

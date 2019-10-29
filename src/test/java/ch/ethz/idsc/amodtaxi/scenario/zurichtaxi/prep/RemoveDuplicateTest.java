@@ -3,8 +3,6 @@ package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi.prep;
 import org.junit.Assert;
 import org.junit.Test;
 
-import ch.ethz.idsc.amodtaxi.scenario.zurichtaxi.prep.RemoveDuplicate;
-
 public class RemoveDuplicateTest {
 
     @Test

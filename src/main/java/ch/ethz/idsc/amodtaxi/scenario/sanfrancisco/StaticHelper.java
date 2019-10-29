@@ -36,7 +36,6 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         return outputDirectory;
     }
 
-
     public static int getDropOffTime(int timeDriveStart, NavigableMap<Integer, TaxiStamp> sortedMap) {
         GlobalAssert.that(sortedMap.get(timeDriveStart).roboTaxiStatus.equals(RoboTaxiStatus.DRIVEWITHCUSTOMER));
         boolean endJourney = false;
@@ -89,5 +88,4 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         return map;
     }
 
-    
 }

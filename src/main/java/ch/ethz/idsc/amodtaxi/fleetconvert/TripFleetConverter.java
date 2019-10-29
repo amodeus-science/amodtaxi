@@ -3,7 +3,6 @@ package ch.ethz.idsc.amodtaxi.fleetconvert;
 
 import java.io.File;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

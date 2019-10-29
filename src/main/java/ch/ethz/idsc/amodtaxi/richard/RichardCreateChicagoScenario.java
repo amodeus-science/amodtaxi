@@ -153,7 +153,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         // TODO eventually remove, this did not improve the fit.
         // finalFilters.addFilter(new TripMaxSpeedFilter(network, db, ScenarioConstants.maxAllowedSpeed));
         ChicagoOnlineTripFleetConverter converter = //
-                new ChicagoOnlineTripFleetConverter(scenarioOptions, network,  tripModifier, //
+                new ChicagoOnlineTripFleetConverter(scenarioOptions, network, tripModifier, //
                         new ChicagoFormatModifier(), finalTripFilter, tripsReader);
         finalTripsFile = Scenario.create(workingDir, tripFile, //
                 converter, workingDir, processingdir, simulationDate, timeConvert);

@@ -1,29 +1,19 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.data;
 
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 
-import ch.ethz.idsc.amodeus.analysis.UnitSaveUtils;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
-import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.math.SI;
-
 import ch.ethz.idsc.tensor.Scalar;
-import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.qty.Quantity;
-import ch.ethz.idsc.tensor.red.Mean;
-import ch.ethz.idsc.tensor.red.Total;
-import ch.ethz.idsc.tensor.sca.N;
 
 /* package */ enum SaveInfo {
     ;
@@ -60,20 +50,20 @@ import ch.ethz.idsc.tensor.sca.N;
         Double minLng = StaticHelper.getMinVal(filesAnalysis, FileAnalysis::getMinLng);
         Double maxLng = StaticHelper.getMaxVal(filesAnalysis, FileAnalysis::getMaxLng);
 
-//        /** journey Times */
-//        Tensor journeyTimes = Tensors.empty();
-//        for (FileAnalysis fileAnalysis : filesAnalysis) {
-//            if (Objects.nonNull(fileAnalysis.getJourneyTimes()))
-//                fileAnalysis.getJourneyTimes().flatten(-1).forEach(s -> journeyTimes.append(s));
-//        }
-//        GlobalAssert.that(journeyTimes.length() == numRequests);
+        // /** journey Times */
+        // Tensor journeyTimes = Tensors.empty();
+        // for (FileAnalysis fileAnalysis : filesAnalysis) {
+        // if (Objects.nonNull(fileAnalysis.getJourneyTimes()))
+        // fileAnalysis.getJourneyTimes().flatten(-1).forEach(s -> journeyTimes.append(s));
+        // }
+        // GlobalAssert.that(journeyTimes.length() == numRequests);
 
-//        /** plot waiting Times */
-//        Tensor plotWaitingTimes = Tensors.empty();
-//        for (FileAnalysis fileAnalysis : filesAnalysis) {
-//            if (Objects.nonNull(fileAnalysis.getPlotWaitingTimes()))
-//                fileAnalysis.getPlotWaitingTimes().stream().forEach(s -> plotWaitingTimes.append(s));
-//        }
+        // /** plot waiting Times */
+        // Tensor plotWaitingTimes = Tensors.empty();
+        // for (FileAnalysis fileAnalysis : filesAnalysis) {
+        // if (Objects.nonNull(fileAnalysis.getPlotWaitingTimes()))
+        // fileAnalysis.getPlotWaitingTimes().stream().forEach(s -> plotWaitingTimes.append(s));
+        // }
 
         // GlobalAssert.that(maxWaitingTimes.length() == numRequests);
         // GlobalAssert.that(minWaitingTimes.length() == numRequests);
@@ -97,11 +87,11 @@ import ch.ethz.idsc.tensor.sca.N;
         out.write("longitude in range: (" + minLng + " / " + maxLng + ")\n");
         out.write("min journey time: " + minJourneyTime + "\n");
         out.write("max journey time: " + maxJourneyTime + "\n");
-//        if (journeyTimes.length() > 0) {
-//            out.write("mean journey time: " + N.DOUBLE.of(Mean.of(journeyTimes)) + "\n");
-//        } else {
-//            out.write("mean journey time: " + "no journeys found" + "\n");
-//        }
+        // if (journeyTimes.length() > 0) {
+        // out.write("mean journey time: " + N.DOUBLE.of(Mean.of(journeyTimes)) + "\n");
+        // } else {
+        // out.write("mean journey time: " + "no journeys found" + "\n");
+        // }
 
         out.write("total distance: " + totalDistance + "\n");
         out.write("customer distance: " + custrDistance + "\n");
@@ -113,11 +103,11 @@ import ch.ethz.idsc.tensor.sca.N;
             SaveInfo.ofSingle(fileAnalysis, out, timeConvert);
         }
 
-//        /** save data */
-//        if (journeyTimes.length() > 0)
-//            UnitSaveUtils.saveFile(journeyTimes, "journeyTimes", saveSubDir);
-//        if (plotWaitingTimes.length() > 0)
-//            UnitSaveUtils.saveFile(plotWaitingTimes, "plotWaitingTimes", saveSubDir);
+        // /** save data */
+        // if (journeyTimes.length() > 0)
+        // UnitSaveUtils.saveFile(journeyTimes, "journeyTimes", saveSubDir);
+        // if (plotWaitingTimes.length() > 0)
+        // UnitSaveUtils.saveFile(plotWaitingTimes, "plotWaitingTimes", saveSubDir);
 
     }
 
@@ -139,12 +129,12 @@ import ch.ethz.idsc.tensor.sca.N;
         out.write("min journey time: " + fileAnalysis.getMinJourneyTime() + "\n");
         out.write("max journey time: " + fileAnalysis.getMaxJourneyTime() + "\n");
 
-//        if (Objects.nonNull(fileAnalysis.getJourneyTimes()) && fileAnalysis.getJourneyTimes().length() > 0//
-//                && Scalars.lessThan(Quantity.of(0, SI.SECOND), (Scalar) Total.of(fileAnalysis.getJourneyTimes()))) {
-//            out.write("mean journey time: " + N.DOUBLE.of(Mean.of(fileAnalysis.getJourneyTimes())) + "\n");
-//        } else {
-//            out.write("mean journey time: undefined" + "\n");
-//        }
+        // if (Objects.nonNull(fileAnalysis.getJourneyTimes()) && fileAnalysis.getJourneyTimes().length() > 0//
+        // && Scalars.lessThan(Quantity.of(0, SI.SECOND), (Scalar) Total.of(fileAnalysis.getJourneyTimes()))) {
+        // out.write("mean journey time: " + N.DOUBLE.of(Mean.of(fileAnalysis.getJourneyTimes())) + "\n");
+        // } else {
+        // out.write("mean journey time: undefined" + "\n");
+        // }
 
         out.write("empty distance:    " + fileAnalysis.distances().Get(0) + "\n");
         out.write("customer distance: " + fileAnalysis.distances().Get(1) + "\n");
