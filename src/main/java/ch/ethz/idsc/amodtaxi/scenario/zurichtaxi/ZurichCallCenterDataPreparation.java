@@ -3,14 +3,12 @@ package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 import ch.ethz.idsc.amodeus.util.Duration;
+import ch.ethz.idsc.amodeus.util.LocalDateTimes;
 import ch.ethz.idsc.amodeus.util.io.CsvReader;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
@@ -21,79 +19,63 @@ public class ZurichCallCenterDataPreparation {
 
     private File originalFile = new File("/home/clruch/Downloads/allTripsWithSemicolon.csv");
     private File exportFile = new File("/home/clruch/Downloads/tripsJune21.csv");
+    private File unreadableFile = new File("/home/clruch/Downloads/tripsJune21Unreadable.csv");
     private File traceFile = new File("/home/clruch/Downloads/2017-06-21-GPSFahrtstrecken-Protokoll.csv");
-    private DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("M/d/yyyy H:mm");
+
     private String delim = ",";
     private String delimTrace = ";";
+    private ZurichTraceLocationFinder locationFinder = new ZurichTraceLocationFinder(traceFile, delimTrace);
+    private ZurichOSMLocationFinder osmLocationFinder = new ZurichOSMLocationFinder();
+    private BufferedWriter writer = new BufferedWriter(new FileWriter(exportFile));
+
     // 21. of June 2017 is a Wednesday
     private int chosenmonth = 6;
     private int chosenday = 21;
 
     public ZurichCallCenterDataPreparation() throws Exception {
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter(exportFile));
         List<CsvReader.Row> unreadable = new ArrayList<>();
         List<CsvReader.Row> readable = new ArrayList<>();
-        ZurichTraceLocationFinder locationFinder = new ZurichTraceLocationFinder(traceFile, delimTrace);
-        ZurichOSMLocationFinder osmLocationFinder = new ZurichOSMLocationFinder();
 
-        Consumer<CsvReader.Row> process = r -> {
-            try {
-                LocalDateTime ldt1 = LocalDateTime.parse(r.get("Erfassung"), dateFormat);
-                LocalDateTime ldt2 = LocalDateTime.parse(r.get("Vermittlung"), dateFormat);
-                LocalDateTime ldt3 = LocalDateTime.parse(r.get("Fahrtbeginn"), dateFormat);
-                LocalDateTime ldt4 = LocalDateTime.parse(r.get("Fahrtende"), dateFormat);
+        Consumer<CsvReader.Row> process = r2 -> {
 
-                Scalar vermittlungZeit = Duration.between(ldt1, ldt2);
-                Scalar warteZeit = Duration.between(ldt1, ldt3);
+            // try to read the row
+            CallCenterRow r = new CallCenterRow(r2);
 
-                // erfasst am 12. 6.
-                if (ldt1.getDayOfMonth() == chosenday && ldt1.getMonthValue() == chosenmonth) {
-                    // vermittelt am 12. 6.
-                    if (ldt2.getDayOfMonth() == chosenday && ldt2.getMonthValue() == chosenmonth) {
-                        // fahrtbeginn am 12. 6.
-                        if (ldt3.getDayOfMonth() == chosenday && ldt3.getMonthValue() == chosenmonth) {
-                            // vermittlung within short amount of time immediately
-                            if (Scalars.lessEquals(vermittlungZeit, Quantity.of(180, "s"))) {
-                                // nonzero difference between vermittlung and fahrbegin
-                                if (Scalars.lessThan(Quantity.of(0, "s"), warteZeit)) {
-
-                                    String fahrzeug = r.get("Kenng");
-
-                                    String abfahrt = r.get("1. Abfahrtsadresse");
-                                    String zielAdd = r.get("Letzte Zieladresse");
-
-                                    Tensor coordsStartTrace = locationFinder.getCoords(fahrzeug, ldt3);
-                                    Tensor coordsEndTrace = locationFinder.getCoords(fahrzeug, ldt4);
-
-                                    Tensor coordsStartOSM = osmLocationFinder.getCoords(abfahrt);
-                                    Tensor coordsEndOSM = osmLocationFinder.getCoords(zielAdd);
-
-                                    // write these to new file
-                                    String line = r.toString();
-                                    line = line + addLocationIfFound(coordsStartTrace, coordsEndTrace);
-                                    line = line + addLocationIfFound(coordsStartOSM, coordsEndOSM);
-                                    line = line + "\n";
-                                    writer.write(line);
-
-                                }
-                            }
-                        }
-                    }
-                }
-                readable.add(r);
-            } catch (Exception exception) {
-                unreadable.add(r);
-                // exception.printStackTrace();
-                // System.out.println(r);
-                // System.exit(1);
+            // process
+            if (r.success) {
+                readable.add(r2);
+                processReadableLine(r);
+            } else {
+                unreadable.add(r2);
             }
+
         };
 
+        System.out.println("KACKE0");
+
+        // create the new trip file
         CsvReader reader = new CsvReader(originalFile, delim);
         writer.write(reader.headerLine() + ",WGS84StartTrace" + ",WGS84EndTrace" + ",WGS84OSMStart" + ",WGS84OSMEnd" + "\n");
         reader.rows(process);
         writer.close();
+
+        // save unreadable rows to other file
+
+        System.out.println("KACKE1");
+
+        BufferedWriter writer2 = new BufferedWriter(new FileWriter(unreadableFile));
+        unreadable.forEach(row -> {
+            try {
+                String line = row.toString() + "\n";
+                writer2.write(line);
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+        });
+        writer2.close();
+
+        System.out.println("KACKE2");
 
         System.out.println("Unreadable rows: " + unreadable.size());
         System.out.println("Example:" + unreadable.get(0));
@@ -102,19 +84,57 @@ public class ZurichCallCenterDataPreparation {
 
     }
 
-    private static String addLocationIfFound(Tensor coordsStart, Tensor coordsEnd) {
-        if (Objects.nonNull(coordsStart) && Objects.nonNull(coordsEnd))
-            return ("," + coordsStart.toString().replace(",", ";") + "," + coordsEnd.toString().replace(",", ";"));
+    private void processReadableLine(CallCenterRow r) {
 
-        if (Objects.isNull(coordsStart) && Objects.nonNull(coordsEnd))
-            return ("," + "undef" + "," + coordsEnd.toString().replace(",", ";"));
+        // erfasst am 12. 6.
+        if (r.ldt1.getDayOfMonth() == chosenday && r.ldt1.getMonthValue() == chosenmonth) {
+            // vermittelt am 12. 6.
+            if (r.ldt2.getDayOfMonth() == chosenday && r.ldt2.getMonthValue() == chosenmonth) {
+                // fahrtbeginn am 12. 6.
+                if (r.ldt3.getDayOfMonth() == chosenday && r.ldt3.getMonthValue() == chosenmonth) {
 
-        if (Objects.nonNull(coordsStart) && Objects.isNull(coordsEnd))
-            return ("," + coordsStart.toString().replace(",", ";") + "," + "undef");
+                    if (LocalDateTimes.lessThan(r.ldt2, r.ldt1))
+                        System.err.println(r.ldt2 + " < " + r.ldt1);
 
-        // both are null
-        return ("," + "undef" + "," + "undef");
+                    if (LocalDateTimes.lessThan(r.ldt3, r.ldt1))
+                        System.err.println(r.ldt3 + " < " + r.ldt1);
 
+                    Scalar vermittlungZeit = Duration.abs(r.ldt1, r.ldt2);
+                    Scalar warteZeit = Duration.abs(r.ldt1, r.ldt3);
+
+                    // vermittlung within short amount of time immediately
+                    if (Scalars.lessEquals(vermittlungZeit, Quantity.of(180, "s"))) {
+
+                        // nonzero difference between vermittlung and fahrbegin
+                        if (Scalars.lessThan(Quantity.of(0, "s"), warteZeit)) {
+
+                            String fahrzeug = r.fahrzeug;// r.get("Kenng");
+
+                            String abfahrt = r.abfahrt;// r.get("1. Abfahrtsadresse");
+                            String zielAdd = r.zielAdd;// r.get("Letzte Zieladresse");
+
+                            Tensor coordsStartTrace = locationFinder.getCoords(fahrzeug, r.ldt3);
+                            Tensor coordsEndTrace = locationFinder.getCoords(fahrzeug, r.ldt4);
+
+                            Tensor coordsStartOSM = osmLocationFinder.getCoords(abfahrt);
+                            Tensor coordsEndOSM = osmLocationFinder.getCoords(zielAdd);
+
+                            // write these to new file
+                            String line = r.line;
+                            line = line + StaticHelper.addLocationIfFound(coordsStartTrace, coordsEndTrace);
+                            line = line + StaticHelper.addLocationIfFound(coordsStartOSM, coordsEndOSM);
+                            line = line + "\n";
+                            try {
+                                writer.write(line);
+                            } catch (Exception exception) {
+                                exception.printStackTrace();
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // ---

@@ -13,7 +13,7 @@ public class ZurichOSMLocationFinder {
     private final FixedLocation fixedLocation = new FixedLocation();
     private int counter = 0;
 
-    public Tensor getCoords(String address) throws InterruptedException {
+    public Tensor getCoords(String address) {
 
         // System.out.println("Address:");
         // System.out.println(address);

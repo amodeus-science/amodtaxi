@@ -1,11 +1,11 @@
 package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import de.lmu.ifi.dbs.elki.application.jsmap.JSONBuffer.JSONException;
 
 public enum NominatimJSON {
     ;
@@ -24,9 +24,8 @@ public enum NominatimJSON {
 
             return t1;
         } catch (JSONException exception) {
-
+            exception.printStackTrace();
         }
-        System.out.println("JSONException");
         return null;
     }
 

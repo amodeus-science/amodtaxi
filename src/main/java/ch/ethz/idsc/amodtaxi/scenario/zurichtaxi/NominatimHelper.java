@@ -22,12 +22,12 @@ import javax.net.ssl.HttpsURLConnection;
 
             // dump all the content
             returnString = NominatimHelper.readInterfaceResponse(con);
-            
+
             con.disconnect();
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return returnString;

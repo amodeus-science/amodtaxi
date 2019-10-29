@@ -71,7 +71,7 @@ public class NominatimQueryTester {
         URI uri = new URI(https_url);
         JSONTokener tokener = new JSONTokener(uri.toURL().openStream());
         JSONObject queryJSON = new JSONObject(tokener);
-        
+
         // check lat long
         Tensor latLong = NominatimJSON.toCoordinates(queryJSON);
         Assert.assertTrue(latLong.equals(Tensors.fromString("{7.44504019681667, 46.94707525}")));
