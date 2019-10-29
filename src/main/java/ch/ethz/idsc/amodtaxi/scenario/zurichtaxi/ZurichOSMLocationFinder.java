@@ -1,114 +1,48 @@
 package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import java.io.StringReader;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-
-import javax.net.ssl.HttpsURLConnection;
+import org.json.JSONObject;
 
 import ch.ethz.idsc.tensor.Tensor;
 
 public class ZurichOSMLocationFinder {
 
-    public ZurichOSMLocationFinder() {
-
-    }
+    private final FixedLocation fixedLocation = new FixedLocation();
 
     public Tensor getCoords(String address) throws InterruptedException {
 
         System.out.println("Address:");
         System.out.println(address);
-        System.err.println(prepare(address));
-        System.out.println("---");
 
-        Thread.sleep(1000);
-        // FIXME
+        Tensor longLat = fixedLocation.includes(address);
+        if (Objects.isNull(longLat)) {
 
-        return null;
+            List<String> elements = TaxiAddress.prepare(address);
+            System.out.println("Elements: ");
+            System.out.println(elements);
+            System.out.println("---");
 
-        // System.out.println("0");
-        // if (tracemap.containsKey(vehicle)) {
-        // Entry<LocalDateTime, CsvReader.Row> closestRow = closestRow(vehicle, ldt);
-        // // time difference too large
-        // if (Scalars.lessThan(tDiffMax, Duration.abs(closestRow.getKey(), ldt))) {
-        // System.out.println("1");
-        // return null;
-        // }
-        // // compute coords from trace
-        // Double breite = Double.parseDouble(closestRow.getValue().get("\"Breitengrad\""));
-        // Double laenge = Double.parseDouble(closestRow.getValue().get("\"Laengengrad\""));
-        // return Tensors.vector(breite, laenge);
-        // }
-        // System.out.println("2");
-        // return null;
-    }
+            String https_url = NomatimURL.build(elements);
+            String returnJSONString = NominatimHelper.queryInterface(https_url);
+            JSONObject queryJSON = new JSONObject(returnJSONString);
+            longLat = NominatimJSON.toCoordinates(queryJSON);
 
-    private static String prepare(String original) {
+            System.out.println("ReturnJSONString:");
+            System.out.println(returnJSONString);
 
-        String copy = original;
-
-        // remove ";"
-        copy = copy.replace(";", "");
-
-        // remove "GPS"
-        copy = copy.replace("GPS", "");
-
-        // remove "GPS"
-        copy = copy.replace("CH-", "");
-
-        String https_url = urlBuilder(Arrays.asList("135", "pilkington", "avenue", "birmingham"));
-        String returnString = NominatimHelper.queryInterface(https_url);
-        
-        XMLResponseHelper.extractFirstLatLong(returnString);
-
-        System.out.println(returnString);
-
-        return copy;
-    }
-
-    private static String urlBuilder(List<String> elements) {
-        String queryInsert = "";
-
-        for (int i = 0; i < elements.size(); ++i) {
-            if (i < elements.size() - 1)
-                queryInsert = queryInsert + elements.get(i) + "+";
-            else
-                queryInsert = queryInsert + elements.get(i);
         }
 
-        // BEFORE with XML
-//        String https_url = "https://nominatim.openstreetmap.org/search?q="//
-//                + queryInsert//
-//                // + "135+pilkington+avenue,+birmingham"//
-//                + "&format=xml&polygon=1&addressdetails=1";
-//        return https_url;
+        System.out.println("LongLat:");
+        System.out.println(longLat);
         
+        Thread.sleep(1000);
 
-        
-        // NOW JSON
-        String https_url = "https://nominatim.openstreetmap.org/search?q="//
-                + queryInsert//
-                // + "135+pilkington+avenue,+birmingham"//
-                + "&format=geojson";
-        return https_url;
-        
-//        
-//        17+Strada+Pictor+Alexandru+Romano%2C+Bukarest
+        System.out.println("----");
 
+        return longLat;
 
-        
     }
-
 
 }

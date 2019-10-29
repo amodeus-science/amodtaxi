@@ -5,18 +5,18 @@ import java.net.URI;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.junit.Assert;
+import org.junit.Test;
 
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 
-public class JasonTester {
+public class NominatimQueryTester {
 
-    public static void main(String[] args) throws Exception {
-
+    @Test
+    public void detailedPrintTest() throws Exception {
         // creating it
-
         String https_url = "https://nominatim.openstreetmap.org/search?q="//
-                // + queryInsert//
                 + "135+pilkington+avenue,+birmingham"//
                 + "&format=geojson";
 
@@ -56,26 +56,25 @@ public class JasonTester {
         System.out.println(t1);
         System.out.println("---");
 
-        // JSONObject jo = new JSONObject();
-        // jo.put("type", "FeatureCollection");
-        //
-        // {
-        // JSONArray ja = new JSONArray();
-        // ja.put(Boolean.TRUE);
-        // ja.put("lorem ipsum");
-        //
-        // JSONObject jo2 = new JSONObject();
-        // jo2.put("abc", "def");
-        // ja.put(jo2);
-        //
-        // jo.put("features", ja);
-        //
-        // System.out.println(jo);
-        // }
-        //
-        // // reading from it
-        // JSONArray ja = jo.getJSONArray("features");
-        // System.out.println(ja);
+        Assert.assertTrue(t1.equals(Tensors.fromString("{-1.8164308339635, 52.5487921}")));
+    }
+
+    @Test
+    public void simpleTest() throws Exception {
+
+        // creating it
+        String https_url = "https://nominatim.openstreetmap.org/search?q="//
+                + "1+bundesplatz+bern"//
+                + "&format=geojson";
+
+        // receive query
+        URI uri = new URI(https_url);
+        JSONTokener tokener = new JSONTokener(uri.toURL().openStream());
+        JSONObject queryJSON = new JSONObject(tokener);
+        
+        // check lat long
+        Tensor latLong = NominatimJSON.toCoordinates(queryJSON);
+        Assert.assertTrue(latLong.equals(Tensors.fromString("{7.44504019681667, 46.94707525}")));
 
     }
 
