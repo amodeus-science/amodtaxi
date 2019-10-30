@@ -31,7 +31,6 @@ public class ZurichTraceTripPreparation {
 
     public ZurichTraceTripPreparation() throws FileNotFoundException, IOException {
 
-
         // adding all vehicles to individual sets
         Consumer<CsvReader.Row> process = r -> {
             String fahrzeug = r.get("\"Fahrzeug\"");
@@ -41,6 +40,9 @@ public class ZurichTraceTripPreparation {
             tracemap.get(fahrzeug).put(ldt, r);
         };
 
+        CsvReader reader = new CsvReader(traceFile, delimTrace);
+        reader.rows(process);
+
         // for each vehicle, extract the trips
         List<TaxiTrip> allTrips = new ArrayList<>();
         tracemap.values().forEach(trace -> {
@@ -48,9 +50,7 @@ public class ZurichTraceTripPreparation {
             allTrips.addAll(vt.fromTrace(trace));
         });
 
-        CsvReader reader = new CsvReader(traceFile, delimTrace);
-        reader.rows(process);
-
+        
         System.out.println("Number of distinct taxis: " + tracemap.size());
         System.out.println("Number of trips:          " + allTrips.size());
 
