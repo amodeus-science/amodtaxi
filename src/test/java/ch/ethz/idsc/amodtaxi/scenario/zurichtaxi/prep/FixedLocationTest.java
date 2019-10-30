@@ -25,4 +25,18 @@ public class FixedLocationTest {
         Assert.assertTrue(Objects.nonNull(location));
     }
 
+    @Test
+    public void test2() {
+        String address = "BUSSTATION FRIESENBERGSTRASSE; FRIESENBERGSTRASSE/SCHWEIGHOFSTRASSE";
+        Tensor location = fixedLocation.includes(address);
+        Assert.assertTrue(Objects.nonNull(location));
+    }
+
+    @Test
+    public void test3() {
+        String address = "; BADENERSTRASSE 651";
+        Tensor location = fixedLocation.includes(address);
+        Assert.assertTrue(Objects.nonNull(location));
+    }
+
 }

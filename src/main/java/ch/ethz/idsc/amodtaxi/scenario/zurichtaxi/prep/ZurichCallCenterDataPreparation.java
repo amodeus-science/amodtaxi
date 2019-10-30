@@ -25,7 +25,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
     private String delim = ",";
     private String delimTrace = ";";
-    private ZurichTraceLocationFinder locationFinder = new ZurichTraceLocationFinder(traceFile, delimTrace);
+    private ZurichTraceLocationFinder traceLocationFinder = new ZurichTraceLocationFinder(traceFile, delimTrace);
     private ZurichOSMLocationFinder osmLocationFinder = new ZurichOSMLocationFinder();
     private BufferedWriter writer = new BufferedWriter(new FileWriter(exportFile));
 
@@ -114,8 +114,8 @@ import ch.ethz.idsc.tensor.qty.Quantity;
                             String abfahrt = r.abfahrt;// r.get("1. Abfahrtsadresse");
                             String zielAdd = r.zielAdd;// r.get("Letzte Zieladresse");
 
-                            Tensor coordsStartTrace = locationFinder.getCoords(fahrzeug, r.ldt3);
-                            Tensor coordsEndTrace = locationFinder.getCoords(fahrzeug, r.ldt4);
+                            Tensor coordsStartTrace = traceLocationFinder.getCoords(fahrzeug, r.ldt3);
+                            Tensor coordsEndTrace = traceLocationFinder.getCoords(fahrzeug, r.ldt4);
 
                             Tensor coordsStartOSM = osmLocationFinder.getCoords(abfahrt);
                             Tensor coordsEndOSM = osmLocationFinder.getCoords(zielAdd);

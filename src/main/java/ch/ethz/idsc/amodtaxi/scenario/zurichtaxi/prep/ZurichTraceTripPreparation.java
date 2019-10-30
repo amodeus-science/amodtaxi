@@ -1,0 +1,65 @@
+package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi.prep;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.NavigableMap;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.function.Consumer;
+
+import ch.ethz.idsc.amodeus.taxitrip.ExportTaxiTrips;
+import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
+import ch.ethz.idsc.amodeus.util.io.CsvReader;
+
+public class ZurichTraceTripPreparation {
+
+    private final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("d.M.yyyy H:mm:ss");
+    private final File traceFile = new File("/home/clruch/Downloads/2017-06-21-GPSFahrtstrecken-Protokoll.csv");
+    private String delimTrace = ";";
+
+    private final File taxiTripFile = new File("/home/clruch/Downloads/traceTaxiTrips");
+
+    //
+    private final HashMap<String, NavigableMap<LocalDateTime, CsvReader.Row>> tracemap = new HashMap<>();
+
+    public ZurichTraceTripPreparation() throws FileNotFoundException, IOException {
+
+
+        // adding all vehicles to individual sets
+        Consumer<CsvReader.Row> process = r -> {
+            String fahrzeug = r.get("\"Fahrzeug\"");
+            LocalDateTime ldt = LocalDateTime.parse(r.get("\"Zeitpunkt\""), dateFormat);
+            if (!tracemap.containsKey(fahrzeug))
+                tracemap.put(fahrzeug, new TreeMap<>());
+            tracemap.get(fahrzeug).put(ldt, r);
+        };
+
+        // for each vehicle, extract the trips
+        List<TaxiTrip> allTrips = new ArrayList<>();
+        tracemap.values().forEach(trace -> {
+            VehicleTrips vt = new VehicleTrips();
+            allTrips.addAll(vt.fromTrace(trace));
+        });
+
+        CsvReader reader = new CsvReader(traceFile, delimTrace);
+        reader.rows(process);
+
+        System.out.println("Number of distinct taxis: " + tracemap.size());
+        System.out.println("Number of trips:          " + allTrips.size());
+
+        ExportTaxiTrips.toFile(allTrips.stream(), taxiTripFile);
+    }
+
+    // --
+    public static void main(String[] args) throws FileNotFoundException, IOException {
+        new ZurichTraceTripPreparation();
+    }
+
+}
