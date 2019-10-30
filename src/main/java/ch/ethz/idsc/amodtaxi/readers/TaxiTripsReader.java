@@ -42,8 +42,9 @@ public abstract class TaxiTripsReader {
         CsvReader reader = new CsvReader(file, delim);
         unreadable.add(reader.sortedHeaders().stream().collect(Collectors.joining(",")));
         reader.rows(row -> {
-            int tripId = tripIds.getAndIncrement();
-            if (tripId % 1000 == 0)
+            int incrm = tripIds.getAndIncrement();
+            String tripId = Integer.toString(incrm);
+            if (incrm % 1000 == 0)
                 System.out.println("trips: " + tripId);
             try {
                 String taxiCode = getTaxiCode(row);

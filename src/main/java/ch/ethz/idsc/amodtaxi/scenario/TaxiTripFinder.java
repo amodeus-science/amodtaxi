@@ -38,7 +38,7 @@ public enum TaxiTripFinder {
                 Scalar waitTime = null;
                 LocalDateTime pickupDateTime = stampStart.globalTime;
                 LocalDateTime dropOffDateTime = stampEnd.globalTime;
-                TaxiTrip taxiTrip = TaxiTrip.of(requestIndex, taxiId, TensorCoords.toTensor(stampStart.gps), TensorCoords.toTensor(stampEnd.gps), //
+                TaxiTrip taxiTrip = TaxiTrip.of(Integer.toString(requestIndex), taxiId, TensorCoords.toTensor(stampStart.gps), TensorCoords.toTensor(stampEnd.gps), //
                         distance, waitTime, pickupDateTime, dropOffDateTime);
                 taxiTrips.add(taxiTrip);
                 ++requestIndex;

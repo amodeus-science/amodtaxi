@@ -36,7 +36,8 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
         /** insert all {@link TaxiTrip}s into {@link Population} */
         taxiTrips.stream()//
                 .forEach(taxiTrip -> {
-                    Person person = PersonCreate.fromTrip(taxiTrip, ++globalId, populationFactory, //
+                    Person person = PersonCreate.fromTrip(taxiTrip, Integer.toString((int) (++globalId)), //
+                            populationFactory, //
                             linkSelect, simulationDate, timeConvert);
                     population.addPerson(person);
                 });

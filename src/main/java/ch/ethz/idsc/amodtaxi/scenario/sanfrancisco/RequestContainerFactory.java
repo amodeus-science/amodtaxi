@@ -13,13 +13,13 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
 // TODO refactor why does it have two methods instead of one?
 /* package */ class RequestContainerFactory {
-    private final int requestIndex;
+    private final String requestIndex;
     private final int fromLinkIndex;
     private final int toLinkIndex;
     private final LocalDateTime submissionTime;
     private final AmodeusTimeConvert timeConvert;
 
-    public RequestContainerFactory(int rIndex, int fromLIndex, int toLIndex, //
+    public RequestContainerFactory(String rIndex, int fromLIndex, int toLIndex, //
             LocalDateTime submissionTime, AmodeusTimeConvert timeConvert) {
         GlobalAssert.that(timeConvert.toEpochSec(submissionTime) >= 1211018404 - 4 - 3600 * 3);
         GlobalAssert.that(timeConvert.toEpochSec(submissionTime) <= 1213088836 + 24 * 3600);
@@ -32,7 +32,7 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
     public RequestContainer create(RequestStatus status, LocalDate simulationDate) {
         RequestContainer requestContainer = new RequestContainer();
-        requestContainer.requestIndex = requestIndex;
+        requestContainer.requestIndex = Integer.parseInt(requestIndex);
         requestContainer.fromLinkIndex = fromLinkIndex;
         requestContainer.toLinkIndex = toLinkIndex;
         requestContainer.submissionTime = timeConvert.ldtToAmodeus(submissionTime, simulationDate);
