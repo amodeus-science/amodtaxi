@@ -1,20 +1,18 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
-package ch.ethz.idsc.amodtaxi.scenario.chicago;
+package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi;
 
 import java.io.File;
 
 import ch.ethz.idsc.amodeus.util.io.Locate;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioSetup;
 
-/* package */ enum ChicagoSetup {
+/* package */ enum ZurichSetup {
     ;
 
     public static void in(File workingDir) throws Exception {
-        ChicagoGeoInformation.setup();
-        File resourcesDir = new File(Locate.repoFolder(CreateChicagoScenario.class, "amodtaxi"), //
-                "resources/chicagoScenario");
+        ZurichGeoInformation.setup();
+        File resourcesDir = new File(Locate.repoFolder(ZurichSetup.class, "amodtaxi"), //
+                "resources/zurichTaxiScenario");
         ScenarioSetup.in(workingDir, resourcesDir);
-
     }
-
 }
