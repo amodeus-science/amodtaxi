@@ -20,7 +20,7 @@
 				<param name="dispatchPeriod" value="10" />
 			</parameterset>
 			<parameterset type="generator">
-				<param name="numberOfVehicles" value="500" />
+				<param name="numberOfVehicles" value="50" />
 				<param name="type" value="PopulationDensity" />
 				<param name="vehicleType" value="null" />
 			</parameterset>

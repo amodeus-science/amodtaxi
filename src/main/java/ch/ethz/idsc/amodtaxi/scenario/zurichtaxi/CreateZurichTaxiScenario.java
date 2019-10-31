@@ -41,7 +41,7 @@ public class CreateZurichTaxiScenario {
     private File finalTripsFile;
     private Network network = null;
     private MatsimAmodeusDatabase db = null;
-    private final int maxIter = 100;
+    private final int maxIter = 30000;
     private final AmodeusTimeConvert timeConvert = new AmodeusTimeConvert(ZoneId.of("Europe/Paris"));
 
     public CreateZurichTaxiScenario(File workingDir) throws Exception {
@@ -67,7 +67,7 @@ public class CreateZurichTaxiScenario {
 
     private void run() throws Exception {
         // FIXME remove debug loop once done
-        boolean debug = true;
+        boolean debug = false;
 
         /** download of open street map data to create scenario */
         System.out.println("Downloading open stret map data, this may take a while...");
@@ -80,6 +80,9 @@ public class CreateZurichTaxiScenario {
         /** prepare the network */
         ScenarioBasicNetworkPreparer.run(workingDir);
 
+        
+        System.exit(1);
+        
         /** load taxi data from the trips file */
         File tripsFile = new File("/home/clruch/Downloads/tripsJune21_best_new.csv");
         ZurichTaxiTripReader reader = new ZurichTaxiTripReader(",");

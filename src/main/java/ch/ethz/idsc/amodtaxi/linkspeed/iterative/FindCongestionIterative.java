@@ -146,8 +146,8 @@ import ch.ethz.idsc.tensor.Scalars;
             // DEBUGGING
             /** DEBUGGING every 1000 trips, export cost map */
             if (iterationCount % 100 == 0) {
-                StaticHelper.exportRatioMap(processingDir, tripMaintainer.getLookupMap(), Integer.toString(iterationCount));
-                StaticHelper.plotRatioMap(processingDir, randomTrips.getRatios(), Integer.toString(iterationCount));
+                StaticHelper.exportRatioMap(new File(processingDir,"diff"), tripMaintainer.getLookupMap(), Integer.toString(iterationCount));
+                StaticHelper.plotRatioMap(new File(processingDir,"plot"), randomTrips.getRatios(), Integer.toString(iterationCount));
             }
             // DEBUGGING END
 

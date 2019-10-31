@@ -9,9 +9,9 @@ import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03Plus;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 
 /* package */ enum ZurichReferenceFrames implements ReferenceFrame {
-    SWITZERLAND( //
-            new GeotoolsTransformation("EPSG:4801", "WGS84"), //
-            new GeotoolsTransformation("WGS84", "EPSG:4801")),//
+    SWITZERLAND_EPSG( //
+            new GeotoolsTransformation("EPSG:21781", "WGS84"), //
+            new GeotoolsTransformation("WGS84", "EPSG:21781")),//
     ;
     // ---
     private final CoordinateTransformation coords_toWGS84;

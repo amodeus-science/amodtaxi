@@ -8,7 +8,7 @@ import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 
 /* package */ enum ZurichLocationSpecs implements LocationSpec {
     ZURICHTAXI( //
-            ZurichReferenceFrames.SWITZERLAND, //
+            ZurichReferenceFrames.SWITZERLAND_EPSG, //
             new Coord(2683600.0, 1251400.0)), //
     ;
 
