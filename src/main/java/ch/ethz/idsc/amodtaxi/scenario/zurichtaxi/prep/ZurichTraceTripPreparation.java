@@ -1,16 +1,12 @@
 package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi.prep;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.NavigableMap;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 
@@ -50,7 +46,6 @@ public class ZurichTraceTripPreparation {
             allTrips.addAll(vt.fromTrace(trace));
         });
 
-        
         System.out.println("Number of distinct taxis: " + tracemap.size());
         System.out.println("Number of trips:          " + allTrips.size());
 

@@ -79,8 +79,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
             if (Scalars.lessThan(dBelow, dAbove))
                 return entryBelow;
-            else
-                return entryAbove;
+            return entryAbove;
         }
         // no entry below
         if (Objects.isNull(below) && Objects.nonNull(above))

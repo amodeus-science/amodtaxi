@@ -12,7 +12,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
 public enum FinishedScenario {
     ;
 
-    public static void copyToDir(String processingDir, String destinDir,//
+    public static void copyToDir(String processingDir, String destinDir, //
             String[] fileNames) throws IOException {
         System.out.println("Copying scenario from : " + processingDir);
         System.out.println("to :                    " + destinDir);
@@ -24,7 +24,6 @@ public enum FinishedScenario {
         destinDirFile.mkdir();
 
         {// files from processing directory
-
 
             for (String fileName : fileNames) {
                 Path source = Paths.get(processingDir, fileName);

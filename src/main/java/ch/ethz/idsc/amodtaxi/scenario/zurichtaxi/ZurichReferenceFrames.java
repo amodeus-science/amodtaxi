@@ -2,9 +2,7 @@
 package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi;
 
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.CH1903LV03PlustoWGS84;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
-import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03Plus;
 
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 

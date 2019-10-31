@@ -61,8 +61,8 @@ import ch.ethz.idsc.tensor.Scalars;
         this.tripMaintainer = new TripComparisonMaintainer(randomTrips, network, db);
 
         /** export initial distribution */
-        StaticHelper.exportRatioMap(new File(processingDir,"diff"), tripMaintainer.getLookupMap(), "Initial");
-        StaticHelper.plotRatioMap(new File(processingDir,"plot"), randomTrips.getRatios(), "Initial");
+        StaticHelper.exportRatioMap(new File(processingDir, "diff"), tripMaintainer.getLookupMap(), "Initial");
+        StaticHelper.plotRatioMap(new File(processingDir, "plot"), randomTrips.getRatios(), "Initial");
 
         /** show initial score */
         System.out.println("Cost initial: " + randomTrips.getRatioCost());
@@ -146,8 +146,8 @@ import ch.ethz.idsc.tensor.Scalars;
             // DEBUGGING
             /** DEBUGGING every interval trips, export cost map */
             if (iterationCount % 50 == 0) {
-                StaticHelper.exportRatioMap(new File(processingDir,"diff"), tripMaintainer.getLookupMap(), Integer.toString(iterationCount));
-                StaticHelper.plotRatioMap(new File(processingDir,"plot"), randomTrips.getRatios(), Integer.toString(iterationCount));
+                StaticHelper.exportRatioMap(new File(processingDir, "diff"), tripMaintainer.getLookupMap(), Integer.toString(iterationCount));
+                StaticHelper.plotRatioMap(new File(processingDir, "plot"), randomTrips.getRatios(), Integer.toString(iterationCount));
             }
             // DEBUGGING END
 

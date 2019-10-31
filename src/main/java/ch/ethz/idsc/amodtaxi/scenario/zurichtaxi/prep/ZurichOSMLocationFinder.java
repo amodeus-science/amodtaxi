@@ -40,7 +40,7 @@ import ch.ethz.idsc.tensor.Tensor;
             }
 
             // try with last 3 elements
-            elements3 = new ArrayList<String>();
+            elements3 = new ArrayList<>();
             if (Objects.isNull(longLat)) {
 
                 for (int i = 0; i < elements.size(); ++i) {
