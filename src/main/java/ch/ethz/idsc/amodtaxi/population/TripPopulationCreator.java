@@ -62,10 +62,6 @@ public class TripPopulationCreator {
         System.out.println("INFO start population creation");
         GlobalAssert.that(inFile.isFile());
 
-        // Population init
-        Population population = PopulationUtils.createPopulation(config, network);
-        PopulationFactory populationFactory = population.getFactory();
-
         // Population creation (iterate trough all id's)
         System.out.println("Reading inFile:");
         System.out.println(inFile.getAbsolutePath());
@@ -74,6 +70,19 @@ public class TripPopulationCreator {
         new CsvReader(inFile, ";").rows(row -> {
             trips.add(TaxiTripParse.fromRow(row));
         });
+
+        File finalTripFile = new File(inFile.getAbsolutePath().replace(".csv", "_final.csv"));
+        process(trips, finalTripFile);
+    }
+
+    public void process(List<TaxiTrip> trips, File finalTripFile)//
+            throws MalformedURLException, Exception {
+
+        this.finalTripFile = finalTripFile;
+
+        // Population init
+        Population population = PopulationUtils.createPopulation(config, network);
+        PopulationFactory populationFactory = population.getFactory();
 
         // filter the stream
         List<TaxiTrip> finalFilteredTrips = new ArrayList<>();
@@ -89,7 +98,7 @@ public class TripPopulationCreator {
         });
 
         // export finally used set of trips
-        finalTripFile = new File(inFile.getAbsolutePath().replace(".csv", "_final.csv"));
+
         ExportTaxiTrips.toFile(finalFilteredTrips.stream(), finalTripFile);
 
         // write the modified population to file

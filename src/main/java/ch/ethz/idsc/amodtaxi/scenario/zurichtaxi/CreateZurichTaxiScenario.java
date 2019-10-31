@@ -1,53 +1,72 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi;
 
+import static ch.ethz.idsc.amodtaxi.scenario.zurichtaxi.ZurichTaxiConstants.simualtionDate;
+
 import java.io.File;
-import java.util.ArrayList;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.pt2matsim.run.Osm2MultimodalNetwork;
 
+import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
+import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
-import ch.ethz.idsc.amodeus.taxitrip.ImportTaxiTrips;
+import ch.ethz.idsc.amodeus.options.ScenarioOptions;
+import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
-import ch.ethz.idsc.amodtaxi.linkspeed.iterative.IterativeLinkSpeedEstimator;
+import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
+import ch.ethz.idsc.amodeus.util.math.CreateQuadTree;
+import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.osm.OsmLoader;
+import ch.ethz.idsc.amodtaxi.population.TripPopulationCreator;
 import ch.ethz.idsc.amodtaxi.scenario.FinishedScenario;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioBasicNetworkPreparer;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
+import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilter;
 
 public class CreateZurichTaxiScenario {
 
     private final File workingDir;
-    private final File processingDir;
+    // private final File processingDir;
     private File finalTripsFile;
     private Network network = null;
     private MatsimAmodeusDatabase db = null;
     private final int maxIter = 100000;
+    private final AmodeusTimeConvert timeConvert = new AmodeusTimeConvert(ZoneId.of("Europe/Paris"));
 
     public CreateZurichTaxiScenario(File workingDir) throws Exception {
         this.workingDir = workingDir;
         ZurichSetup.in(workingDir);
-        processingDir = run();
+        run();
         File destinDir = new File(workingDir, "CreatedScenario");
         Objects.requireNonNull(finalTripsFile);
 
         System.out.println("The final trips file is: ");
         System.out.println(finalTripsFile.getAbsolutePath());
 
-        /** loading final trips */
-        List<TaxiTrip> trips = new ArrayList<>();
-        ImportTaxiTrips.fromFile(finalTripsFile).//
-                forEach(tt -> trips.add(tt));
-        new IterativeLinkSpeedEstimator(maxIter).compute(processingDir, network, db, trips);
-        FinishedScenario.copyToDir(workingDir.getAbsolutePath(), //
-                processingDir.getAbsolutePath(), //
-                destinDir.getAbsolutePath());
+        // /** loading final trips */
+        // List<TaxiTrip> finalTrips = ImportTaxiTrips.fromFile(finalTripsFile).collect(Collectors.toList());
+        //
+        // new IterativeLinkSpeedEstimator(maxIter).compute(workingDir, network, db, finalTrips);
+        // FinishedScenario.copyToDir(workingDir.getAbsolutePath(), //
+        // workingDir.getAbsolutePath(), //
+        // destinDir.getAbsolutePath());
+
+        FinishedScenario.copyToDir(workingDir.getAbsolutePath(), destinDir.getAbsolutePath(), //
+                new String[] { "AmodeusOptions.properties", "network.xml.gz", "population.xml.gz", //
+                        "LPOptions.properties", "config_full.xml", "linkSpeedData" });
+
     }
 
-    private File run() throws Exception {
+    private void run() throws Exception {
         // FIXME remove debug loop once done
         boolean debug = false;
 
@@ -62,13 +81,15 @@ public class CreateZurichTaxiScenario {
         /** prepare the network */
         ScenarioBasicNetworkPreparer.run(workingDir);
 
-
         /** load taxi data from the trips file */
-        
-        
-        
+        File tripsFile = new File("/home/clruch/Downloads/tripsJune21_best_new.csv");
+        ZurichTaxiTripReader reader = new ZurichTaxiTripReader(",");
+        List<TaxiTrip> allTrips = reader.getTripStream(tripsFile).collect(Collectors.toList());
+        allTrips.stream().forEach(t -> {
+            System.out.println(t.toString());
+        });
 
-        //
+        // //
         // File processingdir = new File(workingDir, "Scenario");
         // if (processingdir.isDirectory())
         // DeleteDirectory.of(processingdir, 2, 25);
@@ -77,19 +98,18 @@ public class CreateZurichTaxiScenario {
         // CopyFiles.now(workingDir.getAbsolutePath(), processingdir.getAbsolutePath(), //
         // Arrays.asList(new String[] { "AmodeusOptions.properties", "config_full.xml", //
         // "network.xml", "network.xml.gz", "LPOptions.properties" }));
-        // ScenarioOptions scenarioOptions = new ScenarioOptions(processingdir, //
-        // ScenarioOptionsBase.getDefault());
+        ScenarioOptions scenarioOptions = new ScenarioOptions(workingDir, //
+                ScenarioOptionsBase.getDefault());
         // LocalDate simulationDate = LocalDateConvert.ofOptions(scenarioOptions.getString("date"));
-        //
-        // //
-        // File configFile = new File(scenarioOptions.getPreparerConfigName());
-        // System.out.println(configFile.getAbsolutePath());
-        // GlobalAssert.that(configFile.exists());
-        // Config configFull = ConfigUtils.loadConfig(configFile.toString());
-        // network = NetworkLoader.fromNetworkFile(new File(processingdir, configFull.network().getInputFile()));
-        // db = MatsimAmodeusDatabase.initialize(network, scenarioOptions.getLocationSpec().referenceFrame());
-        // FastLinkLookup fll = new FastLinkLookup(network, db);
-        //
+
+        File configFile = new File(scenarioOptions.getPreparerConfigName());
+        System.out.println(configFile.getAbsolutePath());
+        GlobalAssert.that(configFile.exists());
+        Config configFull = ConfigUtils.loadConfig(configFile.toString());
+        network = NetworkLoader.fromNetworkFile(new File(workingDir, configFull.network().getInputFile()));
+        db = MatsimAmodeusDatabase.initialize(network, scenarioOptions.getLocationSpec().referenceFrame());
+        FastLinkLookup fll = new FastLinkLookup(network, db);
+
         // /** prepare for creation of scenario */
         // TaxiTripsReader tripsReader = new OnlineTripsReaderChicago();
         // TripBasedModifier tripModifier = new ChicagoOnlineTripBasedModifier(random, network, //
@@ -104,11 +124,19 @@ public class CreateZurichTaxiScenario {
         // ChicagoOnlineTripFleetConverter converter = //
         // new ChicagoOnlineTripFleetConverter(scenarioOptions, network, tripModifier, //
         // new ChicagoFormatModifier(), finalTripFilter, tripsReader);
-        // finalTripsFile = Scenario.create(workingDir, tripFile, //
-        // converter, workingDir, processingdir, simulationDate, timeConvert);
-        // return processingdir;
 
-        return null;
+        TaxiTripFilter finalTripFilter = new TaxiTripFilter();
+
+        // /** trips which are faster than the network freeflow speeds would allow are removed */
+        // finalTripFilter.addFilter(new TripNetworkFilter(network, db, //
+        // Quantity.of(2.235200008, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m"), true));
+
+        QuadTree<Link> qt = CreateQuadTree.of(network);
+        TripPopulationCreator populationCreator = //
+                new TripPopulationCreator(workingDir, configFull, network, db, qt, //
+                        simualtionDate, timeConvert, finalTripFilter);
+        populationCreator.process(allTrips, new File(workingDir, "/finalTrips.csv"));
+        finalTripsFile = populationCreator.getFinalTripFile();
     }
 
     // --

@@ -4,11 +4,11 @@ package ch.ethz.idsc.amodtaxi.scenario.chicago;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -29,8 +29,8 @@ import ch.ethz.idsc.amodtaxi.fleetconvert.ChicagoOnlineTripFleetConverter;
 import ch.ethz.idsc.amodtaxi.linkspeed.iterative.IterativeLinkSpeedEstimator;
 import ch.ethz.idsc.amodtaxi.osm.OsmLoader;
 import ch.ethz.idsc.amodtaxi.scenario.FinishedScenario;
-import ch.ethz.idsc.amodtaxi.scenario.ScenarioBasicNetworkPreparer;
 import ch.ethz.idsc.amodtaxi.scenario.Scenario;
+import ch.ethz.idsc.amodtaxi.scenario.ScenarioBasicNetworkPreparer;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
 import ch.ethz.idsc.amodtaxi.scenario.TaxiTripsReader;
 import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilter;
@@ -79,14 +79,14 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         // new code
 
         /** loading final trips */
-        List<TaxiTrip> trips = new ArrayList<>();
-        ImportTaxiTrips.fromFile(finalTripsFile).//
-                forEach(tt -> trips.add(tt));
+        List<TaxiTrip> finalTrips = ImportTaxiTrips.fromFile(finalTripsFile).collect(Collectors.toList());
+        new IterativeLinkSpeedEstimator(maxIter).compute(processingDir, network, db, finalTrips);
 
-        new IterativeLinkSpeedEstimator(maxIter).compute(processingDir, network, db, trips);
-
-        FinishedScenario.copyToDir(workingDir.getAbsolutePath(), processingDir.getAbsolutePath(), //
-                destinDir.getAbsolutePath());
+        FinishedScenario.copyToDir(processingDir.getAbsolutePath(), //
+                destinDir.getAbsolutePath(), new String[] { //
+                        "AmodeusOptions.properties", "network.xml.gz", "population.xml.gz", //
+                        "LPOptions.properties", "config_full.xml", //
+                        "virtualNetworkChicago", "linkSpeedData" });
         cleanUp(workingDir);
     }
 

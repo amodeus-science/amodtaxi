@@ -1,6 +1,8 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi.prep;
 
+import static ch.ethz.idsc.amodtaxi.scenario.zurichtaxi.ZurichTaxiConstants.simualtionDate;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -14,7 +16,6 @@ import ch.ethz.idsc.amodeus.util.io.CsvReader;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
 /* package */ class ZurichCallCenterDataPreparation {
@@ -30,9 +31,9 @@ import ch.ethz.idsc.tensor.qty.Quantity;
     private ZurichOSMLocationFinder osmLocationFinder = new ZurichOSMLocationFinder();
     private BufferedWriter writer = new BufferedWriter(new FileWriter(exportFile));
 
-    // 21. of June 2017 is a Wednesday
-    private int chosenmonth = 6;
-    private int chosenday = 21;
+    // // 21. of June 2017 is a Wednesday
+    // private int chosenmonth = 6;
+    // private int chosenday = 21;
 
     public ZurichCallCenterDataPreparation() throws Exception {
 
@@ -87,6 +88,14 @@ import ch.ethz.idsc.tensor.qty.Quantity;
     }
 
     private void processReadableLine(CallCenterRow r) {
+
+        // Before TODO remove eventually...
+        // private int chosenmonth = 6;
+        // private int chosenday = 21;
+
+        // 21. of June 2017 is a Wednesday
+        int chosenmonth = simualtionDate.getMonthValue();
+        int chosenday = simualtionDate.getDayOfMonth();
 
         // erfasst am 12. 6.
         if (r.ldt1.getDayOfMonth() == chosenday && r.ldt1.getMonthValue() == chosenmonth) {

@@ -12,10 +12,9 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
 public enum FinishedScenario {
     ;
 
-    public static void copyToDir(String workingDir, //
-            String processingDir, String destinDir) throws IOException {
+    public static void copyToDir(String processingDir, String destinDir,//
+            String[] fileNames) throws IOException {
         System.out.println("Copying scenario from : " + processingDir);
-        System.out.println("and :                   " + workingDir);
         System.out.println("to :                    " + destinDir);
 
         File destinDirFile = new File(destinDir);
@@ -25,9 +24,7 @@ public enum FinishedScenario {
         destinDirFile.mkdir();
 
         {// files from processing directory
-            String[] fileNames = new String[] { //
-                    "av.xml", "AmodeusOptions.properties", "network.xml.gz", "population.xml.gz", //
-                    "config_full.xml", "virtualNetworkChicago", "linkSpeedData" };
+
 
             for (String fileName : fileNames) {
                 Path source = Paths.get(processingDir, fileName);
@@ -39,21 +36,5 @@ public enum FinishedScenario {
                 }
             }
         }
-
-        {// files from working directory
-            String[] fileNames = new String[] { //
-                    "LPOptions.properties" };
-
-            for (String fileName : fileNames) {
-                Path source = Paths.get(workingDir, fileName);
-                Path target = Paths.get(destinDir, fileName);
-                try {
-                    Files.copy(source, target /* , options */);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
     }
 }
