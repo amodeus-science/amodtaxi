@@ -21,6 +21,7 @@ import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
+import ch.ethz.idsc.amodeus.taxitrip.ExportTaxiTrips;
 import ch.ethz.idsc.amodeus.taxitrip.ImportTaxiTrips;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
@@ -33,7 +34,14 @@ import ch.ethz.idsc.amodtaxi.scenario.FinishedScenario;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioBasicNetworkPreparer;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
 import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilter;
+import ch.ethz.idsc.amodtaxi.tripfilter.TripDurationFilter;
+import ch.ethz.idsc.amodtaxi.tripfilter.TripNetworkFilter;
+import ch.ethz.idsc.tensor.qty.Quantity;
 
+/** Can be done:
+ * - bigger map incl. St. Gallen
+ * - more than 20k iterations
+ * ... ? */
 public class CreateZurichTaxiScenario {
 
     private final File workingDir;
@@ -41,7 +49,7 @@ public class CreateZurichTaxiScenario {
     private File finalTripsFile;
     private Network network = null;
     private MatsimAmodeusDatabase db = null;
-    private final int maxIter = 30000;
+    private final int maxIter = 20000;
     private final AmodeusTimeConvert timeConvert = new AmodeusTimeConvert(ZoneId.of("Europe/Paris"));
 
     public CreateZurichTaxiScenario(File workingDir) throws Exception {
@@ -57,7 +65,17 @@ public class CreateZurichTaxiScenario {
         /** loading final trips */
         List<TaxiTrip> finalTrips = ImportTaxiTrips.fromFile(finalTripsFile).collect(Collectors.toList());
 
-        new IterativeLinkSpeedEstimator(maxIter).compute(workingDir, network, db, finalTrips);
+        /** filtering the ones without meaningful duration */
+        TaxiTripFilter finalTripFilter = new TaxiTripFilter();
+        /** trips which are faster than the network freeflow speeds would allow are removed */
+        finalTripFilter.addFilter(new TripNetworkFilter(network, db, //
+                Quantity.of(0.0000001, "m*s^-1"), Quantity.of(100000, "s"), Quantity.of(0.000001, "m"), true));
+        finalTripFilter.addFilter(new TripDurationFilter(Quantity.of(1, "s"), Quantity.of(Double.MAX_VALUE, "s")));
+        List<TaxiTrip> fitForTrafficEstimation = finalTripFilter.filterStream(finalTrips.stream()).collect(Collectors.toList());
+        finalTripFilter.printSummary();
+        ExportTaxiTrips.toFile(fitForTrafficEstimation.stream(), new File(workingDir, "estimationTrips.csv"));
+
+        new IterativeLinkSpeedEstimator(maxIter).compute(workingDir, network, db, fitForTrafficEstimation);
 
         FinishedScenario.copyToDir(workingDir.getAbsolutePath(), destinDir.getAbsolutePath(), //
                 new String[] { "AmodeusOptions.properties", "network.xml.gz", "population.xml.gz", //
@@ -80,9 +98,6 @@ public class CreateZurichTaxiScenario {
         /** prepare the network */
         ScenarioBasicNetworkPreparer.run(workingDir);
 
-        
-        System.exit(1);
-        
         /** load taxi data from the trips file */
         File tripsFile = new File("/home/clruch/Downloads/tripsJune21_best_new.csv");
         ZurichTaxiTripReader reader = new ZurichTaxiTripReader(",");
