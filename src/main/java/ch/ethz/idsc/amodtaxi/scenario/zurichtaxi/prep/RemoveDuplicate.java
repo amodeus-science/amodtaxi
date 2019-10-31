@@ -11,8 +11,7 @@ package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi.prep;
         String reduced = original.replace("  ", " ");
         if (reduced.length() == original.length())
             return reduced;
-        else
-            return spaces(reduced);
+        return spaces(reduced);
     }
 
 }

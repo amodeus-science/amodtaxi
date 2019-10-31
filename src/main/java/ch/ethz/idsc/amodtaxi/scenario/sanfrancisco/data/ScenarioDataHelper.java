@@ -31,7 +31,8 @@ import ch.ethz.idsc.amodtaxi.scenario.FileAnalysis;
 
         /** prepare folder to save information */
         File saveSubDir = localDate.equals(LocalDate.MAX) //
-                ? new File(saveDirectory, "AllFiles") : new File(saveDirectory, localDate.toString());
+                ? new File(saveDirectory, "AllFiles")
+                : new File(saveDirectory, localDate.toString());
         saveSubDir.mkdir();
 
         /** write the analyzed information */

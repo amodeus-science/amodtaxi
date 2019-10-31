@@ -12,20 +12,15 @@ import javax.net.ssl.HttpsURLConnection;
 
 public enum NominatimHelper {
     ;
-
     public static String queryInterface(String https_url) {
         String returnString = "";
         URL url;
         try {
-
             url = new URL(https_url);
             HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-
             // dump all the content
             returnString = NominatimHelper.readInterfaceResponse(con);
-
             con.disconnect();
-
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (Exception e) {
@@ -37,13 +32,11 @@ public enum NominatimHelper {
     private static String readInterfaceResponse(HttpsURLConnection con) {
         String allOfIt = "";
         if (Objects.nonNull(con)) {
-            try {
-                BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
                 String input;
                 while ((input = br.readLine()) != null) {
                     allOfIt = allOfIt + input;
                 }
-                br.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }

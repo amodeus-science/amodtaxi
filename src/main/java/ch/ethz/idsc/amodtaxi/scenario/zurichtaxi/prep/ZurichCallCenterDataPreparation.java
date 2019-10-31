@@ -67,16 +67,16 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
         System.out.println("KACKE1");
 
-        BufferedWriter writer2 = new BufferedWriter(new FileWriter(unreadableFile));
-        unreadable.forEach(row -> {
-            try {
-                String line = row.toString() + "\n";
-                writer2.write(line);
-            } catch (Exception exception) {
-                exception.printStackTrace();
-            }
-        });
-        writer2.close();
+        try (BufferedWriter writer2 = new BufferedWriter(new FileWriter(unreadableFile))) {
+            unreadable.forEach(row -> {
+                try {
+                    String line = row.toString() + "\n";
+                    writer2.write(line);
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+            });
+        }
 
         System.out.println("KACKE2");
 
