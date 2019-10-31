@@ -3,7 +3,7 @@ package ch.ethz.idsc.amodtaxi.scenario.chicago;
 
 import java.time.LocalDate;
 
-public enum LocalDateConvert {
+/* package */ enum LocalDateConvert {
     ;
 
     public static LocalDate ofOptions(String dateString) {

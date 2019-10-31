@@ -1,5 +1,5 @@
 /* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
-package ch.ethz.idsc.amodtaxi.readers;
+package ch.ethz.idsc.amodtaxi.scenario;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,12 +12,14 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.Duration;
+import ch.ethz.idsc.amodeus.util.LocalDateTimes;
 import ch.ethz.idsc.amodeus.util.io.CsvReader;
 import ch.ethz.idsc.amodeus.util.io.CsvReader.Row;
 import ch.ethz.idsc.amodeus.util.math.SI;
@@ -43,17 +45,21 @@ public abstract class TaxiTripsReader {
         unreadable.add(reader.sortedHeaders().stream().collect(Collectors.joining(",")));
         reader.rows(row -> {
             int incrm = tripIds.getAndIncrement();
-            String tripId = Integer.toString(incrm);
+            String tripId = "no_dat_id_" + Integer.toString(incrm);
             if (incrm % 1000 == 0)
                 System.out.println("trips: " + tripId);
             try {
-                String taxiCode = getTaxiCode(row);
+                String taxiCode = getTaxiId(row);
                 int taxiId = taxiIds.getOrDefault(taxiCode, taxiIds.size());
                 taxiIds.put(taxiCode, taxiId);
-                LocalDateTime pickupTime = getStartTime(row);
-                LocalDateTime dropoffTime = getEndTime(row);
+                LocalDateTime pickupTime = getPickupTime(row);
+                LocalDateTime dropoffTime = getDropoffTime(row);
+                LocalDateTime submissionTimeDate = LocalDateTimes.subtractFrom(pickupTime, getWaitingTime(row));
                 Scalar durationCompute = Duration.between(pickupTime, dropoffTime);
                 Scalar durationDataset = getDuration(row);
+                String dataTripId = getTripId(row);
+                if (Objects.nonNull(dataTripId))
+                    tripId = dataTripId;
                 if (Scalars.lessEquals(Quantity.of(0.1, SI.SECOND), //
                         durationDataset.subtract(durationCompute).abs()))
                     System.err.println("Mismatch between duration recorded in data" + //
@@ -61,12 +67,12 @@ public abstract class TaxiTripsReader {
                     "computed duration using start and end time: " + //
                     pickupTime + " --> " + dropoffTime + " != " + durationDataset);
                 TaxiTrip trip = TaxiTrip.of(//
-                        tripId, // TODO can I do real trip ID from CSV?
+                        tripId, //
                         Integer.toString(taxiId), //
                         getPickupLocation(row), //
                         getDropoffLocation(row), //
                         getDistance(row), //
-                        getWaitingTime(row), //
+                        submissionTimeDate, //
                         pickupTime, //
                         dropoffTime);
                 list.add(trip);
@@ -99,11 +105,15 @@ public abstract class TaxiTripsReader {
         }
     }
 
-    public abstract String getTaxiCode(Row row);
+    public abstract String getTripId(Row row);
 
-    public abstract LocalDateTime getStartTime(Row row) throws ParseException;
+    public abstract String getTaxiId(Row row);
 
-    public abstract LocalDateTime getEndTime(Row row) throws ParseException;
+    public abstract LocalDateTime getSubmissionTime(Row row) throws ParseException;
+
+    public abstract LocalDateTime getPickupTime(Row row) throws ParseException;
+
+    public abstract LocalDateTime getDropoffTime(Row row) throws ParseException;
 
     public abstract Tensor getPickupLocation(Row row);
 

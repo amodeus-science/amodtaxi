@@ -29,7 +29,7 @@ public class ZurichTraceTripPreparation {
     //
     private final HashMap<String, NavigableMap<LocalDateTime, CsvReader.Row>> tracemap = new HashMap<>();
 
-    public ZurichTraceTripPreparation() throws FileNotFoundException, IOException {
+    public ZurichTraceTripPreparation() throws Exception {
 
         // adding all vehicles to individual sets
         Consumer<CsvReader.Row> process = r -> {
@@ -58,7 +58,7 @@ public class ZurichTraceTripPreparation {
     }
 
     // --
-    public static void main(String[] args) throws FileNotFoundException, IOException {
+    public static void main(String[] args) throws Exception {
         new ZurichTraceTripPreparation();
     }
 

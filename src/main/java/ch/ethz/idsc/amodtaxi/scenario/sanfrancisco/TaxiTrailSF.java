@@ -86,8 +86,8 @@ public class TaxiTrailSF implements TaxiTrail {
     @Override
     public Collection<TaxiTrip> allTripsBeginningOn(LocalDate localDate) {
         return taxiTrips.stream()//
-                .filter(t -> LocalDateTimes.lessEquals(localDate.atStartOfDay(), t.pickupDate))//
-                .filter(t -> LocalDateTimes.lessEquals(t.pickupDate, localDate.atTime(23, 59, 59)))//
+                .filter(t -> LocalDateTimes.lessEquals(localDate.atStartOfDay(), t.pickupTimeDate))//
+                .filter(t -> LocalDateTimes.lessEquals(t.pickupTimeDate, localDate.atTime(23, 59, 59)))//
                 .collect(Collectors.toList());
     }
 }

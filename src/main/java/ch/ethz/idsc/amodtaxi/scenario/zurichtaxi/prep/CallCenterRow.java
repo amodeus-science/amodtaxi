@@ -1,16 +1,14 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi.prep;
 
+import static ch.ethz.idsc.amodtaxi.scenario.zurichtaxi.prep.ZurichTaxiConstants.callCenterDateFormat;
+
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 import ch.ethz.idsc.amodeus.util.io.CsvReader;
 
 /* package */ class CallCenterRow {
-
-    private DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("M/d/yyyy H:mm");
-    // --
 
     public LocalDateTime ldt1;
     public LocalDateTime ldt2;
@@ -25,10 +23,10 @@ import ch.ethz.idsc.amodeus.util.io.CsvReader;
     public CallCenterRow(CsvReader.Row r) {
 
         try {
-            ldt1 = LocalDateTime.parse(r.get("Erfassung"), dateFormat);
-            ldt2 = LocalDateTime.parse(r.get("Vermittlung"), dateFormat);
-            ldt3 = LocalDateTime.parse(r.get("Fahrtbeginn"), dateFormat);
-            ldt4 = LocalDateTime.parse(r.get("Fahrtende"), dateFormat);
+            ldt1 = LocalDateTime.parse(r.get("Erfassung"), callCenterDateFormat);
+            ldt2 = LocalDateTime.parse(r.get("Vermittlung"), callCenterDateFormat);
+            ldt3 = LocalDateTime.parse(r.get("Fahrtbeginn"), callCenterDateFormat);
+            ldt4 = LocalDateTime.parse(r.get("Fahrtende"), callCenterDateFormat);
             fahrzeug = r.get("Kenng");
             abfahrt = r.get("1. Abfahrtsadresse");
             zielAdd = r.get("Letzte Zieladresse");

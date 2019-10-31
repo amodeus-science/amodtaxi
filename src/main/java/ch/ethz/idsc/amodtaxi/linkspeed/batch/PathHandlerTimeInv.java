@@ -27,7 +27,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         Path fastest = calc.computePath(taxiTrip);
 
         /** extract data from {@link TaxiTrip} */
-        this.duration = taxiTrip.duration;
+        this.duration = taxiTrip.driveTime;
         /** extract data from free flow shortest path */
         this.freeflowDuation = Quantity.of(fastest.travelTime, SI.SECOND);
 

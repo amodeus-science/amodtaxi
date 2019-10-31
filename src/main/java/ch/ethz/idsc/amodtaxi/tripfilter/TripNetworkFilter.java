@@ -59,10 +59,10 @@ public class TripNetworkFilter extends AbstractConsciousFilter {
         boolean slowerThanNetwork = checkSlowerNetwork ? Scalars.lessEquals(compare.nwPathDurationRatio, RealScalar.ONE) : true;
         if (slowerThanNetwork)
             ++numslowerThanNetwork;
-        boolean belowMaxDelay = Scalars.lessEquals(trip.duration.subtract(compare.pathTime), maxDelay);
+        boolean belowMaxDelay = Scalars.lessEquals(trip.driveTime.subtract(compare.pathTime), maxDelay);
         if (belowMaxDelay)
             ++numbelowMaxDelay;
-        boolean fasterThanMinSpeed = Scalars.lessEquals(minSpeed, compare.pathDist.divide(trip.duration));
+        boolean fasterThanMinSpeed = Scalars.lessEquals(minSpeed, compare.pathDist.divide(trip.driveTime));
         if (fasterThanMinSpeed)
             ++numfasterThanMinSpeed;
         boolean longerThanMinDistance = Scalars.lessEquals(minDistance, compare.pathDist);

@@ -23,14 +23,14 @@ import ch.ethz.idsc.tensor.img.ColorDataIndexed;
     ;
 
     public static int startTime(TaxiTrip trip) {
-        return trip.pickupDate.getHour() * 3600//
-                + trip.pickupDate.getMinute() * 60//
-                + trip.pickupDate.getSecond();
+        return trip.pickupTimeDate.getHour() * 3600//
+                + trip.pickupTimeDate.getMinute() * 60//
+                + trip.pickupTimeDate.getSecond();
 
     }
 
     public static int endTime(TaxiTrip trip) {
-        return startTime(trip) + trip.duration.number().intValue();
+        return startTime(trip) + trip.driveTime.number().intValue();
     }
 
     public static boolean ratioDidImprove(Scalar ratioBefore, Scalar ratioAfter) {

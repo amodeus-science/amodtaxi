@@ -21,16 +21,16 @@ public enum PathHandlerUtil {
 
     public static void validityCheck(TaxiTrip taxiTrip, AmodeusTimeConvert timeConvert, //
             LocalDate simulationDate, FastLinkLookup fll) {
-        int tripStart = timeConvert.ldtToAmodeus(taxiTrip.pickupDate, simulationDate);
-        int tripEnd = timeConvert.ldtToAmodeus(taxiTrip.dropoffDate, simulationDate);
+        int tripStart = timeConvert.ldtToAmodeus(taxiTrip.pickupTimeDate, simulationDate);
+        int tripEnd = timeConvert.ldtToAmodeus(taxiTrip.dropoffTimeDate, simulationDate);
         int tripDuration = tripEnd - tripStart;
         GlobalAssert.that(tripDuration >= 0);
         GlobalAssert.that(tripStart >= 0);
         GlobalAssert.that(tripEnd >= 0);
-        GlobalAssert.that(LocalDateTimes.lessEquals(simulationDate.atStartOfDay(), taxiTrip.pickupDate));
-        GlobalAssert.that(LocalDateTimes.lessEquals(simulationDate.atStartOfDay(), taxiTrip.dropoffDate));
-        GlobalAssert.that(LocalDateTimes.lessEquals(taxiTrip.pickupDate, taxiTrip.dropoffDate));
-        GlobalAssert.that(Scalars.lessEquals(Quantity.of(0, SI.SECOND), taxiTrip.duration));
+        GlobalAssert.that(LocalDateTimes.lessEquals(simulationDate.atStartOfDay(), taxiTrip.pickupTimeDate));
+        GlobalAssert.that(LocalDateTimes.lessEquals(simulationDate.atStartOfDay(), taxiTrip.dropoffTimeDate));
+        GlobalAssert.that(LocalDateTimes.lessEquals(taxiTrip.pickupTimeDate, taxiTrip.dropoffTimeDate));
+        GlobalAssert.that(Scalars.lessEquals(Quantity.of(0, SI.SECOND), taxiTrip.driveTime));
         Link pickupLink = fll.getLinkFromWGS84(TensorCoords.toCoord(taxiTrip.pickupLoc));
         Link dropOffLink = fll.getLinkFromWGS84(TensorCoords.toCoord(taxiTrip.dropoffLoc));
         Objects.requireNonNull(pickupLink);

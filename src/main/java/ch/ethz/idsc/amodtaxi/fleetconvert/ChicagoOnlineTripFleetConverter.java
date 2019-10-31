@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.util.math.SI;
-import ch.ethz.idsc.amodtaxi.readers.TaxiTripsReader;
+import ch.ethz.idsc.amodtaxi.scenario.TaxiTripsReader;
 import ch.ethz.idsc.amodtaxi.scenario.chicago.ScenarioConstants;
 import ch.ethz.idsc.amodtaxi.tripfilter.RandomRemoverFilter;
 import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilter;

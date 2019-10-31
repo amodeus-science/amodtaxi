@@ -27,7 +27,7 @@ public class DurationCompare {
         path = calc.computePath(trip);
         pathTime = Quantity.of(path.travelTime, SI.SECOND);
         pathDist = Quantity.of(path.links.stream().mapToDouble(l -> l.getLength()).sum(), SI.METER);
-        duration = trip.duration;
+        duration = trip.driveTime;
         nwPathDurationRatio = pathTime.divide(duration);
     }
 }

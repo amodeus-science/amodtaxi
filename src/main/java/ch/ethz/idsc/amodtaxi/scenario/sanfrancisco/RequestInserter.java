@@ -53,7 +53,7 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
         for (TaxiTrip taxiTrip : taxiTrips) {
 
             Map<RequestStatus, LocalDateTime> reqTimes = //
-                    StaticHelper.getRequestTimes(taxiTrip.pickupDate, timeTaxiStamps);
+                    StaticHelper.getRequestTimes(taxiTrip.pickupTimeDate, timeTaxiStamps);
 
             /** basic setup of RequestContainer */
             LocalDateTime submissionTime = reqTimes.get(RequestStatus.REQUESTED);
@@ -69,11 +69,11 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
             Objects.requireNonNull(submissionDay);
 
             /** from link */
-            Coord position = db.referenceFrame.coords_fromWGS84().transform(timeTaxiStamps.get(taxiTrip.pickupDate).gps);
+            Coord position = db.referenceFrame.coords_fromWGS84().transform(timeTaxiStamps.get(taxiTrip.pickupTimeDate).gps);
             int fromLinkIndex = fastLinkLookup.getLinkIndexFromXY(position);
 
             /** to link */
-            LocalDateTime lastDriveTimeSTep = timeTaxiStamps.lowerKey(taxiTrip.dropoffDate);
+            LocalDateTime lastDriveTimeSTep = timeTaxiStamps.lowerKey(taxiTrip.dropoffTimeDate);
             Coord positionEnd = db.referenceFrame.coords_fromWGS84().transform(timeTaxiStamps.get(lastDriveTimeSTep).gps);
             int toLinkIndex = fastLinkLookup.getLinkIndexFromXY(positionEnd);
 
@@ -95,16 +95,16 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
             }
 
             /** add request containers while driving */
-            LocalDateTime time = taxiTrip.pickupDate;
+            LocalDateTime time = taxiTrip.pickupTimeDate;
             do {
                 RequestContainer container = requestContainerFactory.create(RequestStatus.DRIVING, submissionDay);
                 addContainer(timeTaxiStamps.get(time), container);
                 time = timeTaxiStamps.higherKey(time);
-            } while (Objects.nonNull(time) && LocalDateTimes.lessEquals(time, taxiTrip.dropoffDate));
+            } while (Objects.nonNull(time) && LocalDateTimes.lessEquals(time, taxiTrip.dropoffTimeDate));
 
             /** add request containers after driving */
             RequestContainer container = requestContainerFactory.create(RequestStatus.DROPOFF, submissionDay);
-            addContainer(timeTaxiStamps.get(taxiTrip.dropoffDate), container);
+            addContainer(timeTaxiStamps.get(taxiTrip.dropoffTimeDate), container);
         }
 
         /** One {@link TaxiTrip} will produce several {@link RequestContainer} that are

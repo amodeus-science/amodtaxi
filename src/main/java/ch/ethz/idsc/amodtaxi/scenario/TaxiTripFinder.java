@@ -35,11 +35,12 @@ public enum TaxiTripFinder {
                     (entry.getKey().equals(timeTaxiStamps.lastKey()) && occNow)) { /** driving ended */
                 stampEnd = entry.getValue();
                 Scalar distance = null;
-                Scalar waitTime = null;
                 LocalDateTime pickupDateTime = stampStart.globalTime;
                 LocalDateTime dropOffDateTime = stampEnd.globalTime;
-                TaxiTrip taxiTrip = TaxiTrip.of(Integer.toString(requestIndex), taxiId, TensorCoords.toTensor(stampStart.gps), TensorCoords.toTensor(stampEnd.gps), //
-                        distance, waitTime, pickupDateTime, dropOffDateTime);
+
+                TaxiTrip taxiTrip = TaxiTrip.of(Integer.toString(requestIndex), taxiId, //
+                        TensorCoords.toTensor(stampStart.gps), TensorCoords.toTensor(stampEnd.gps), distance, //
+                        null, pickupDateTime, dropOffDateTime);
                 taxiTrips.add(taxiTrip);
                 ++requestIndex;
             }

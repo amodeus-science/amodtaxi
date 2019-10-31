@@ -20,17 +20,17 @@ public class TripEndTimeFilter extends AbstractConsciousFilter {
     public boolean testInternal(TaxiTrip t) {
         // seconds of day when trip starts
         // 15 minutes are added because trips are always projected to start of 15 min interval
-        double secStart = 15 * 60.0 + t.pickupDate.getHour() * 3600.0 + //
-                t.pickupDate.getMinute() * 60.0 + t.pickupDate.getSecond();
+        double secStart = 15 * 60.0 + t.pickupTimeDate.getHour() * 3600.0 + //
+                t.pickupTimeDate.getMinute() * 60.0 + t.pickupTimeDate.getSecond();
 
         // end time
-        Scalar endTime = Quantity.of(secStart, SI.SECOND).add(t.duration);
+        Scalar endTime = Quantity.of(secStart, SI.SECOND).add(t.driveTime);
 
         // trips which end after the maximum end time are rejected
         boolean afterEnd = Scalars.lessEquals(endTime, maxEndTime);
         if (!afterEnd) {
             System.out.println("Trip removed because it ends after the simulation termination: ");
-            System.out.println(t.pickupDate + " with duration " + t.duration);
+            System.out.println(t.pickupTimeDate + " with duration " + t.driveTime);
             System.out.println("===");
         }
         return afterEnd;

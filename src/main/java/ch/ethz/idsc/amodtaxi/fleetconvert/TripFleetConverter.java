@@ -24,7 +24,7 @@ import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.math.CreateQuadTree;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.population.TripPopulationCreator;
-import ch.ethz.idsc.amodtaxi.readers.TaxiTripsReader;
+import ch.ethz.idsc.amodtaxi.scenario.TaxiTripsReader;
 import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilter;
 import ch.ethz.idsc.amodtaxi.tripmodif.TaxiDataModifier;
 import ch.ethz.idsc.amodtaxi.tripmodif.TripBasedModifier;

@@ -24,8 +24,8 @@ public class TripDurationFilter extends AbstractConsciousFilter {
 
     @Override
     public boolean testInternal(TaxiTrip t) {
-        return Scalars.lessEquals(minDuration, t.duration) && //
-                Scalars.lessEquals(t.duration, maxDuration);
+        return Scalars.lessEquals(minDuration, t.driveTime) && //
+                Scalars.lessEquals(t.driveTime, maxDuration);
     }
 
 }

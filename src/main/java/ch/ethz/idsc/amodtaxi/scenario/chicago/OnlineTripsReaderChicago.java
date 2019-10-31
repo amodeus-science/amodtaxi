@@ -7,31 +7,37 @@ import java.time.LocalDateTime;
 import ch.ethz.idsc.amodeus.util.LocalDateTimes;
 import ch.ethz.idsc.amodeus.util.io.CsvReader.Row;
 import ch.ethz.idsc.amodeus.util.math.SI;
+import ch.ethz.idsc.amodtaxi.scenario.TaxiTripsReader;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
-public class OnlineTripsReaderChicago extends ChicagoTripsReaderBasic {
+/* package */ class OnlineTripsReaderChicago extends TaxiTripsReader {
 
     public OnlineTripsReaderChicago() {
         super(",");
     }
 
     @Override
-    public final String getTaxiCode(Row row) {
+    public String getTripId(Row row) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public final String getTaxiId(Row row) {
         return row.get("taxi_id");
     }
 
     @Override
-    public LocalDateTime getStartTime(Row line) throws ParseException {
+    public LocalDateTime getPickupTime(Row line) throws ParseException {
         return LocalDateTime.parse(line.get("trip_start_timestamp"), ScenarioConstants.onlineFormat);
     }
 
     @Override
-    public LocalDateTime getEndTime(Row line) throws ParseException {
-        return LocalDateTimes.addTo(getStartTime(line), getDuration(line));
-        // return LocalDateTime.parse(line.get("trip_end_timestamp"), ScenarioConstants.onlineFormat);
+    public LocalDateTime getDropoffTime(Row line) throws ParseException {
+        return LocalDateTimes.addTo(getPickupTime(line), getDuration(line));
     }
 
     @Override
@@ -51,6 +57,24 @@ public class OnlineTripsReaderChicago extends ChicagoTripsReaderBasic {
     @Override
     public Scalar getDuration(Row line) {
         return Quantity.of(Long.valueOf(line.get("trip_seconds")), SI.SECOND);
+    }
+
+    @Override
+    public final Scalar getDistance(Row row) {
+        return Quantity.of(Double.valueOf(row.get("trip_miles"))//
+                * ScenarioConstants.milesToM, SI.METER);
+    }
+
+    @Override
+    public final Scalar getWaitingTime(Row row) {
+        // not available from data
+        return null;
+    }
+
+    @Override
+    public LocalDateTime getSubmissionTime(Row row) throws ParseException {
+        // not available from data
+        return null;
     }
 
 }

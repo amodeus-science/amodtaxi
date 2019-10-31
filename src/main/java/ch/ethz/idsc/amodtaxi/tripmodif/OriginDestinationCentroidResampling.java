@@ -101,9 +101,9 @@ public class OriginDestinationCentroidResampling implements TripModifier {
                 fastLinkLookup.getWGS84fromLink(lOriginDist), //
                 fastLinkLookup.getWGS84fromLink(lDestinDist), //
                 originalTrip.distance, //
-                originalTrip.waitTime, //
-                originalTrip.pickupDate, //
-                originalTrip.duration);
+                originalTrip.submissionTimeDate, //
+                originalTrip.pickupTimeDate, //
+                originalTrip.dropoffTimeDate);
     }
 
     @Override

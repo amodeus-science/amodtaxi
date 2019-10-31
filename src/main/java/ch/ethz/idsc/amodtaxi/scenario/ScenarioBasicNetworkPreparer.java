@@ -1,5 +1,5 @@
 /* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
-package ch.ethz.idsc.amodtaxi.scenario.chicago;
+package ch.ethz.idsc.amodtaxi.scenario;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,9 +12,8 @@ import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
 import ch.ethz.idsc.amodeus.util.io.GZHandler;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.network.LinkModes;
-import ch.ethz.idsc.amodtaxi.scenario.NetworkCutterUtils;
 
-public enum InitialNetworkPreparer {
+public enum ScenarioBasicNetworkPreparer {
     ;
 
     public static Network run(File processingDir) {

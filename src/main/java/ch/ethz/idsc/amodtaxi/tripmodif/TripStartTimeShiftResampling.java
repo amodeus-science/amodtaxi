@@ -25,7 +25,7 @@ public class TripStartTimeShiftResampling implements TripModifier {
         TaxiTrip tripOrig = taxiTrip;
 
         /** get start time and duration */
-        LocalDateTime start = tripOrig.pickupDate;
+        LocalDateTime start = tripOrig.pickupTimeDate;
 
         /** assert that start time is multiple of 15 minutes */
         GlobalAssert.that(start.getMinute() % 15 == 0); // this is always true for Chicago online data
@@ -40,9 +40,9 @@ public class TripStartTimeShiftResampling implements TripModifier {
                 tripOrig.pickupLoc, //
                 tripOrig.dropoffLoc, //
                 tripOrig.distance, //
+                LocalDateTimes.addTo(tripOrig.pickupTimeDate, shift), //
                 tripOrig.waitTime, //
-                LocalDateTimes.addTo(tripOrig.pickupDate, shift), //
-                tripOrig.duration);
+                tripOrig.driveTime);
     }
 
     @Override

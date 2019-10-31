@@ -28,10 +28,11 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.fleetconvert.ChicagoOnlineTripFleetConverter;
 import ch.ethz.idsc.amodtaxi.linkspeed.iterative.IterativeLinkSpeedEstimator;
 import ch.ethz.idsc.amodtaxi.osm.OsmLoader;
-import ch.ethz.idsc.amodtaxi.readers.TaxiTripsReader;
 import ch.ethz.idsc.amodtaxi.scenario.FinishedScenario;
+import ch.ethz.idsc.amodtaxi.scenario.ScenarioBasicNetworkPreparer;
 import ch.ethz.idsc.amodtaxi.scenario.Scenario;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
+import ch.ethz.idsc.amodtaxi.scenario.TaxiTripsReader;
 import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilter;
 import ch.ethz.idsc.amodtaxi.tripfilter.TripNetworkFilter;
 import ch.ethz.idsc.amodtaxi.tripmodif.ChicagoFormatModifier;
@@ -102,10 +103,9 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         if (!debug)
             Osm2MultimodalNetwork.run(workingDir.getAbsolutePath() + "/" + ScenarioLabels.pt2MatSettings);
         /** prepare the network */
-        InitialNetworkPreparer.run(workingDir);
+        ScenarioBasicNetworkPreparer.run(workingDir);
 
-        /** based on the taxi data, create a population and assemble a AMoDeus scenario */
-
+        /** load taxi data for the city of Chicago */
         File tripFile;
         if (!debug) {
             tripFile = ChicagoDataLoader.from(ScenarioLabels.amodeusFile, workingDir);
@@ -125,7 +125,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
                 ScenarioOptionsBase.getDefault());
         LocalDate simulationDate = LocalDateConvert.ofOptions(scenarioOptions.getString("date"));
 
-        //
+        /** based on the taxi data, create a population and assemble a AMoDeus scenario */
         File configFile = new File(scenarioOptions.getPreparerConfigName());
         System.out.println(configFile.getAbsolutePath());
         GlobalAssert.that(configFile.exists());

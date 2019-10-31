@@ -14,6 +14,7 @@ import ch.ethz.idsc.amodeus.util.io.CsvReader;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
 /* package */ class ZurichCallCenterDataPreparation {
@@ -125,6 +126,9 @@ import ch.ethz.idsc.tensor.qty.Quantity;
                             line = line + StaticHelper.addLocationIfFound(coordsStartTrace, coordsEndTrace);
                             line = line + StaticHelper.addLocationIfFound(coordsStartOSM, coordsEndOSM);
                             line = line + "\n";
+
+                            System.out.println("line: " + line);
+
                             try {
                                 writer.write(line);
                             } catch (Exception exception) {

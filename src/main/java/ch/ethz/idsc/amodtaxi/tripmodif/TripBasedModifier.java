@@ -21,7 +21,7 @@ public class TripBasedModifier implements TaxiDataModifier {
     }
 
     @Override // from TaxiDataModifier
-    public File modify(File taxiData) throws IOException {
+    public File modify(File taxiData) throws Exception {
 
         /** gather all original trips */
         List<TaxiTrip> originals = new ArrayList<>();
