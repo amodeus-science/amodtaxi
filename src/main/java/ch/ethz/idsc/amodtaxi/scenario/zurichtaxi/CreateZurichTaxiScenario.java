@@ -21,10 +21,12 @@ import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
+import ch.ethz.idsc.amodeus.taxitrip.ImportTaxiTrips;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.math.CreateQuadTree;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import ch.ethz.idsc.amodtaxi.linkspeed.iterative.IterativeLinkSpeedEstimator;
 import ch.ethz.idsc.amodtaxi.osm.OsmLoader;
 import ch.ethz.idsc.amodtaxi.population.TripPopulationCreator;
 import ch.ethz.idsc.amodtaxi.scenario.FinishedScenario;
@@ -39,7 +41,7 @@ public class CreateZurichTaxiScenario {
     private File finalTripsFile;
     private Network network = null;
     private MatsimAmodeusDatabase db = null;
-    private final int maxIter = 100000;
+    private final int maxIter = 100;
     private final AmodeusTimeConvert timeConvert = new AmodeusTimeConvert(ZoneId.of("Europe/Paris"));
 
     public CreateZurichTaxiScenario(File workingDir) throws Exception {
@@ -52,13 +54,10 @@ public class CreateZurichTaxiScenario {
         System.out.println("The final trips file is: ");
         System.out.println(finalTripsFile.getAbsolutePath());
 
-        // /** loading final trips */
-        // List<TaxiTrip> finalTrips = ImportTaxiTrips.fromFile(finalTripsFile).collect(Collectors.toList());
-        //
-        // new IterativeLinkSpeedEstimator(maxIter).compute(workingDir, network, db, finalTrips);
-        // FinishedScenario.copyToDir(workingDir.getAbsolutePath(), //
-        // workingDir.getAbsolutePath(), //
-        // destinDir.getAbsolutePath());
+        /** loading final trips */
+        List<TaxiTrip> finalTrips = ImportTaxiTrips.fromFile(finalTripsFile).collect(Collectors.toList());
+
+        new IterativeLinkSpeedEstimator(maxIter).compute(workingDir, network, db, finalTrips);
 
         FinishedScenario.copyToDir(workingDir.getAbsolutePath(), destinDir.getAbsolutePath(), //
                 new String[] { "AmodeusOptions.properties", "network.xml.gz", "population.xml.gz", //
@@ -68,7 +67,7 @@ public class CreateZurichTaxiScenario {
 
     private void run() throws Exception {
         // FIXME remove debug loop once done
-        boolean debug = false;
+        boolean debug = true;
 
         /** download of open street map data to create scenario */
         System.out.println("Downloading open stret map data, this may take a while...");
