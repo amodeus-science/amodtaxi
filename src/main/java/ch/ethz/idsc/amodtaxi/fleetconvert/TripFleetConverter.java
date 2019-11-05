@@ -27,14 +27,13 @@ import ch.ethz.idsc.amodtaxi.population.TripPopulationCreator;
 import ch.ethz.idsc.amodtaxi.scenario.TaxiTripsReader;
 import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilter;
 import ch.ethz.idsc.amodtaxi.tripmodif.TaxiDataModifier;
-import ch.ethz.idsc.amodtaxi.tripmodif.TripBasedModifier;
 
 public abstract class TripFleetConverter {
 
     protected final ScenarioOptions scenarioOptions;
     protected final Network network;
     protected final TaxiTripFilter primaryFilter = new TaxiTripFilter();
-    protected final TripBasedModifier contentModifier;
+    protected final TaxiDataModifier contentModifier;
     protected final TaxiDataModifier formatModifier;
     protected final TaxiTripFilter finalFilters;
     protected final TaxiTripsReader tripsReader;
@@ -44,7 +43,7 @@ public abstract class TripFleetConverter {
     private File finalTripsFile = null;
 
     public TripFleetConverter(ScenarioOptions scenarioOptions, Network network, //
-            TripBasedModifier tripModifier, //
+            TaxiDataModifier tripModifier, //
             TaxiDataModifier generalModifier, TaxiTripFilter finalFilters, //
             TaxiTripsReader tripsReader) {
         this.scenarioOptions = scenarioOptions;
@@ -79,8 +78,7 @@ public abstract class TripFleetConverter {
         /** initial formal modifications, e.g., replacing certain characters,
          * other modifications should be done in the third step */
         File preparedFile = formatModifier.modify(newTripFile);
-        Stream<TaxiTrip> stream = tripsReader.getTripStream(preparedFile);
-        List<TaxiTrip> allTrips = stream.collect(Collectors.toList());
+        List<TaxiTrip> allTrips = tripsReader.getTrips(preparedFile);
         System.out.println("Before primary filter: " + allTrips.size());
 
         /** filtering of trips, e.g., removal of 0 [s] trips */

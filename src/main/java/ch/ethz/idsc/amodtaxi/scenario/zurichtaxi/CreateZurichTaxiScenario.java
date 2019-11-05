@@ -63,7 +63,7 @@ public class CreateZurichTaxiScenario {
         System.out.println(finalTripsFile.getAbsolutePath());
 
         /** loading final trips */
-        List<TaxiTrip> finalTrips = ImportTaxiTrips.fromFile(finalTripsFile).collect(Collectors.toList());
+        List<TaxiTrip> finalTrips = ImportTaxiTrips.fromFile(finalTripsFile);
 
         /** filtering the ones without meaningful duration */
         TaxiTripFilter finalTripFilter = new TaxiTripFilter();
@@ -101,7 +101,7 @@ public class CreateZurichTaxiScenario {
         /** load taxi data from the trips file */
         File tripsFile = new File("/home/clruch/Downloads/tripsJune21_best_new.csv");
         ZurichTaxiTripReader reader = new ZurichTaxiTripReader(",");
-        List<TaxiTrip> allTrips = reader.getTripStream(tripsFile).collect(Collectors.toList());
+        List<TaxiTrip> allTrips = reader.getTrips(tripsFile);
         allTrips.stream().forEach(t -> {
             System.out.println(t.toString());
         });

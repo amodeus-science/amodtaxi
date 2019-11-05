@@ -3,7 +3,6 @@ package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -21,7 +20,7 @@ public class ZurichTaxiTripReaderTest {
         File tripSampleFile = new File(Locate.repoFolder(ZurichTaxiTripReaderTest.class, "amodtaxi"), //
                 "resources/zurichTaxiScenario/trips_sample.csv");
         ZurichTaxiTripReader reader = new ZurichTaxiTripReader(",");
-        List<TaxiTrip> trips = reader.getTripStream(tripSampleFile).collect(Collectors.toList());
+        List<TaxiTrip> trips = reader.getTrips(tripSampleFile);
 
         /** basic tests on id */
         Assert.assertTrue(trips.get(0).localId.equals("19864185"));

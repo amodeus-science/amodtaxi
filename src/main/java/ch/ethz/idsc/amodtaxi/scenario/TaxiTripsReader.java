@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.Duration;
@@ -37,7 +36,7 @@ public abstract class TaxiTripsReader {
         this.delim = delim;
     }
 
-    public Stream<TaxiTrip> getTripStream(File file) throws IOException {
+    public List<TaxiTrip> getTrips(File file) throws IOException {
         final AtomicInteger tripIds = new AtomicInteger(0);
         List<TaxiTrip> list = new LinkedList<>();
         System.out.println("TaxiTripsReader, reading file: " + file.getAbsolutePath());
@@ -81,7 +80,7 @@ public abstract class TaxiTripsReader {
                 unreadable.add(row.toString());
             }
         });
-        return list.stream();
+        return list;
     }
 
     public int getNumberOfTaxis() {

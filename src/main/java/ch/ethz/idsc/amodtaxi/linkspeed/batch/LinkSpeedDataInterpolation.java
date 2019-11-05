@@ -82,7 +82,8 @@ public class LinkSpeedDataInterpolation {
 
                     }
                 }
-            } else { /** no recordings exist for link */
+            } else {
+                /** no recordings exist for link */
                 for (Integer time : recordedTimes) {
                     Scalar speed = MeanLinkSpeed.ofNeighbors(kernel.getNeighbors(link), time, link, db, lsData);
                     if (Objects.nonNull(speed)) {
