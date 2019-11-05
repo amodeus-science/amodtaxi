@@ -24,6 +24,7 @@ import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.io.CopyFiles;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodtaxi.fleetconvert.ChicagoOnlineTripFleetConverter;
 import ch.ethz.idsc.amodtaxi.fleetconvert.TripFleetConverter;
 import ch.ethz.idsc.amodtaxi.linkspeed.iterative.IterativeLinkSpeedEstimator;
@@ -36,14 +37,16 @@ import ch.ethz.idsc.amodtaxi.scenario.TaxiTripsReader;
 import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
 import ch.ethz.idsc.amodtaxi.tripfilter.TripNetworkFilter;
 import ch.ethz.idsc.amodtaxi.tripmodif.ChicagoFormatModifier;
-import ch.ethz.idsc.amodtaxi.tripmodif.ChicagoOnlineTripBasedModifier;
+import ch.ethz.idsc.amodtaxi.tripmodif.OriginDestinationCentroidResampling;
 import ch.ethz.idsc.amodtaxi.tripmodif.TaxiDataModifier;
+import ch.ethz.idsc.amodtaxi.tripmodif.TaxiDataModifierCollection;
+import ch.ethz.idsc.amodtaxi.tripmodif.TripStartTimeShiftResampling;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
 /* package */ class CreateChicagoScenario {
     private static final AmodeusTimeConvert timeConvert = new AmodeusTimeConvert(ZoneId.of("America/Chicago"));
-    private static final Random random = new Random(123);
+    private static final Random RANDOM = new Random(123);
     // ---
 
     private static void createScenario(File workingDir) throws Exception {
@@ -72,16 +75,16 @@ import ch.ethz.idsc.tensor.qty.Quantity;
             tripFile = new File(workingDir, "/Taxi_Trips_2019_07_19.csv");
         }
 
-        File processingdir = new File(workingDir, "Scenario");
-        if (processingdir.isDirectory())
-            DeleteDirectory.of(processingdir, 2, 25);
-        if (!processingdir.isDirectory())
-            processingdir.mkdir();
+        File processingDir = new File(workingDir, "Scenario");
+        if (processingDir.isDirectory())
+            DeleteDirectory.of(processingDir, 2, 25);
+        if (!processingDir.isDirectory())
+            processingDir.mkdir();
 
-        CopyFiles.now(workingDir.getAbsolutePath(), processingdir.getAbsolutePath(), //
+        CopyFiles.now(workingDir.getAbsolutePath(), processingDir.getAbsolutePath(), //
                 Arrays.asList(new String[] { "AmodeusOptions.properties", "config_full.xml", //
                         "network.xml", "network.xml.gz", "LPOptions.properties" }));
-        ScenarioOptions scenarioOptions = new ScenarioOptions(processingdir, //
+        ScenarioOptions scenarioOptions = new ScenarioOptions(processingDir, //
                 ScenarioOptionsBase.getDefault());
         LocalDate simulationDate = LocalDateConvert.ofOptions(scenarioOptions.getString("date"));
 
@@ -90,17 +93,30 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         System.out.println(configFile.getAbsolutePath());
         GlobalAssert.that(configFile.exists());
         Config configFull = ConfigUtils.loadConfig(configFile.toString());
-        final Network network = NetworkLoader.fromNetworkFile(new File(processingdir, configFull.network().getInputFile()));
+        final Network network = NetworkLoader.fromNetworkFile(new File(processingDir, configFull.network().getInputFile()));
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, scenarioOptions.getLocationSpec().referenceFrame());
         FastLinkLookup fll = new FastLinkLookup(network, db);
 
         /** prepare for creation of scenario */
         TaxiTripsReader tripsReader = new OnlineTripsReaderChicago();
-        TaxiDataModifier tripModifier = new ChicagoOnlineTripBasedModifier(random, network, //
-                fll, new File(processingdir, "virtualNetworkChicago"));
-        TaxiTripFilterCollection finalTripFilter = new TaxiTripFilterCollection();
+        TaxiDataModifier tripModifier;
+        // = ChicagoOnlineTripBasedModifier.create(random, network, //
+        // fll, new File(processingdir, "virtualNetworkChicago"));
+        {
+            TaxiDataModifierCollection taxiDataModifierCollection = new TaxiDataModifierCollection();
+            /** below filter was removed as it causes request spikes at quarter hour intervals,
+             * see class for detailed description */
+            // addModifier(new ChicagoTripStartTimeResampling(random));
+            /** instead the TripStartTimeShiftResampling is used: */
+            taxiDataModifierCollection.addModifier(new TripStartTimeShiftResampling(RANDOM, Quantity.of(900, SI.SECOND)));
+            /** TODO RVM document why centroid resampling */
+            File vNFile = new File(processingDir, "virtualNetworkChicago");
+            taxiDataModifierCollection.addModifier(new OriginDestinationCentroidResampling(RANDOM, network, fll, vNFile));
+            tripModifier = taxiDataModifierCollection;
+        }
+        TaxiTripFilterCollection taxiTripFilterCollection = new TaxiTripFilterCollection();
         /** trips which are faster than the network freeflow speeds would allow are removed */
-        finalTripFilter.addFilter(new TripNetworkFilter(network, db, //
+        taxiTripFilterCollection.addFilter(new TripNetworkFilter(network, db, //
                 Quantity.of(2.235200008, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m"), true));
 
         // TODO eventually remove, this did not improve the fit.
@@ -110,9 +126,9 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         { // prepare final scenario
             TripFleetConverter converter = //
                     new ChicagoOnlineTripFleetConverter(scenarioOptions, network, tripModifier, //
-                            new ChicagoFormatModifier(), finalTripFilter, tripsReader);
+                            new ChicagoFormatModifier(), taxiTripFilterCollection, tripsReader);
             File finalTripsFile = Scenario.create(workingDir, tripFile, //
-                    converter, workingDir, processingdir, simulationDate, timeConvert);
+                    converter, workingDir, processingDir, simulationDate, timeConvert);
 
             Objects.requireNonNull(finalTripsFile);
 
@@ -127,9 +143,9 @@ import ch.ethz.idsc.tensor.qty.Quantity;
             finalTrips = ImportTaxiTrips.fromFile(finalTripsFile);
         }
         final int maxIter = 100000;
-        new IterativeLinkSpeedEstimator(maxIter).compute(processingdir, network, db, finalTrips);
+        new IterativeLinkSpeedEstimator(maxIter).compute(processingDir, network, db, finalTrips);
 
-        FinishedScenario.copyToDir(processingdir.getAbsolutePath(), //
+        FinishedScenario.copyToDir(processingDir.getAbsolutePath(), //
                 destinDir.getAbsolutePath(), new String[] { //
                         "AmodeusOptions.properties", "network.xml.gz", "population.xml.gz", //
                         "LPOptions.properties", "config_full.xml", //

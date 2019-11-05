@@ -49,7 +49,7 @@ public class TripNetworkFilter extends AbstractConsciousFilter {
         this.checkSlowerNetwork = checkSlowerNetwork;
     }
 
-    @Override
+    @Override // from AbstractConsciousFilter
     public boolean testInternal(TaxiTrip trip) {
 
         /** getting the data */

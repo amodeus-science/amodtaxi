@@ -10,6 +10,7 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 
+// TODO RVM document
 public class TripStartTimeShiftResampling implements TripModifier {
 
     private final Random random;
@@ -22,10 +23,9 @@ public class TripStartTimeShiftResampling implements TripModifier {
 
     @Override
     public TaxiTrip modify(TaxiTrip taxiTrip) {
-        TaxiTrip tripOrig = taxiTrip;
 
         /** get start time and duration */
-        LocalDateTime start = tripOrig.pickupTimeDate;
+        LocalDateTime start = taxiTrip.pickupTimeDate;
 
         /** assert that start time is multiple of 15 minutes */
         GlobalAssert.that(start.getMinute() % 15 == 0); // this is always true for Chicago online data
@@ -34,15 +34,15 @@ public class TripStartTimeShiftResampling implements TripModifier {
         Scalar shift = RealScalar.of(random.nextDouble()).multiply(maxShift);
 
         /** compute updated trip and return */
-        return TaxiTrip.of(//
-                tripOrig.localId, //
-                tripOrig.taxiId, //
-                tripOrig.pickupLoc, //
-                tripOrig.dropoffLoc, //
-                tripOrig.distance, //
-                LocalDateTimes.addTo(tripOrig.pickupTimeDate, shift), //
-                tripOrig.waitTime, //
-                tripOrig.driveTime);
+        return TaxiTrip.of( //
+                taxiTrip.localId, //
+                taxiTrip.taxiId, //
+                taxiTrip.pickupLoc, //
+                taxiTrip.dropoffLoc, //
+                taxiTrip.distance, //
+                LocalDateTimes.addTo(taxiTrip.pickupTimeDate, shift), //
+                taxiTrip.waitTime, //
+                taxiTrip.driveTime);
     }
 
     @Override
