@@ -25,17 +25,17 @@ import ch.ethz.idsc.amodeus.util.math.CreateQuadTree;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.population.TripPopulationCreator;
 import ch.ethz.idsc.amodtaxi.scenario.TaxiTripsReader;
-import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilter;
+import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
 import ch.ethz.idsc.amodtaxi.tripmodif.TaxiDataModifier;
 
 public abstract class TripFleetConverter {
 
     protected final ScenarioOptions scenarioOptions;
     protected final Network network;
-    protected final TaxiTripFilter primaryFilter = new TaxiTripFilter();
+    protected final TaxiTripFilterCollection primaryFilter = new TaxiTripFilterCollection();
     protected final TaxiDataModifier contentModifier;
     protected final TaxiDataModifier formatModifier;
-    protected final TaxiTripFilter finalFilters;
+    protected final TaxiTripFilterCollection finalFilters;
     protected final TaxiTripsReader tripsReader;
     protected final MatsimAmodeusDatabase db;
     protected final QuadTree<Link> qt;
@@ -44,7 +44,7 @@ public abstract class TripFleetConverter {
 
     public TripFleetConverter(ScenarioOptions scenarioOptions, Network network, //
             TaxiDataModifier tripModifier, //
-            TaxiDataModifier generalModifier, TaxiTripFilter finalFilters, //
+            TaxiDataModifier generalModifier, TaxiTripFilterCollection finalFilters, //
             TaxiTripsReader tripsReader) {
         this.scenarioOptions = scenarioOptions;
         this.network = network;

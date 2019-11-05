@@ -25,6 +25,7 @@ import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.io.CopyFiles;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.fleetconvert.ChicagoOnlineTripFleetConverter;
+import ch.ethz.idsc.amodtaxi.fleetconvert.TripFleetConverter;
 import ch.ethz.idsc.amodtaxi.linkspeed.iterative.IterativeLinkSpeedEstimator;
 import ch.ethz.idsc.amodtaxi.osm.OsmLoader;
 import ch.ethz.idsc.amodtaxi.scenario.FinishedScenario;
@@ -32,11 +33,11 @@ import ch.ethz.idsc.amodtaxi.scenario.Scenario;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioBasicNetworkPreparer;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
 import ch.ethz.idsc.amodtaxi.scenario.TaxiTripsReader;
-import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilter;
+import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
 import ch.ethz.idsc.amodtaxi.tripfilter.TripNetworkFilter;
 import ch.ethz.idsc.amodtaxi.tripmodif.ChicagoFormatModifier;
 import ch.ethz.idsc.amodtaxi.tripmodif.ChicagoOnlineTripBasedModifier;
-import ch.ethz.idsc.amodtaxi.tripmodif.TripBasedModifier;
+import ch.ethz.idsc.amodtaxi.tripmodif.TaxiDataModifier;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
@@ -95,9 +96,9 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
         /** prepare for creation of scenario */
         TaxiTripsReader tripsReader = new OnlineTripsReaderChicago();
-        TripBasedModifier tripModifier = new ChicagoOnlineTripBasedModifier(random, network, //
+        TaxiDataModifier tripModifier = new ChicagoOnlineTripBasedModifier(random, network, //
                 fll, new File(processingdir, "virtualNetworkChicago"));
-        TaxiTripFilter finalTripFilter = new TaxiTripFilter();
+        TaxiTripFilterCollection finalTripFilter = new TaxiTripFilterCollection();
         /** trips which are faster than the network freeflow speeds would allow are removed */
         finalTripFilter.addFilter(new TripNetworkFilter(network, db, //
                 Quantity.of(2.235200008, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m"), true));
@@ -107,7 +108,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         File destinDir = new File(workingDir, "CreatedScenario");
         List<TaxiTrip> finalTrips;
         { // prepare final scenario
-            ChicagoOnlineTripFleetConverter converter = //
+            TripFleetConverter converter = //
                     new ChicagoOnlineTripFleetConverter(scenarioOptions, network, tripModifier, //
                             new ChicagoFormatModifier(), finalTripFilter, tripsReader);
             File finalTripsFile = Scenario.create(workingDir, tripFile, //

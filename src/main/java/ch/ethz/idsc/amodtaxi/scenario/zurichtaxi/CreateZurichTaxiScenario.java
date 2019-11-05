@@ -33,7 +33,7 @@ import ch.ethz.idsc.amodtaxi.population.TripPopulationCreator;
 import ch.ethz.idsc.amodtaxi.scenario.FinishedScenario;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioBasicNetworkPreparer;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
-import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilter;
+import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
 import ch.ethz.idsc.amodtaxi.tripfilter.TripDurationFilter;
 import ch.ethz.idsc.amodtaxi.tripfilter.TripNetworkFilter;
 import ch.ethz.idsc.tensor.qty.Quantity;
@@ -66,7 +66,7 @@ public class CreateZurichTaxiScenario {
         List<TaxiTrip> finalTrips = ImportTaxiTrips.fromFile(finalTripsFile);
 
         /** filtering the ones without meaningful duration */
-        TaxiTripFilter finalTripFilter = new TaxiTripFilter();
+        TaxiTripFilterCollection finalTripFilter = new TaxiTripFilterCollection();
         /** trips which are faster than the network freeflow speeds would allow are removed */
         finalTripFilter.addFilter(new TripNetworkFilter(network, db, //
                 Quantity.of(0.0000001, "m*s^-1"), Quantity.of(100000, "s"), Quantity.of(0.000001, "m"), true));
@@ -142,7 +142,7 @@ public class CreateZurichTaxiScenario {
         // new ChicagoOnlineTripFleetConverter(scenarioOptions, network, tripModifier, //
         // new ChicagoFormatModifier(), finalTripFilter, tripsReader);
 
-        TaxiTripFilter finalTripFilter = new TaxiTripFilter();
+        TaxiTripFilterCollection finalTripFilter = new TaxiTripFilterCollection();
 
         // /** trips which are faster than the network freeflow speeds would allow are removed */
         // finalTripFilter.addFilter(new TripNetworkFilter(network, db, //

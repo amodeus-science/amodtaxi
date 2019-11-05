@@ -9,7 +9,7 @@ import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 
 /** Contains a set of filters that process an individual {@link TaxiTrip}
  * and let it pass or not: TaxiTrip -> {true,false} */
-public class TaxiTripFilter {
+public class TaxiTripFilterCollection {
     private final List<ConsciousFilter> filters = new ArrayList<>();
 
     public final void addFilter(ConsciousFilter filter) {

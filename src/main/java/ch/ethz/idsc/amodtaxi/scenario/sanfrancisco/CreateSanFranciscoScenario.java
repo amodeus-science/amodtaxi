@@ -21,7 +21,7 @@ import ch.ethz.idsc.amodeus.util.io.MultiFileReader;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodtaxi.osm.StaticMapCreator;
 import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
-import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilter;
+import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
 import ch.ethz.idsc.amodtaxi.tripfilter.TripNetworkFilter;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.qty.Quantity;
@@ -79,12 +79,12 @@ public class CreateSanFranciscoScenario {
             try {
                 /** compute scenario */
 
-                TaxiTripFilter speedEstimationTripFilter = new TaxiTripFilter();
+                TaxiTripFilterCollection speedEstimationTripFilter = new TaxiTripFilterCollection();
                 /** trips which are faster than the network freeflow speeds would allow are removed */
                 speedEstimationTripFilter.addFilter(new TripNetworkFilter(network, db, //
                         Quantity.of(2.235200008, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m"), true));
 
-                TaxiTripFilter finalPopulationTripFilter = new TaxiTripFilter();
+                TaxiTripFilterCollection finalPopulationTripFilter = new TaxiTripFilterCollection();
                 /** trips which are faster than the network freeflow speeds would allow are removed */
                 finalPopulationTripFilter.addFilter(new TripNetworkFilter(network, db, //
                         Quantity.of(2.235200008, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m"), false));

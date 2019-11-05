@@ -25,7 +25,7 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.linkspeed.LinkSpeedsExport;
 import ch.ethz.idsc.amodtaxi.linkspeed.iterative.IterativeLinkSpeedEstimator;
 import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
-import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilter;
+import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
 import ch.ethz.idsc.tensor.Scalar;
 
 /* package */ class StandaloneFleetConverterSF {
@@ -38,8 +38,8 @@ import ch.ethz.idsc.tensor.Scalar;
     private final int maxIter = 100000; // 10'000 need 1 hour
     private DayTaxiRecord dayTaxiRecord;
     private ScenarioOptions simOptions;
-    private final TaxiTripFilter speedEstimationTripFilter;
-    private final TaxiTripFilter populationTripFilter;
+    private final TaxiTripFilterCollection speedEstimationTripFilter;
+    private final TaxiTripFilterCollection populationTripFilter;
 
     private final QuadTree<Link> qt;
     private File outputDirectory;
@@ -49,8 +49,8 @@ import ch.ethz.idsc.tensor.Scalar;
 
     public StandaloneFleetConverterSF(File workingDirectory, DayTaxiRecord dayTaxiRecord, //
             MatsimAmodeusDatabase db, Network network, Scalar TIME_STEP, //
-            AmodeusTimeConvert timeConvert, TaxiTripFilter taxiTripFilter, //
-            TaxiTripFilter populationTripFilter) throws Exception {
+            AmodeusTimeConvert timeConvert, TaxiTripFilterCollection taxiTripFilter, //
+            TaxiTripFilterCollection populationTripFilter) throws Exception {
         this.workingDirectory = workingDirectory;
         this.dayTaxiRecord = dayTaxiRecord;
         this.db = db;
