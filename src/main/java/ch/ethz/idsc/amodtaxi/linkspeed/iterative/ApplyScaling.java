@@ -31,7 +31,7 @@ import ch.ethz.idsc.tensor.Scalar;
             /** get link properties */
             Integer linkId = LinkIndex.fromLink(db, link);
             double freeSpeed = link.getFreespeed();
-            LinkSpeedTimeSeries lsTime = lsData.getLinkSet().get(linkId);
+            LinkSpeedTimeSeries lsTime = lsData.getLinkMap().get(linkId);
 
             /** if no recordings are present, initialize with free speed for duration of trip */
             if (Objects.isNull(lsTime)) {
@@ -43,7 +43,7 @@ import ch.ethz.idsc.tensor.Scalar;
                     lsData.addData(linkId, time, freeSpeed);
                 }
             }
-            lsTime = lsData.getLinkSet().get(linkId);
+            lsTime = lsData.getLinkMap().get(linkId);
             Objects.requireNonNull(lsTime);
 
             List<Integer> relevantTimes = new ArrayList<>();

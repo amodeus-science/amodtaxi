@@ -68,8 +68,8 @@ public class LinkSpeedDataInterpolation {
             // }
 
             /** some recordings exist for link */
-            if (lsData.getLinkSet().containsKey(linkID)) {
-                LinkSpeedTimeSeries timeSeries = lsData.getLinkSet().get(linkID);
+            if (lsData.getLinkMap().containsKey(linkID)) {
+                LinkSpeedTimeSeries timeSeries = lsData.getLinkMap().get(linkID);
                 for (Integer time : recordedTimes) {
                     if (!timeSeries.getRecordedTimes().contains(time)) {
                         System.out.println("Are we ever here?... ");
