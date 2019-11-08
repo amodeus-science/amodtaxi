@@ -17,7 +17,6 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.pt2matsim.run.Osm2MultimodalNetwork;
 
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
-import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
@@ -66,6 +65,7 @@ public class CreateZurichTaxiScenario {
         List<TaxiTrip> finalTrips = ImportTaxiTrips.fromFile(finalTripsFile).collect(Collectors.toList());
 
         /** filtering the ones without meaningful duration */
+        System.out.println("FinalTrips: " + finalTrips.size());
         TaxiTripFilter finalTripFilter = new TaxiTripFilter();
         /** trips which are faster than the network freeflow speeds would allow are removed */
         finalTripFilter.addFilter(new TripNetworkFilter(network, db, //
@@ -74,7 +74,10 @@ public class CreateZurichTaxiScenario {
         List<TaxiTrip> fitForTrafficEstimation = finalTripFilter.filterStream(finalTrips.stream()).collect(Collectors.toList());
         finalTripFilter.printSummary();
         ExportTaxiTrips.toFile(fitForTrafficEstimation.stream(), new File(workingDir, "estimationTrips.csv"));
-
+        System.out.println("fitForTrafficEstimation: " + fitForTrafficEstimation.size());
+        
+        System.exit(1);
+        
         new IterativeLinkSpeedEstimator(maxIter).compute(workingDir, network, db, fitForTrafficEstimation);
 
         FinishedScenario.copyToDir(workingDir.getAbsolutePath(), destinDir.getAbsolutePath(), //
@@ -106,18 +109,8 @@ public class CreateZurichTaxiScenario {
             System.out.println(t.toString());
         });
 
-        // //
-        // File processingdir = new File(workingDir, "Scenario");
-        // if (processingdir.isDirectory())
-        // DeleteDirectory.of(processingdir, 2, 25);
-        // if (!processingdir.isDirectory())
-        // processingdir.mkdir();
-        // CopyFiles.now(workingDir.getAbsolutePath(), processingdir.getAbsolutePath(), //
-        // Arrays.asList(new String[] { "AmodeusOptions.properties", "config_full.xml", //
-        // "network.xml", "network.xml.gz", "LPOptions.properties" }));
         ScenarioOptions scenarioOptions = new ScenarioOptions(workingDir, //
                 ScenarioOptionsBase.getDefault());
-        // LocalDate simulationDate = LocalDateConvert.ofOptions(scenarioOptions.getString("date"));
 
         File configFile = new File(scenarioOptions.getPreparerConfigName());
         System.out.println(configFile.getAbsolutePath());
@@ -125,28 +118,8 @@ public class CreateZurichTaxiScenario {
         Config configFull = ConfigUtils.loadConfig(configFile.toString());
         network = NetworkLoader.fromNetworkFile(new File(workingDir, configFull.network().getInputFile()));
         db = MatsimAmodeusDatabase.initialize(network, scenarioOptions.getLocationSpec().referenceFrame());
-        FastLinkLookup fll = new FastLinkLookup(network, db);
-
-        // /** prepare for creation of scenario */
-        // TaxiTripsReader tripsReader = new OnlineTripsReaderChicago();
-        // TripBasedModifier tripModifier = new ChicagoOnlineTripBasedModifier(random, network, //
-        // fll, new File(processingdir, "virtualNetworkChicago"));
-        // TaxiTripFilter finalTripFilter = new TaxiTripFilter();
-        // /** trips which are faster than the network freeflow speeds would allow are removed */
-        // finalTripFilter.addFilter(new TripNetworkFilter(network, db, //
-        // Quantity.of(2.235200008, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m"), true));
-        //
-        // // TODO eventually remove, this did not improve the fit.
-        // // finalFilters.addFilter(new TripMaxSpeedFilter(network, db, ScenarioConstants.maxAllowedSpeed));
-        // ChicagoOnlineTripFleetConverter converter = //
-        // new ChicagoOnlineTripFleetConverter(scenarioOptions, network, tripModifier, //
-        // new ChicagoFormatModifier(), finalTripFilter, tripsReader);
 
         TaxiTripFilter finalTripFilter = new TaxiTripFilter();
-
-        // /** trips which are faster than the network freeflow speeds would allow are removed */
-        // finalTripFilter.addFilter(new TripNetworkFilter(network, db, //
-        // Quantity.of(2.235200008, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m"), true));
 
         QuadTree<Link> qt = CreateQuadTree.of(network);
         TripPopulationCreator populationCreator = //
