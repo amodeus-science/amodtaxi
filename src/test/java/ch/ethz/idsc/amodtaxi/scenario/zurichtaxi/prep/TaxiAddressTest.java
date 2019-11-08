@@ -3,7 +3,7 @@ package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi.prep;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Test;;
+import org.junit.Test;
 
 public class TaxiAddressTest {
 

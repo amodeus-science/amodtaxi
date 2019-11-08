@@ -53,7 +53,7 @@ import ch.ethz.idsc.tensor.Tensors;
                 // a trip ends
                 if (beforeOccupied && !nowOccupied && Objects.nonNull(tripStartStamp)) {
                     String id = "trace_" + Integer.toString((++globalReqCount));
-                    
+
                     // pickup date and time
                     LocalDateTime pickupDate = tripStartStamp.getKey();
                     Double breitePck = Double.parseDouble(tripStartStamp.getValue().get("\"Breitengrad\""));
@@ -65,7 +65,7 @@ import ch.ethz.idsc.tensor.Tensors;
                     Double breiteDrp = Double.parseDouble(currentStamp.getValue().get("\"Breitengrad\""));
                     Double laengeDrp = Double.parseDouble(currentStamp.getValue().get("\"Laengengrad\""));
                     Tensor dropoffLoc = Tensors.vector(breiteDrp, laengeDrp);
-                    
+
                     // creating trip
                     TaxiTrip trip = TaxiTrip.of(id, taxiId, pickupLoc, dropoffLoc, null, //
                             null, pickupDate, dropoffDate);

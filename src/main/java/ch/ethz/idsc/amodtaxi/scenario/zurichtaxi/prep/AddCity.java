@@ -26,8 +26,7 @@ import java.util.List;
 
         if (noCity)
             return original + " zurich";
-        else
-            return original;
+        return original;
 
     }
 }
