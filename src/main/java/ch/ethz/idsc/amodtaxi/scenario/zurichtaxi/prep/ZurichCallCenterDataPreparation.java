@@ -55,7 +55,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
         };
 
-        System.out.println("KACKE0");
+
 
         // create the new trip file
         CsvReader reader = new CsvReader(originalFile, delim);
@@ -65,7 +65,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
         // save unreadable rows to other file
 
-        System.out.println("KACKE1");
+
 
         try (BufferedWriter writer2 = new BufferedWriter(new FileWriter(unreadableFile))) {
             unreadable.forEach(row -> {
@@ -78,7 +78,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
             });
         }
 
-        System.out.println("KACKE2");
+
 
         System.out.println("Unreadable rows: " + unreadable.size());
         System.out.println("Example:" + unreadable.get(0));

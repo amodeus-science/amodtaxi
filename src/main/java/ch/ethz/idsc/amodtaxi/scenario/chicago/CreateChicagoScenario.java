@@ -64,6 +64,9 @@ import ch.ethz.idsc.tensor.qty.Quantity;
     private MatsimAmodeusDatabase db = null;
     private final int maxIter = 100000;
 
+    /** Possible ways to adapt:
+     * - use recorded distance (miles?) for the analysis and the reshuffling of trips
+     * - use not only community are abut also census tract. */
     private CreateChicagoScenario(File workingDir) throws Exception {
         this.workingDir = workingDir;
         ChicagoSetup.in(workingDir);
