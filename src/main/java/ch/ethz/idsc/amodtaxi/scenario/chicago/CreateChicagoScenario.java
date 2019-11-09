@@ -47,7 +47,6 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 /* package */ class CreateChicagoScenario {
     private static final AmodeusTimeConvert timeConvert = new AmodeusTimeConvert(ZoneId.of("America/Chicago"));
     private static final Random RANDOM = new Random(123);
-    // ---
 
     private static void createScenario(File workingDir) throws Exception {
 

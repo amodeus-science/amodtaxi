@@ -6,7 +6,7 @@ import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 
-/* package */ enum ChicagoReferenceFrames implements ReferenceFrame {
+public enum ChicagoReferenceFrames implements ReferenceFrame {
     CHICAGO( //
             new GeotoolsTransformation("EPSG:3435", "WGS84"), //
             new GeotoolsTransformation("WGS84", "EPSG:3435")),//

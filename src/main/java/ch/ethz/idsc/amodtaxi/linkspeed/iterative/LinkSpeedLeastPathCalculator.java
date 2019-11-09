@@ -11,7 +11,7 @@ import ch.ethz.idsc.amodeus.linkspeed.LSDataTravelTime;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 
-/* package */ enum LinkSpeedLeastPathCalculator {
+public enum LinkSpeedLeastPathCalculator {
     ;
 
     public static LeastCostPathCalculator from(Network network, //
