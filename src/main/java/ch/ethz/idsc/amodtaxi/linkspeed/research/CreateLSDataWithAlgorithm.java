@@ -3,7 +3,6 @@ package ch.ethz.idsc.amodtaxi.linkspeed.research;
 import java.io.File;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Network;
 
@@ -18,7 +17,7 @@ import ch.ethz.idsc.amodtaxi.scenario.chicago.ChicagoReferenceFrames;
 public class CreateLSDataWithAlgorithm {
 
     public static void main(String[] args) throws Exception {
-        
+
         /** load necessary data */
         File tripFile = new File("/home/clruch/data/TestDeleteMe/traffictrips.csv");
         int maxIter = 500;
@@ -29,11 +28,9 @@ public class CreateLSDataWithAlgorithm {
         Network network = NetworkLoader.fromNetworkFile(networkFile);
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
 
-        
         /** compute lsData with algorithm */
-        List<TaxiTrip> finalTrips = ImportTaxiTrips.fromFile(tripFile).collect(Collectors.toList());
+        List<TaxiTrip> finalTrips = ImportTaxiTrips.fromFile(tripFile);
         new IterativeLinkSpeedEstimator(maxIter).compute(processingDir, network, db, finalTrips);
-        
-        
+
     }
 }

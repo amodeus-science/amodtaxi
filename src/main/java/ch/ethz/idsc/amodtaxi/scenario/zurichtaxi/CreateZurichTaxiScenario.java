@@ -75,9 +75,9 @@ public class CreateZurichTaxiScenario {
         finalTripFilter.printSummary();
         ExportTaxiTrips.toFile(fitForTrafficEstimation.stream(), new File(workingDir, "estimationTrips.csv"));
         System.out.println("fitForTrafficEstimation: " + fitForTrafficEstimation.size());
-        
+
         System.exit(1);
-        
+
         new IterativeLinkSpeedEstimator(maxIter).compute(workingDir, network, db, fitForTrafficEstimation);
 
         FinishedScenario.copyToDir(workingDir.getAbsolutePath(), destinDir.getAbsolutePath(), //

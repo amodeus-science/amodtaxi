@@ -55,8 +55,6 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
         };
 
-
-
         // create the new trip file
         CsvReader reader = new CsvReader(originalFile, delim);
         writer.write(reader.headerLine() + ",WGS84StartTrace" + ",WGS84EndTrace" + ",WGS84OSMStart" + ",WGS84OSMEnd" + "\n");
@@ -64,8 +62,6 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         writer.close();
 
         // save unreadable rows to other file
-
-
 
         try (BufferedWriter writer2 = new BufferedWriter(new FileWriter(unreadableFile))) {
             unreadable.forEach(row -> {
@@ -77,8 +73,6 @@ import ch.ethz.idsc.tensor.qty.Quantity;
                 }
             });
         }
-
-
 
         System.out.println("Unreadable rows: " + unreadable.size());
         System.out.println("Example:" + unreadable.get(0));

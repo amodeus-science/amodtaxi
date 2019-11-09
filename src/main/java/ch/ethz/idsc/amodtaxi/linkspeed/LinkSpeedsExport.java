@@ -7,7 +7,6 @@ import java.io.IOException;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedUtils;
 
-
 // TODO remove duplicate with amodeus.XYZ.LinkSpeedUtils
 public enum LinkSpeedsExport {
     ;

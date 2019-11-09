@@ -64,9 +64,9 @@ public class CreateBasicComparison {
                 }
             }
         }
-        
+
         // FIXME the links which are changed in speedsAlgo but not in the generated trafffic speed
-        // are not yet printed. 
+        // are not yet printed.
 
         System.out.println("differences: ");
         System.out.println(Pretty.of(differences));
