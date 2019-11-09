@@ -6,16 +6,16 @@ import org.matsim.api.core.v01.network.Network;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodtaxi.scenario.TaxiTripsReader;
-import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilter;
+import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
 import ch.ethz.idsc.amodtaxi.tripfilter.TripDurationFilter;
 import ch.ethz.idsc.amodtaxi.tripmodif.TaxiDataModifier;
-import ch.ethz.idsc.amodtaxi.tripmodif.TripBasedModifier;
+import ch.ethz.idsc.amodtaxi.tripmodif.TaxiDataModifierCollection;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
 public class ChicagoTripFleetConverter extends TripFleetConverter {
 
     public ChicagoTripFleetConverter(ScenarioOptions scenarioOptions, Network network, //
-            TripBasedModifier corrector, TaxiDataModifier generalModifier, TaxiTripFilter finalFilters, //
+            TaxiDataModifierCollection corrector, TaxiDataModifier generalModifier, TaxiTripFilterCollection finalFilters, //
             TaxiTripsReader tripsReader) {
         super(scenarioOptions, network, corrector, generalModifier, finalFilters, tripsReader);
     }

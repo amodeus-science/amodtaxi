@@ -13,9 +13,6 @@ public class ChicagoFormatModifier implements TaxiDataModifier {
     private final String taxiCompanyNameOld = "Taxicab Insurance Agency, LLC";
     private final String taxiCompanyNameNew = "Taxicab Insurance Agency LLC";
 
-    public ChicagoFormatModifier() {
-    }
-
     @Override
     public File modify(File taxiData) throws Exception {
         File outFile = new File(taxiData.getAbsolutePath().replace(".csv", "_prepared.csv"));

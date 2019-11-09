@@ -3,7 +3,7 @@ package ch.ethz.idsc.amodtaxi.tripmodif;
 
 import java.io.File;
 
-import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilter;
+import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
 
 @FunctionalInterface
 public interface TaxiDataModifier {
@@ -15,7 +15,7 @@ public interface TaxiDataModifier {
      *         - distributing trips in geographical areas, e.g., if only the departure zone is known
      * 
      *         Filtering, i.e., removing certain trips according to some criteria is done
-     *         with a {@link TaxiTripFilter} and not with classes implementing this interface.
+     *         with a {@link TaxiTripFilterCollection} and not with classes implementing this interface.
      * 
      * @throws Exception */
     File modify(File taxiData) throws Exception;

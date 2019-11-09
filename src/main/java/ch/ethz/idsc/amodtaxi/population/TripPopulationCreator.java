@@ -28,7 +28,7 @@ import ch.ethz.idsc.amodeus.util.geo.ClosestLinkSelect;
 import ch.ethz.idsc.amodeus.util.io.CsvReader;
 import ch.ethz.idsc.amodeus.util.io.GZHandler;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilter;
+import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
 
 public class TripPopulationCreator {
 
@@ -40,13 +40,13 @@ public class TripPopulationCreator {
     private final Network network;
     private final File populationFile;
     private final File populationFileGz;
-    private final TaxiTripFilter finalFilters;
+    private final TaxiTripFilterCollection finalFilters;
     private final TaxiDistanceCalculator distCalc;
     private File finalTripFile;
 
     public TripPopulationCreator(File processingDir, Config config, Network network, //
             MatsimAmodeusDatabase db, QuadTree<Link> qt, //
-            LocalDate simualtionDate, AmodeusTimeConvert timeConvert, TaxiTripFilter finalFilters) {
+            LocalDate simualtionDate, AmodeusTimeConvert timeConvert, TaxiTripFilterCollection finalFilters) {
         this.linkSelect = new ClosestLinkSelect(db, qt);
         this.simulationDate = simualtionDate;
         this.timeConvert = timeConvert;

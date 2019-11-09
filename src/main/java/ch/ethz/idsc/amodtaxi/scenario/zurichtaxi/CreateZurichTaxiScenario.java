@@ -32,7 +32,7 @@ import ch.ethz.idsc.amodtaxi.population.TripPopulationCreator;
 import ch.ethz.idsc.amodtaxi.scenario.FinishedScenario;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioBasicNetworkPreparer;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
-import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilter;
+import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
 import ch.ethz.idsc.amodtaxi.tripfilter.TripDurationFilter;
 import ch.ethz.idsc.amodtaxi.tripfilter.TripNetworkFilter;
 import ch.ethz.idsc.tensor.qty.Quantity;
@@ -62,11 +62,11 @@ public class CreateZurichTaxiScenario {
         System.out.println(finalTripsFile.getAbsolutePath());
 
         /** loading final trips */
-        List<TaxiTrip> finalTrips = ImportTaxiTrips.fromFile(finalTripsFile).collect(Collectors.toList());
+        List<TaxiTrip> finalTrips = ImportTaxiTrips.fromFile(finalTripsFile);
+        System.out.println("FinalTrips: " + finalTrips.size());
 
         /** filtering the ones without meaningful duration */
-        System.out.println("FinalTrips: " + finalTrips.size());
-        TaxiTripFilter finalTripFilter = new TaxiTripFilter();
+        TaxiTripFilterCollection finalTripFilter = new TaxiTripFilterCollection();
         /** trips which are faster than the network freeflow speeds would allow are removed */
         finalTripFilter.addFilter(new TripNetworkFilter(network, db, //
                 Quantity.of(0.0000001, "m*s^-1"), Quantity.of(100000, "s"), Quantity.of(0.000001, "m"), true));
@@ -104,7 +104,7 @@ public class CreateZurichTaxiScenario {
         /** load taxi data from the trips file */
         File tripsFile = new File("/home/clruch/Downloads/tripsJune21_best_new.csv");
         ZurichTaxiTripReader reader = new ZurichTaxiTripReader(",");
-        List<TaxiTrip> allTrips = reader.getTripStream(tripsFile).collect(Collectors.toList());
+        List<TaxiTrip> allTrips = reader.getTrips(tripsFile);
         allTrips.stream().forEach(t -> {
             System.out.println(t.toString());
         });
@@ -119,7 +119,7 @@ public class CreateZurichTaxiScenario {
         network = NetworkLoader.fromNetworkFile(new File(workingDir, configFull.network().getInputFile()));
         db = MatsimAmodeusDatabase.initialize(network, scenarioOptions.getLocationSpec().referenceFrame());
 
-        TaxiTripFilter finalTripFilter = new TaxiTripFilter();
+        TaxiTripFilterCollection finalTripFilter = new TaxiTripFilterCollection();
 
         QuadTree<Link> qt = CreateQuadTree.of(network);
         TripPopulationCreator populationCreator = //

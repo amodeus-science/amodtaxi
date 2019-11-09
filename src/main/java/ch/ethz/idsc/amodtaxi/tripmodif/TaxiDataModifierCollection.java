@@ -4,23 +4,21 @@ package ch.ethz.idsc.amodtaxi.tripmodif;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import ch.ethz.idsc.amodeus.taxitrip.ExportTaxiTrips;
 import ch.ethz.idsc.amodeus.taxitrip.ImportTaxiTrips;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 
-public class TripBasedModifier implements TaxiDataModifier {
+public class TaxiDataModifierCollection implements TaxiDataModifier {
 
     private final List<TripModifier> modifiers = new ArrayList<>();
 
-    protected void addModifier(TripModifier modifier) {
-        if (Objects.nonNull(modifier))
-            modifiers.add(modifier);
+    public void addModifier(TripModifier modifier) {
+        modifiers.add(modifier);
     }
 
     @Override // from TaxiDataModifier
-    public File modify(File taxiData) throws Exception {
+    public final File modify(File taxiData) throws Exception {
 
         /** gather all original trips */
         List<TaxiTrip> originals = new ArrayList<>();

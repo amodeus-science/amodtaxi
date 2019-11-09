@@ -10,17 +10,16 @@ import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodtaxi.scenario.TaxiTripsReader;
 import ch.ethz.idsc.amodtaxi.scenario.chicago.ScenarioConstants;
 import ch.ethz.idsc.amodtaxi.tripfilter.RandomRemoverFilter;
-import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilter;
+import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
 import ch.ethz.idsc.amodtaxi.tripfilter.TripDurationFilter;
 import ch.ethz.idsc.amodtaxi.tripfilter.TripEndTimeFilter;
 import ch.ethz.idsc.amodtaxi.tripmodif.TaxiDataModifier;
-import ch.ethz.idsc.amodtaxi.tripmodif.TripBasedModifier;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
 public class ChicagoOnlineTripFleetConverter extends TripFleetConverter {
 
     public ChicagoOnlineTripFleetConverter(ScenarioOptions scenarioOptions, Network network, //
-            TripBasedModifier modifier, TaxiDataModifier generalModifier, TaxiTripFilter finalFilters, //
+            TaxiDataModifier modifier, TaxiDataModifier generalModifier, TaxiTripFilterCollection finalFilters, //
             TaxiTripsReader tripsReader) {
         super(scenarioOptions, network, modifier, generalModifier, finalFilters, tripsReader);
     }

@@ -8,6 +8,8 @@ import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
     protected int numTested = 0;
     protected int numFalse = 0;
 
+    /** @param t
+     * @return */
     protected abstract boolean testInternal(TaxiTrip t);
 
     @Override
