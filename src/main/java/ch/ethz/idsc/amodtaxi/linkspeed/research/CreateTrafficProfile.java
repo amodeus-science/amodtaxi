@@ -33,7 +33,7 @@ import ch.ethz.idsc.amodtaxi.scenario.chicago.ChicagoReferenceFrames;
 
         /** select some bad links */
         int bound = network.getLinks().size();
-        Set<Link> badLinks = new HashSet();
+        Set<Link> badLinks = new HashSet<>();
         for (int i = 0; i < maxNumberBadLinks; ++i) {
             int elemRand = random.nextInt(bound);
             Link link = network.getLinks().values().stream().skip(elemRand).findFirst().get();

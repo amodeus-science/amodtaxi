@@ -90,9 +90,8 @@ import ch.ethz.idsc.tensor.qty.Quantity;
             Scalar driveTime = Quantity.of(calc.computePath(pickupLink, dropoffLink).travelTime, "s");
 
             // leaving null as currently not used by Richard
-            Scalar waitTime = Quantity.of(300,"s");
+            Scalar waitTime = Quantity.of(300, "s");
             Scalar distance = null;
-
 
             trips.add(//
                     TaxiTrip.of(id, taxiId, pickupLoc, dropoffLoc, //
