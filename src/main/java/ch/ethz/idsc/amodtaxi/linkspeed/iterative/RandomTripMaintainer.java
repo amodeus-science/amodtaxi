@@ -26,7 +26,7 @@ import ch.ethz.idsc.tensor.Tensors;
     private final int checkHorizon;
     /** cost function for convergence check */
     private final Function<List<Scalar>, Scalar> costFunction;
-    /** map tracking number of queries */
+    /** map tracking number of queries; Integer denotes times the trips was queried, so all trips start with key 0 */
     private final NavigableMap<Integer, Set<TaxiTrip>> queryMap = new TreeMap<>();
     private final int numTrips;
 
@@ -47,11 +47,14 @@ import ch.ethz.idsc.tensor.Tensors;
         GlobalAssert.that(allTrips.size() == queryMap.firstEntry().getValue().size());
     }
 
+    // queries next trip, trip is removed from list with lowest key in querymap(least amount of queries) and put in list with key+1
+    // returns queried taxitrip
     public TaxiTrip nextRandom() {
         // find set of trips with least checks
         int numChecks = 0;
         while (!(queryMap.ceilingEntry(numChecks).getValue().size() > 0))
             ++numChecks;
+
         Set<TaxiTrip> leastChecked = queryMap.ceilingEntry(numChecks).getValue();
 
         // select random trip from it
