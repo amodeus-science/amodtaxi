@@ -23,13 +23,13 @@ import ch.ethz.idsc.amodtaxi.scenario.chicago.ChicagoReferenceFrames;
 
         /** initial data */
         ReferenceFrame referenceFrame = ChicagoReferenceFrames.CHICAGO;
-        File networkFile = new File("/home/clruch/data/TestDeleteMe/network.xml.gz");
+        File networkFile = new File("/home/oem/data/ChicagoScenario/network.xml.gz");
         Random random = new Random(10);
         Network network = NetworkLoader.fromNetworkFile(networkFile);
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
         int dt = 450;
         double reduction = 0.5;
-        int maxNumberBadLinks = 100;
+        int maxNumberBadLinks = 10;
 
         /** select some bad links */
         int bound = network.getLinks().size();
@@ -47,11 +47,12 @@ import ch.ethz.idsc.amodtaxi.scenario.chicago.ChicagoReferenceFrames;
                 Integer linkId = LinkIndex.fromLink(db, link);
                 double freeSpeed = link.getFreespeed();
                 lsData.addData(linkId, time, freeSpeed * reduction);
+//                lsData.addData(linkId, 1, freeSpeed * reduction);
             }
         }
 
         /** save the traffic profile to the file system */
-        File linkSpeedsFile = new File("/home/clruch/data/TestDeleteMe/randomTraffic");
+        File linkSpeedsFile = new File("/home/oem/data/chicagotest/randomTraffic");
         LinkSpeedsExport.using(linkSpeedsFile, lsData);
 
     }
