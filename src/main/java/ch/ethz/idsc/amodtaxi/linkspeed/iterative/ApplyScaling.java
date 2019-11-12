@@ -4,8 +4,6 @@ package ch.ethz.idsc.amodtaxi.linkspeed.iterative;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.TreeSet;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -35,51 +33,39 @@ import ch.ethz.idsc.tensor.Scalar;
             double freeSpeed = link.getFreespeed();
             LinkSpeedTimeSeries lsTime = lsData.getLinkMap().get(linkId);
 
-            /** if no recordings are present, initialize with free speed for duration of trip
-             * currently, when no recordings are present, the whole day is initiated with freespeed. */
-
-            // initialize relevant timesteps for whole range
-            TreeSet<Integer> wholeRange = new TreeSet<>();
-            for (int time = 0; time <= 108000; time += dt) {
-                wholeRange.add(time);
+            /** if no recordings are present, initialize with free speed for duration of trip */
+            if (Objects.isNull(lsTime)) {
+                // for (int time = tripStart; time <= tripEnd; time += dt) {
+                // lsData.addData(linkId, time, freeSpeed);
+                // }
+                // TODO remove magic const. really necessary all day?
+                for (int time = 0; time <= 108000; time += dt) {
+                    lsData.addData(linkId, time, freeSpeed);
+                }
             }
-            // find out which timesteps are relevant for this trip
-            TreeSet<Integer> relevantTimes = new TreeSet<>();
-            for (int time : wholeRange) {
+            lsTime = lsData.getLinkMap().get(linkId);
+            Objects.requireNonNull(lsTime);
+
+            List<Integer> relevantTimes = new ArrayList<>();
+            for (int time : lsTime.getRecordedTimes()) {
                 if (tripStart <= time && time <= tripEnd) {
                     relevantTimes.add(time);
                 }
             }
-            // must have at least one entry for convergence
-            if (relevantTimes.size() == 0)
-                relevantTimes.add(wholeRange.floor(tripStart));
+            if (relevantTimes.size() == 0) // must have at least one entry for convergence
+                relevantTimes.add(lsTime.getTimeFloor(tripStart));
+
             GlobalAssert.that(relevantTimes.size() > 0);
 
-            // if (Objects.isNull(lsTime)) {
-            // // for (int time = tripStart; time <= tripEnd; time += dt) {
-            // // lsData.addData(linkId, time, freeSpeed);
-            // // }
-            // // TODO remove magic const. really necessary all day?
-            // // for (int time = 0; time <= 108000; time += dt) {
-            // // lsData.addData(linkId, time, freeSpeed);
-            // // }
-            // for(int time: relevantTimes)
-            // }
-            // lsTime = lsData.getLinkMap().get(linkId);
-            // Objects.requireNonNull(lsTime);
-
-            for (int time : relevantTimes) {
-                // check if entry for current relevant timestep is empty (or no entries for current link),
-                // and add freespeed as default entry
-                if (Objects.isNull(lsTime) || Objects.isNull(lsTime.getSpeedsAt(time))) {
-                    lsData.addData(linkId, time, freeSpeed);
-                    lsTime = lsData.getLinkMap().get(linkId);
-                }
-                
-                // rescale at current time and update speed
-                Scalar speedNow = RealScalar.of(lsTime.getSpeedsAt(time));
+            for (int time : lsTime.getRecordedTimes()) {
+                Scalar speedNow = RealScalar.of(freeSpeed);
+                Double recorded = lsTime.getSpeedsAt(time);
+                if (Objects.nonNull(recorded))
+                    speedNow = RealScalar.of(recorded);
                 Scalar newSpeedS = speedNow.multiply(rescalefactor);
                 double newSpeed = newSpeedS.number().doubleValue();
+
+                // NOW
                 if (newSpeed <= link.getFreespeed() || allowIncrease)
                     lsTime.setSpeed(time, newSpeed);
             }
