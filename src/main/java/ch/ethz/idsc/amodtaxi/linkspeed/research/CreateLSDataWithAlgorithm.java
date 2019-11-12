@@ -19,11 +19,11 @@ public class CreateLSDataWithAlgorithm {
     public static void main(String[] args) throws Exception {
 
         /** load necessary data */
-        File tripFile = new File("/home/clruch/data/TestDeleteMe/traffictrips.csv");
+        File tripFile = new File("/home/oem/data/chicagotest/randomtrips.csv");
         int maxIter = 500;
-        File processingDir = new File("/home/clruch/data/TestDeleteMe");
+        File processingDir = new File("/home/oem/data/chicagotest");
         ReferenceFrame referenceFrame = ChicagoReferenceFrames.CHICAGO;
-        File networkFile = new File("/home/clruch/data/TestDeleteMe/network.xml.gz");
+        File networkFile = new File("/home/oem/data/ChicagoScenario/network.xml.gz");
         Random random = new Random(10);
         Network network = NetworkLoader.fromNetworkFile(networkFile);
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);

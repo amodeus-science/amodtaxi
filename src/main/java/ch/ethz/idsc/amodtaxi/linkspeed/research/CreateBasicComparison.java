@@ -25,45 +25,65 @@ public class CreateBasicComparison {
     public static void main(String[] args) throws Exception {
 
         ReferenceFrame referenceFrame = ChicagoReferenceFrames.CHICAGO;
-        File networkFile = new File("/home/clruch/data/TestDeleteMe/network.xml.gz");
+        File networkFile = new File("/home/oem/data/ChicagoScenario/network.xml.gz");
         Random random = new Random(10);
         Network network = NetworkLoader.fromNetworkFile(networkFile);
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
 
         // load the known random traffic
-        File randomTrafifFile = new File("/home/clruch/data/TestDeleteMe/randomTraffic");
-        LinkSpeedDataContainer lsDataTraffic = LinkSpeedUtils.loadLinkSpeedData(randomTrafifFile);
+        File randomTrafifFile = new File("/home/oem/data/chicagotest/randomTraffic");
+        LinkSpeedDataContainer lsDataRandom = LinkSpeedUtils.loadLinkSpeedData(randomTrafifFile);
 
         // load the algorithm traffic
-        File algorithmTraffic = new File("/home/clruch/data/TestDeleteMe/linkSpeedData");
+        File algorithmTraffic = new File("/home/oem/data/chicagotest/linkSpeedData");
         LinkSpeedDataContainer lsDataAlgorit = LinkSpeedUtils.loadLinkSpeedData(algorithmTraffic);
 
         Tensor differences = Tensors.empty();
-        HashSet<Integer> coveredLinks = new HashSet<>();
 
-        for (Integer linkID : lsDataTraffic.getLinkMap().keySet()) {
-            LinkSpeedTimeSeries seriesTraffic = lsDataTraffic.getLinkMap().get(linkID);
+        for (Integer linkID : lsDataRandom.getLinkMap().keySet()) {
+            LinkSpeedTimeSeries seriesTraffic = lsDataRandom.getLinkMap().get(linkID);
             Link link = db.getOsmLink(linkID).link;
-            coveredLinks.add(linkID);
+
             for (Integer time : seriesTraffic.getRecordedTimes()) {
                 double trafficSpeed = seriesTraffic.getSpeedsAt(time);
-
-                //
 
                 LinkSpeedTimeSeries seriesAlgo = lsDataAlgorit.getLinkMap().get(linkID);
                 if (Objects.nonNull(seriesAlgo)) {
                     Double speedAlgo = seriesAlgo.getSpeedsAt(time);
                     if (Objects.nonNull(speedAlgo)) {
-                        differences.append(Tensors.vector(linkID, time, trafficSpeed, speedAlgo));
+                        differences.append(Tensors.vector(linkID, time, trafficSpeed, speedAlgo, link.getFreespeed()));
                     } else {
                         // TODO what if link is covered but not time?
-                        differences.append(Tensors.vector(linkID, time, trafficSpeed, link.getFreespeed()));
+                        differences.append(Tensors.vector(linkID, time, trafficSpeed, 0, link.getFreespeed()));
                     }
                 } else {
-                    differences.append(Tensors.vector(linkID, time, trafficSpeed, link.getFreespeed()));
+                    differences.append(Tensors.vector(linkID, time, trafficSpeed, 1, link.getFreespeed()));
                 }
             }
         }
+
+        // loop for links which are changed in speedsAlgo but n ot in the generated traffic speed
+//        for (Integer linkID : lsDataAlgorit.getLinkMap().keySet()) {
+//            LinkSpeedTimeSeries seriesAlgo = lsDataAlgorit.getLinkMap().get(linkID);
+//            Link link = db.getOsmLink(linkID).link;
+//
+//            for (Integer time : seriesAlgo.getRecordedTimes()) {
+//                double speedAlgo = seriesAlgo.getSpeedsAt(time);
+//
+//                LinkSpeedTimeSeries seriesTraffic = lsDataRandom.getLinkMap().get(linkID);
+//                if (!Objects.nonNull(seriesTraffic)) {
+//                    differences.append(Tensors.vector(linkID, time, 0, speedAlgo, link.getFreespeed()));
+//                    System.out.println("link only in algo " + speedAlgo);
+//                } else {
+//                    Double speedTraffic = seriesTraffic.getSpeedsAt(time);
+//                    if (!Objects.nonNull(speedTraffic)) {
+//                        differences.append(Tensors.vector(linkID, time, 0, speedAlgo, link.getFreespeed()));
+//                        System.out.println("time only in algo " + speedAlgo);
+//                    }
+//
+//                }
+//            }
+//        }
 
         // FIXME the links which are changed in speedsAlgo but not in the generated trafffic speed
         // are not yet printed.
@@ -71,7 +91,7 @@ public class CreateBasicComparison {
         System.out.println("differences: ");
         System.out.println(Pretty.of(differences));
 
-        Export.of(new File("/home/clruch/data/TestDeleteMe/differences.csv"), differences);
+        Export.of(new File("/home/oem/data/chicagotest/differences.csv"), differences);
 
     }
 }

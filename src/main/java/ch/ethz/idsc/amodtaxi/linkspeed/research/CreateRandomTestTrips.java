@@ -33,12 +33,12 @@ import ch.ethz.idsc.tensor.qty.Quantity;
     public static void main(String[] args) throws Exception {
 
         /** initial data */
-        int numberTrips = 10;
+        int numberTrips = 100;
         Random random = new Random(10);
         LocalDate someDate = LocalDate.of(2019, 11, 8);
         ReferenceFrame referenceFrame = ChicagoReferenceFrames.CHICAGO;
-        File networkFile = new File("/home/clruch/data/TestDeleteMe/network.xml.gz");
-        File linkSpeedFile = new File("/home/clruch/data/TestDeleteMe/randomTraffic");
+        File networkFile = new File("/home/oem/data/ChicagoScenario/network.xml.gz");
+        File linkSpeedFile = new File("/home/oem/data/chicagotest/randomTraffic");
         Network network = NetworkLoader.fromNetworkFile(networkFile);
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
         LinkSpeedDataContainer lsData = LinkSpeedUtils.loadLinkSpeedData(linkSpeedFile);
@@ -60,6 +60,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
             int minute = (secondOfDay - hour * 3600) / 60;
             int second = (secondOfDay - hour * 3600 - minute * 60);
             LocalTime time = LocalTime.of(hour, minute, second);
+//            LocalTime time = LocalTime.of(0, 0, 1);
             LocalDateTime pickupTimeDate = LocalDateTime.of(someDate, time);
 
             // 2 random locations for pickup and dropoff
@@ -100,7 +101,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         }
 
         /** save the trips */
-        File tripFile = new File("/home/clruch/data/TestDeleteMe/traffictrips.csv");
+        File tripFile = new File("/home/oem/data/chicagotest/randomtrips.csv");
         ExportTaxiTrips.toFile(trips.stream(), tripFile);
 
     }
