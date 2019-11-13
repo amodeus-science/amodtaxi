@@ -6,27 +6,37 @@ import java.io.IOException;
 import java.util.Map;
 
 import ch.ethz.idsc.amodeus.analysis.plot.ColorDataAmodeus;
-import ch.ethz.idsc.amodeus.analysis.plot.DiagramSettings;
-import ch.ethz.idsc.amodeus.analysis.plot.HistogramPlot;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.io.SaveFormats;
+import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.linkspeed.LinkSpeedsExport;
+import ch.ethz.idsc.tensor.RationalScalar;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import ch.ethz.idsc.tensor.img.ColorDataIndexed;
+import ch.ethz.idsc.tensor.alg.Range;
+import ch.ethz.idsc.tensor.fig.Histogram;
+import ch.ethz.idsc.tensor.fig.VisualSet;
+import ch.ethz.idsc.tensor.pdf.BinCounts;
+import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAnchor;
+import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.plot.CategoryPlot;
 
 /* package */ enum StaticHelper {
     ;
+
+    private static final int WIDTH = 1000;
+    private static final int HEIGHT = 750;
 
     public static int startTime(TaxiTrip trip) {
         return trip.pickupTimeDate.getHour() * 3600//
                 + trip.pickupTimeDate.getMinute() * 60//
                 + trip.pickupTimeDate.getSecond();
-
     }
 
     public static int endTime(TaxiTrip trip) {
@@ -52,7 +62,7 @@ import ch.ethz.idsc.tensor.img.ColorDataIndexed;
 
     public static void exportRatioMap(File relativeDirectory, Map<TaxiTrip, Scalar> ratioLookupMap, String append) {
         Tensor all = Tensors.empty();
-        ratioLookupMap.values().forEach(s -> all.append(s));
+        ratioLookupMap.values().forEach(all::append);
         try {
             SaveFormats.MATHEMATICA.save(all, relativeDirectory, "diff" + append);
         } catch (IOException e) {
@@ -61,17 +71,31 @@ import ch.ethz.idsc.tensor.img.ColorDataIndexed;
     }
 
     public static void plotRatioMap(File relativeDirectory, Tensor ratios, String append) {
-        String fileName = ("histogram_" + append);
-        String title = "Differences in Link Speeds";
-        String xLabel = "networkspeed / duration";
-        String yLabel = "% of requests";
-        ColorDataIndexed colorDataIndexed = ColorDataAmodeus.indexed("097");
         try {
-            HistogramPlot.of( //
-                    ratios, RealScalar.of(0.02), true, relativeDirectory, //
-                    fileName, title, yLabel, //
-                    xLabel, DiagramSettings.WIDTH, DiagramSettings.HEIGHT, colorDataIndexed, //
-                    Tensors.vector(0, 20));
+            /** compute bins */
+            Scalar binSize = RationalScalar.of(2, 100);
+            Scalar numValues = RationalScalar.of(ratios.length(), 1);
+            Tensor bins = BinCounts.of(ratios, binSize);
+            bins = bins.divide(numValues).multiply(RealScalar.of(100)); // norm
+
+            VisualSet visualSet = new VisualSet(ColorDataAmodeus.indexed("097"));
+            visualSet.add(Range.of(0, bins.length()).multiply(binSize), bins);
+            // ---
+            visualSet.setPlotLabel("Differences in Link Speeds");
+            visualSet.setAxesLabelY("% of requests");
+            visualSet.setAxesLabelX("networkspeed / duration");
+
+            JFreeChart jFreeChart = Histogram.of(visualSet, s -> "[" + s.number() + " , " + s.add(binSize).number() + ")");
+            CategoryPlot categoryPlot = jFreeChart.getCategoryPlot();
+            categoryPlot.getDomainAxis().setLowerMargin(0.0);
+            categoryPlot.getDomainAxis().setUpperMargin(0.0);
+            categoryPlot.getDomainAxis().setCategoryMargin(0.0);
+            categoryPlot.getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.UP_90);
+            categoryPlot.setDomainGridlinePosition(CategoryAnchor.START);
+
+            File file = new File(relativeDirectory, "histogram_" + append + ".png");
+            ChartUtilities.saveChartAsPNG(file, jFreeChart, WIDTH, HEIGHT);
+            GlobalAssert.that(file.isFile());
         } catch (Exception e) {
             e.printStackTrace();
         }
