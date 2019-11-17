@@ -164,8 +164,7 @@ import ch.ethz.idsc.tensor.Scalars;
          * must be done again to take into account newest updates */
         LeastCostPathCalculator lcpc = LinkSpeedLeastPathCalculator.from(network, db, lsData);
         ShortestDurationCalculator calc = new ShortestDurationCalculator(lcpc, network, db);
-        System.out.println(
-        lsData.getLinkMap());
+
         /** comupte ratio of network path and trip duration f */
         DurationCompare comp = new DurationCompare(trip, calc);
         return comp;
