@@ -47,7 +47,7 @@ import ch.ethz.idsc.amodtaxi.scenario.chicago.ChicagoReferenceFrames;
                 Integer linkId = LinkIndex.fromLink(db, link);
                 double freeSpeed = link.getFreespeed();
                 lsData.addData(linkId, time, freeSpeed * reduction);
-//                lsData.addData(linkId, 1, freeSpeed * reduction);
+                // lsData.addData(linkId, 1, freeSpeed * reduction);
             }
         }
 

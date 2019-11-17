@@ -40,7 +40,7 @@ public class LinkSpeedTestSmall {
                     .subtract(Tensors.fromString("{{0.1499999999999999}, {0.14999999999999997},"//
                             + " {0.19999999999999996},{0.19999999999999996}}"));
             if (!(calculator instanceof GLPKLinOptDelayCalculator))
-                Assert.assertTrue(Chop._15.of(Norm._2.of(difference)).equals(RealScalar.ZERO));
+                Chop._15.requireAllZero(Norm._2.of(difference));
         }
 
     }
