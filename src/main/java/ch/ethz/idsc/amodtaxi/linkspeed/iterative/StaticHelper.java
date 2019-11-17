@@ -5,6 +5,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
+import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAnchor;
+import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.plot.CategoryPlot;
+
 import ch.ethz.idsc.amodeus.analysis.plot.ColorDataAmodeus;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
@@ -21,11 +27,6 @@ import ch.ethz.idsc.tensor.alg.Range;
 import ch.ethz.idsc.tensor.fig.Histogram;
 import ch.ethz.idsc.tensor.fig.VisualSet;
 import ch.ethz.idsc.tensor.pdf.BinCounts;
-import org.jfree.chart.ChartUtilities;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CategoryAnchor;
-import org.jfree.chart.axis.CategoryLabelPositions;
-import org.jfree.chart.plot.CategoryPlot;
 
 /* package */ enum StaticHelper {
     ;

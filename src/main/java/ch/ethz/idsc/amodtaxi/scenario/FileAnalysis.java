@@ -19,10 +19,10 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.data.NumberOfRequests;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
-import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.qty.Boole;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
 public class FileAnalysis {
@@ -132,11 +132,7 @@ public class FileAnalysis {
             Tensor row = Tensors.empty();
             boolean occ = sortedEntries.get(time).occupied;// Integer.parseInt(sortedEntries.get(time).get(2));
             row.append(Tensors.fromString(time.toString()));
-            if (occ) {
-                row.append(RealScalar.ONE);
-            } else {
-                row.append(RealScalar.ZERO);
-            }
+            row.append(Boole.of(occ));
             profile.append(row);
         }
         SaveUtils.saveFile(profile, "occProfile_" + fileName, workingDirectory);
