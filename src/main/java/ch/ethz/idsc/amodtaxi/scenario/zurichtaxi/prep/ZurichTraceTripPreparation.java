@@ -15,7 +15,7 @@ import ch.ethz.idsc.amodeus.taxitrip.ExportTaxiTrips;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.io.CsvReader;
 
-public class ZurichTraceTripPreparation {
+/* package */ class ZurichTraceTripPreparation {
 
     private final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("d.M.yyyy H:mm:ss");
     private final File traceFile = new File("/home/clruch/Downloads/2017-06-21-GPSFahrtstrecken-Protokoll.csv");

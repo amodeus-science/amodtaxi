@@ -20,7 +20,7 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 import ch.ethz.idsc.tensor.io.Serialization;
 
-public class SimContainerPopulator {
+/* package */ class SimContainerPopulator {
 
     private final MatsimAmodeusDatabase db;
     private final QuadTree<Link> quadTree;

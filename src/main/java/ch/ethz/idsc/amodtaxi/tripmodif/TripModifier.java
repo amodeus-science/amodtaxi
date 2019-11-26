@@ -3,7 +3,7 @@ package ch.ethz.idsc.amodtaxi.tripmodif;
 
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 
-public interface TripModifier {
+/* package */ interface TripModifier {
 
     /** informs about the taxiTrip, this SHOULD NOT change
      * the {@link TaxiTrip} @param taxiTrip */

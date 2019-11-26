@@ -9,7 +9,7 @@ import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
 import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
 
-public class AllTaxiTrips {
+/* package */ class AllTaxiTrips {
 
     /** Usage: {@link Collection}<{@link TaxiTrips}> trips = AllTaxiTrips.in(dayTaxiRecord).on(simulationDate)
      * 

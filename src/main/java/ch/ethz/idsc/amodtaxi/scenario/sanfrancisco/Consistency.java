@@ -15,7 +15,7 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
 
-public enum Consistency {
+/* package */ enum Consistency {
     ;
 
     public static void checkTrail(List<TaxiTrail> trails) {

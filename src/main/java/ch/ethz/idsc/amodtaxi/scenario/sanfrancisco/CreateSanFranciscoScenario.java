@@ -26,7 +26,7 @@ import ch.ethz.idsc.amodtaxi.tripfilter.TripNetworkFilter;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
-public class CreateSanFranciscoScenario {
+/* package */ class CreateSanFranciscoScenario {
 
     private static final Collection<LocalDate> dates = DateSelectSF.specific(06, 04);
     private static final int numTraceFiles = 536;// maximum taxis are: 536;

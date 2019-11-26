@@ -15,7 +15,7 @@ import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.Scalar;
 
-public class TripDistanceFilter extends AbstractConsciousFilter {
+/* package */ class TripDistanceFilter extends AbstractConsciousFilter {
 
     private final FastLinkLookup fll;
     private final LeastCostPathCalculator lcpc;

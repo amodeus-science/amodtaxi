@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 
-public class ChicagoScenarioCreation {
+/* package */ class ChicagoScenarioCreation {
 
     public void test() throws IOException, Exception {
         File workingDir = MultiFileTools.getDefaultWorkingDirectory();

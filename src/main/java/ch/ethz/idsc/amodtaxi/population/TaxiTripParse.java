@@ -10,7 +10,7 @@ import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 
-public enum TaxiTripParse {
+/* package */ enum TaxiTripParse {
     ;
 
     public static TaxiTrip fromRow(CsvReader.Row line) {

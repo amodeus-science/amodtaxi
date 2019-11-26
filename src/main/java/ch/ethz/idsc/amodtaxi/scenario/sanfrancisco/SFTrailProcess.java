@@ -7,7 +7,7 @@ import java.util.NavigableMap;
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxiStatus;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 
-public enum SFTrailProcess {
+/* package */ enum SFTrailProcess {
     ;
 
     // public final RequestInserter requestInserter;

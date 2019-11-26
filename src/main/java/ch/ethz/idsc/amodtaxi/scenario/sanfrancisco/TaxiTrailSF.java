@@ -22,7 +22,7 @@ import ch.ethz.idsc.amodtaxi.scenario.TaxiTripFinder;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
 
-public class TaxiTrailSF implements TaxiTrail {
+/* package */ class TaxiTrailSF implements TaxiTrail {
 
     private final String id;
     protected int override = 0;

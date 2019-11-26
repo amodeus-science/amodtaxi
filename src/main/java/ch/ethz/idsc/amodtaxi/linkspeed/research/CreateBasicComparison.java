@@ -20,7 +20,7 @@ import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.io.Export;
 import ch.ethz.idsc.tensor.io.Pretty;
 
-public class CreateBasicComparison {
+/* package */ class CreateBasicComparison {
 
     public static void main(String[] args) throws Exception {
 

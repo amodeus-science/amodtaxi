@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.network.Network;
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
 import ch.ethz.idsc.tensor.io.HomeDirectory;
 
-public class ScenarioSpeedSearcher {
+/* package */ class ScenarioSpeedSearcher {
 
     public static void main(String[] args) {
 

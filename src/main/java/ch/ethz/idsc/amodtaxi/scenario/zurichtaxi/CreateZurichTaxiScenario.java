@@ -41,7 +41,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
  * - bigger map incl. St. Gallen
  * - more than 20k iterations
  * ... ? */
-public class CreateZurichTaxiScenario {
+/* package */ class CreateZurichTaxiScenario {
 
     private final File workingDir;
     // private final File processingDir;

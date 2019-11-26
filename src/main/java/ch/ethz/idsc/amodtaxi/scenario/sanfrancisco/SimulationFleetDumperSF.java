@@ -34,7 +34,7 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
 import ch.ethz.idsc.tensor.Scalar;
 
-public class SimulationFleetDumperSF {
+/* package */ class SimulationFleetDumperSF {
 
     private int totalMatchedRequests;
     private final Scalar tStepSize;

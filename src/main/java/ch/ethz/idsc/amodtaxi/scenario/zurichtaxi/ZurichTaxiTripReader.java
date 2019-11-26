@@ -14,7 +14,7 @@ import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 
-public class ZurichTaxiTripReader extends TaxiTripsReader {
+/* package */ class ZurichTaxiTripReader extends TaxiTripsReader {
 
     public ZurichTaxiTripReader(String delim) {
         super(delim);

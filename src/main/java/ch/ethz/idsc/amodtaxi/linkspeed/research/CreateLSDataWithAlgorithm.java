@@ -15,7 +15,7 @@ import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodtaxi.linkspeed.iterative.IterativeLinkSpeedEstimator;
 import ch.ethz.idsc.amodtaxi.scenario.chicago.ChicagoReferenceFrames;
 
-public class CreateLSDataWithAlgorithm {
+/* package */ class CreateLSDataWithAlgorithm {
 
     public static void main(String[] args) throws Exception {
 
