@@ -1,3 +1,4 @@
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.scenario.zurichtaxi;
 
 import static ch.ethz.idsc.amodtaxi.scenario.zurichtaxi.ZurichTaxiConstants.callCenterDateFormat;
