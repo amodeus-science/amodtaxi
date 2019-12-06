@@ -32,7 +32,7 @@ import ch.ethz.idsc.tensor.Scalars;
     private final MatsimAmodeusDatabase db;
     /** this is a value in (0,1] which determines the convergence
      * speed of the algorithm, a value close to 1 may lead to
-     * loss of convergence, it is adviced o chose slow. No changes
+     * loss of convergence, it is adviced to chose slow. No changes
      * are applied for epsilon == 0. */
     private final Scalar epsilon1;
     /** probability of taking a new trip */
@@ -61,8 +61,12 @@ import ch.ethz.idsc.tensor.Scalars;
         this.tripMaintainer = new TripComparisonMaintainer(randomTrips, network, db);
 
         /** export initial distribution */
-        StaticHelper.exportRatioMap(new File(processingDir, "diff"), tripMaintainer.getLookupMap(), "Initial");
-        StaticHelper.plotRatioMap(new File(processingDir, "plot"), randomTrips.getRatios(), "Initial");
+        File diff = new File(processingDir, "diff");
+        File plot = new File(processingDir, "plot");
+        diff.mkdir();
+        plot.mkdir();
+        StaticHelper.exportRatioMap(diff, tripMaintainer.getLookupMap(), "Initial");
+        StaticHelper.plotRatioMap(plot, randomTrips.getRatios(), "Initial");
 
         /** show initial score */
         System.out.println("Cost initial: " + randomTrips.getRatioCost());
@@ -165,7 +169,7 @@ import ch.ethz.idsc.tensor.Scalars;
         LeastCostPathCalculator lcpc = LinkSpeedLeastPathCalculator.from(network, db, lsData);
         ShortestDurationCalculator calc = new ShortestDurationCalculator(lcpc, network, db);
 
-        /** comupte ratio of network path and trip duration f */
+        /** compute ratio of network path and trip duration f */
         DurationCompare comp = new DurationCompare(trip, calc);
         return comp;
     }
