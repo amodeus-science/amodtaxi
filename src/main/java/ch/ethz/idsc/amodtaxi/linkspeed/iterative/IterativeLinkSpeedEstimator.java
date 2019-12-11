@@ -66,7 +66,7 @@ public class IterativeLinkSpeedEstimator implements TaxiLinkSpeedEstimator {
         System.out.println("Number of trips: " + trips.size());
 
         new FindCongestionIterative(network, db, processingDir, lsData, trips, maxIter, //
-                tolerance, epsilon1, epsilon2, random, dt, m -> Cost.max(m), trips.size());
+                tolerance, epsilon1, epsilon2, random, dt, Cost::max, trips.size());
 
         /** final export */
         StaticHelper.export(processingDir, lsData, "");
@@ -99,9 +99,9 @@ public class IterativeLinkSpeedEstimator implements TaxiLinkSpeedEstimator {
                 MatsimAmodeusDatabase.initialize(network, scenarioOptions.getLocationSpec().referenceFrame());
 
         /** generating the trips file */
-        List<TaxiTrip> trips = new ArrayList<>();
-        ImportTaxiTrips.fromFile(finalTripsFile).//
-                forEach(tt -> trips.add(tt));
+        // List<TaxiTrip> trips = new ArrayList<>();
+        // ImportTaxiTrips.fromFile(finalTripsFile).forEach(trips::add);
+        List<TaxiTrip> trips = new ArrayList<>(ImportTaxiTrips.fromFile(finalTripsFile));
         new IterativeLinkSpeedEstimator(200000).compute(processingDir, network, db, trips);
     }
 
