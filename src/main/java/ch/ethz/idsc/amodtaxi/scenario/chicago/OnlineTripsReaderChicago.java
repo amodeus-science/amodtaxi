@@ -32,7 +32,7 @@ public class OnlineTripsReaderChicago extends TaxiTripsReader {
 
     @Override
     public LocalDateTime getPickupTime(Row line) throws ParseException {
-        return LocalDateTime.parse(line.get("trip_start_timestamp"), ScenarioConstants.onlineFormat);
+        return LocalDateTime.parse(line.get("trip_start_timestamp"), ScenarioConstants.onlineFormatter);
     }
 
     @Override
