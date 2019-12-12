@@ -19,16 +19,12 @@ public class TaxiDataModifierCollection implements TaxiDataModifier {
 
     @Override // from TaxiDataModifier
     public final File modify(File taxiData) throws Exception {
-
         /** gather all original trips */
-        List<TaxiTrip> originals = new ArrayList<>();
-        ImportTaxiTrips.fromFile(taxiData).forEach(tt -> originals.add(tt));
+        List<TaxiTrip> originals = new ArrayList<>(ImportTaxiTrips.fromFile(taxiData));
 
         /** notify about all the taxi trips */
-        originals.forEach(taxiTrip -> {
-            for (TripModifier modifier : modifiers)
-                modifier.notify(taxiTrip);
-        });
+        originals.forEach(taxiTrip -> //
+                modifiers.forEach(modifier -> modifier.notify(taxiTrip)));
 
         /** let modifiers do modifications on each trip, then return */
         List<TaxiTrip> modified = new ArrayList<>();
@@ -42,5 +38,4 @@ public class TaxiDataModifierCollection implements TaxiDataModifier {
         ExportTaxiTrips.toFile(modified.stream(), outFile);
         return outFile;
     }
-
 }

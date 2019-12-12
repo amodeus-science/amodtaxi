@@ -7,8 +7,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.TreeSet;
 
+import ch.ethz.idsc.tensor.red.Total;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DistanceAsTravelDisutility;
@@ -33,33 +35,28 @@ import ch.ethz.idsc.tensor.qty.Quantity;
     private final ClosestLinkSelect linkSelect;
     private final File exportFolder;
 
-    public TaxiDistanceCalculator(File exportFolder, Network network, //
-            ClosestLinkSelect linkSelect) {
+    public TaxiDistanceCalculator(File exportFolder, Network network, ClosestLinkSelect linkSelect) {
         this.exportFolder = exportFolder;
-        this.lcpc = new FastAStarLandmarksFactory()//
-                .createPathCalculator(network, new DistanceAsTravelDisutility(), //
-                        new FreeSpeedTravelTime());
+        this.lcpc = new FastAStarLandmarksFactory().createPathCalculator( //
+                network, new DistanceAsTravelDisutility(), new FreeSpeedTravelTime());
         this.linkSelect = linkSelect;
     }
 
     public void addTrip(TaxiTrip taxiTrip) {
-        if (!tripMap.containsKey(taxiTrip.taxiId)) {
-            // taxi trips are sorted according to pickup date
-            tripMap.put(taxiTrip.taxiId, new TreeSet<>());
-        }
-        tripMap.get(taxiTrip.taxiId).add(taxiTrip);
+        tripMap.computeIfAbsent(taxiTrip.taxiId, id -> new TreeSet<>()) // taxi trips are sorted according to pickup date
+                /* tripMap.get(taxiTrip.taxiId) */ .add(taxiTrip);
     }
 
     public void exportTotalDistance() throws IOException {
         Map<String, Tensor> totalDistances = new HashMap<>();
-        for (String taxiId : tripMap.keySet()) {
+        tripMap.forEach((taxiId, trips) -> {
             // initialize
             Scalar taxiTotDist = Quantity.of(0, "km");
             Scalar taxiEmptyDistance = Quantity.of(0, "km");
 
             // calculate minimum trip and intra trip distances
             TaxiTrip tripBefore = null;
-            for (TaxiTrip trip : tripMap.get(taxiId)) {
+            for (TaxiTrip trip : trips) {
                 // distance of current trip
                 Link tStart = linkSelect.linkFromWGS84(trip.pickupLoc);
                 Link tDesti = linkSelect.linkFromWGS84(trip.dropoffLoc);
@@ -75,28 +72,22 @@ import ch.ethz.idsc.tensor.qty.Quantity;
                 tripBefore = trip;
             }
             totalDistances.put(taxiId, Tensors.of(taxiTotDist, taxiEmptyDistance));
-        }
+        });
+
         // export
-        Tensor export = Tensors.empty();
-        Scalar fleetDistance = Quantity.of(0, "km");
-        Scalar fleetDistanceEmpty = Quantity.of(0, "km");
-        for (String id : totalDistances.keySet()) {
-            export.append(Tensors.of(Scalars.fromString(id), totalDistances.get(id)));
-            fleetDistance = fleetDistance.add(totalDistances.get(id).Get(0));
-            fleetDistanceEmpty = fleetDistanceEmpty.add(totalDistances.get(id).Get(1));
-        }
+        Tensor export = Tensor.of(totalDistances.entrySet().stream().map(e -> Tensors.of(Scalars.fromString(e.getKey()), e.getValue())));
+        Scalar fleetDistance = Total.ofVector(export.get(Tensor.ALL, 1, 0));
+        Scalar fleetDistanceEmpty = Total.ofVector(export.get(Tensor.ALL, 1, 1));
+
         export.append(Tensors.of(Scalars.fromString("{fleet}"), Tensors.of(fleetDistance, fleetDistanceEmpty)));
         Export.of(new File(exportFolder, "minFleetDistance.csv"), export);
-        int totalTrips = tripMap.values().stream().mapToInt(s -> s.size()).sum();
+        int totalTrips = tripMap.values().stream().mapToInt(Set::size).sum();
         System.out.println("Total trips: " + totalTrips);
     }
 
     private Scalar shortPathDistance(Link linkStart, Link to) {
         Path shortest = lcpc.calcLeastCostPath(linkStart.getFromNode(), to.getToNode(), 1, null, null);
-        double distance = 0.0;
-        for (Link link : shortest.links)
-            distance += link.getLength();
+        double distance = shortest.links.stream().mapToDouble(Link::getLength).sum();
         return Quantity.of(distance / 1000.0, "km");
-
     }
 }

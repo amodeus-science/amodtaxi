@@ -12,7 +12,6 @@ import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.TensorCoords;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
-import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.Scalar;
 
 /* package */ class TripDistanceFilter extends AbstractConsciousFilter {
@@ -24,9 +23,7 @@ import ch.ethz.idsc.tensor.Scalar;
     public TripDistanceFilter(Network network, MatsimAmodeusDatabase db, Scalar minDistance) {
         this.minDistance = minDistance;
         // least cost path calculator
-        lcpc = new FastAStarLandmarksFactory()//
-                .createPathCalculator(network, new DistanceAsTravelDisutility(), //
-                        new FreeSpeedTravelTime());
+        lcpc = new FastAStarLandmarksFactory().createPathCalculator(network, new DistanceAsTravelDisutility(), new FreeSpeedTravelTime());
         // fast link lookup
         fll = new FastLinkLookup(network, db);
     }
@@ -41,9 +38,6 @@ import ch.ethz.idsc.tensor.Scalar;
         // lcpc.
 
         // FIXME implement if needed
-        GlobalAssert.that(false);
-        return true;
-
+        throw new RuntimeException();
     }
-
 }

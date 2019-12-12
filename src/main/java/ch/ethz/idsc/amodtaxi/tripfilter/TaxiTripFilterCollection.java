@@ -27,8 +27,6 @@ public class TaxiTripFilterCollection {
     }
 
     public void printSummary() {
-        for (ConsciousFilter dataFilter : filters)
-            dataFilter.printSummary();
+        filters.forEach(ConsciousFilter::printSummary);
     }
-
 }

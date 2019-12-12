@@ -3,6 +3,7 @@ package ch.ethz.idsc.amodtaxi.population;
 
 import java.time.LocalDateTime;
 
+import ch.ethz.idsc.amodeus.taxitrip.ImportTaxiTrips;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.io.CsvReader;
 import ch.ethz.idsc.tensor.Scalar;
@@ -10,6 +11,7 @@ import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 
+@Deprecated /** use {@link ImportTaxiTrips} instead */
 /* package */ enum TaxiTripParse {
     ;
 
@@ -21,12 +23,11 @@ import ch.ethz.idsc.tensor.Tensors;
         Tensor dropoffLoc = Tensors.fromString(line.get("dropoffLoc"));
         Scalar distance = Scalars.fromString(line.get("distance"));
         Scalar waitTime = Scalars.fromString(line.get("waitTime"));
-        LocalDateTime pickupDate = LocalDateTime.parse(line.get("pickupDate"));
-        Scalar duration = Scalars.fromString(line.get("duration"));
+        LocalDateTime pickupDate = LocalDateTime.parse(line.get("pickupTimeDate")); // pickupDate
+        Scalar duration = Scalars.fromString(line.get("driveTime")); // duration
 
         // compile trip
         return TaxiTrip.of(globalId, taxiId, pickupLoc, dropoffLoc, distance, //
                 pickupDate, waitTime, duration);
     }
-
 }

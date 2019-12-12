@@ -11,5 +11,5 @@ public enum ScenarioLabels {
     public static String LPFile = "LPOptions.properties";
     public static String osmData = "map.osm";
     public static String network = "network.xml";
-
+    public static String networkGz = network + ".gz";
 }
