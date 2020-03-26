@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.Duration;
@@ -41,7 +40,7 @@ public abstract class TaxiTripsReader {
         List<TaxiTrip> list = new LinkedList<>();
         System.out.println("TaxiTripsReader, reading file: " + file.getAbsolutePath());
         CsvReader reader = new CsvReader(file, delim);
-        unreadable.add(reader.sortedHeaders().stream().collect(Collectors.joining(",")));
+        unreadable.add(String.join(",", reader.sortedHeaders()));
         reader.rows(row -> {
             int incrm = tripIds.getAndIncrement();
             String tripId = "no_dat_id_" + Integer.toString(incrm);
@@ -53,7 +52,8 @@ public abstract class TaxiTripsReader {
                 taxiIds.put(taxiCode, taxiId);
                 LocalDateTime pickupTime = getPickupTime(row);
                 LocalDateTime dropoffTime = getDropoffTime(row);
-                LocalDateTime submissionTimeDate = LocalDateTimes.subtractFrom(pickupTime, getWaitingTime(row));
+                Scalar waitingTime = getWaitingTime(row);
+                LocalDateTime submissionTimeDate = Objects.nonNull(waitingTime) ? LocalDateTimes.subtractFrom(pickupTime, waitingTime) : null;
                 Scalar durationCompute = Duration.between(pickupTime, dropoffTime);
                 Scalar durationDataset = getDuration(row);
                 String dataTripId = getTripId(row);

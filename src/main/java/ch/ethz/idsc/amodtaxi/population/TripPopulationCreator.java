@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import ch.ethz.idsc.amodeus.taxitrip.ImportTaxiTrips;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -65,19 +66,13 @@ public class TripPopulationCreator {
         // Population creation (iterate trough all id's)
         System.out.println("Reading inFile:");
         System.out.println(inFile.getAbsolutePath());
-        // row to list of trips
-        List<TaxiTrip> trips = new ArrayList<>();
-        new CsvReader(inFile, ";").rows(row -> {
-            trips.add(TaxiTripParse.fromRow(row));
-        });
+        List<TaxiTrip> trips = ImportTaxiTrips.fromFile(inFile);
 
         File finalTripFile = new File(inFile.getAbsolutePath().replace(".csv", "_final.csv"));
         process(trips, finalTripFile);
     }
 
-    public void process(List<TaxiTrip> trips, File finalTripFile)//
-            throws MalformedURLException, Exception {
-
+    public void process(List<TaxiTrip> trips, File finalTripFile) throws MalformedURLException, Exception {
         this.finalTripFile = finalTripFile;
 
         // Population init
@@ -124,5 +119,4 @@ public class TripPopulationCreator {
         Objects.requireNonNull(finalTripFile);
         return finalTripFile;
     }
-
 }

@@ -51,12 +51,11 @@ public class TripNetworkFilter extends AbstractConsciousFilter {
 
     @Override // from AbstractConsciousFilter
     public boolean testInternal(TaxiTrip trip) {
-
         /** getting the data */
         DurationCompare compare = new DurationCompare(trip, calc);
 
         /** evaluating criteria */
-        boolean slowerThanNetwork = checkSlowerNetwork ? Scalars.lessEquals(compare.nwPathDurationRatio, RealScalar.ONE) : true;
+        boolean slowerThanNetwork = !checkSlowerNetwork || Scalars.lessEquals(compare.nwPathDurationRatio, RealScalar.ONE);
         if (slowerThanNetwork)
             ++numslowerThanNetwork;
         boolean belowMaxDelay = Scalars.lessEquals(trip.driveTime.subtract(compare.pathTime), maxDelay);
@@ -90,12 +89,11 @@ public class TripNetworkFilter extends AbstractConsciousFilter {
         System.out.println("Faster than min speed:    " + numfasterThanMinSpeed + " / " + numTested());
         System.out.println("Longer than min distance: " + numlongerThanMinDistance + " / " + numTested());
         System.out.println("Have real path:           " + numhasRealPath + " / " + numTested());
-        try {
-
-            SaveUtils.saveFile(ratios, "ratios", HomeDirectory.file("data/TaxiComparison_SFScenario"));
-            UnitSaveUtils.saveFile(durations, "durations", HomeDirectory.file("data/TaxiComparison_SFScenario"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // try {
+        //     SaveUtils.saveFile(ratios, "ratios", HomeDirectory.file("data/TaxiComparison_SFScenario"));
+        //     UnitSaveUtils.saveFile(durations, "durations", HomeDirectory.file("data/TaxiComparison_SFScenario"));
+        // } catch (Exception e) {
+        //     e.printStackTrace();
+        // }
     }
 }

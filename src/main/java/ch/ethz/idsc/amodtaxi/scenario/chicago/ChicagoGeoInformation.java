@@ -4,7 +4,7 @@ package ch.ethz.idsc.amodtaxi.scenario.chicago;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.LocationSpecDatabase;
 
-/* package */ enum ChicagoGeoInformation {
+public enum ChicagoGeoInformation {
     ;
 
     public static void setup() {

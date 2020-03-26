@@ -13,7 +13,7 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
-/* package */ class OnlineTripsReaderChicago extends TaxiTripsReader {
+public class OnlineTripsReaderChicago extends TaxiTripsReader {
 
     public OnlineTripsReaderChicago() {
         super(",");
@@ -32,7 +32,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
     @Override
     public LocalDateTime getPickupTime(Row line) throws ParseException {
-        return LocalDateTime.parse(line.get("trip_start_timestamp"), ScenarioConstants.onlineFormat);
+        return LocalDateTime.parse(line.get("trip_start_timestamp"), ScenarioConstants.onlineFormatter);
     }
 
     @Override

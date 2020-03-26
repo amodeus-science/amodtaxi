@@ -13,7 +13,7 @@ import java.util.Properties;
 
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
-/* package */ enum ChicagoDataLoader {
+public enum ChicagoDataLoader {
     ;
 
     public static File from(File properties, File dir, int entryLimit) throws Exception {
@@ -40,10 +40,11 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
         try {
             URL url = getURL(properties, entryLimit);
             System.out.println("INFO download data from " + url);
-            InputStream in = url.openStream();
-            file = createFile(properties, dir);
-            Files.copy(in, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("INFO successfully copied data to " + file.getAbsolutePath());
+            try (InputStream in = url.openStream()) {
+                file = createFile(properties, dir);
+                Files.copy(in, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                System.out.println("INFO successfully copied data to " + file.getAbsolutePath());
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

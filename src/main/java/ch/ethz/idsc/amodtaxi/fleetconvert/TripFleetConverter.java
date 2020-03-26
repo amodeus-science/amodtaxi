@@ -109,8 +109,6 @@ public abstract class TripFleetConverter {
                         qt, simulationDate, timeConvert, finalFilters);
         populationCreator.process(modifiedTripsFile);
         finalTripsFile = populationCreator.getFinalTripFile();
-
-        System.exit(1);
     }
 
     public File getFinalTripFile() {
