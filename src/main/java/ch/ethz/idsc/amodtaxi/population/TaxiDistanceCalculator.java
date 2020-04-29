@@ -37,7 +37,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
     public TaxiDistanceCalculator(File exportFolder, Network network, ClosestLinkSelect linkSelect) {
         this.exportFolder = exportFolder;
-        this.lcpc = new FastAStarLandmarksFactory().createPathCalculator( //
+        this.lcpc = new FastAStarLandmarksFactory(Runtime.getRuntime().availableProcessors()).createPathCalculator( //
                 network, new DistanceAsTravelDisutility(), new FreeSpeedTravelTime());
         this.linkSelect = linkSelect;
     }

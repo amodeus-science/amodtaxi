@@ -23,7 +23,7 @@ import ch.ethz.idsc.tensor.Scalar;
     public TripDistanceFilter(Network network, MatsimAmodeusDatabase db, Scalar minDistance) {
         this.minDistance = minDistance;
         // least cost path calculator
-        lcpc = new FastAStarLandmarksFactory().createPathCalculator(network, new DistanceAsTravelDisutility(), new FreeSpeedTravelTime());
+        lcpc = new FastAStarLandmarksFactory(Runtime.getRuntime().availableProcessors()).createPathCalculator(network, new DistanceAsTravelDisutility(), new FreeSpeedTravelTime());
         // fast link lookup
         fll = new FastLinkLookup(network, db);
     }

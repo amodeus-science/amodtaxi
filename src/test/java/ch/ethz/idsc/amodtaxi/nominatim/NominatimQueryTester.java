@@ -57,7 +57,7 @@ public class NominatimQueryTester {
         System.out.println(t1);
         System.out.println("---");
 
-        Assert.assertTrue(t1.equals(Tensors.fromString("{-1.8164308339635, 52.5487921}")));
+        Assert.assertTrue(t1.equals(Tensors.fromString("{-1.8164308339635031, 52.5487921}")));
     }
 
     @Test
@@ -75,7 +75,8 @@ public class NominatimQueryTester {
 
         // check lat long
         Tensor latLong = NominatimJSON.toCoordinates(queryJSON);
-        Assert.assertTrue(latLong.equals(Tensors.fromString("{7.44504019681667, 46.94707525}")));
+        System.out.println(latLong);
+        Assert.assertTrue(latLong.equals(Tensors.fromString("{7.445040196816667, 46.94707525}")));
 
     }
 
