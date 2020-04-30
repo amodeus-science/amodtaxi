@@ -53,7 +53,7 @@ public class TaxiData {
                 .forEach(ld -> System.out.println(ld));
 
         /** analysis of the files per local date */
-        LeastCostPathCalculator leastCostPathCalculator = new FastAStarLandmarksFactory()//
+        LeastCostPathCalculator leastCostPathCalculator = new FastAStarLandmarksFactory(Runtime.getRuntime().availableProcessors())//
                 .createPathCalculator(network, new DistanceAsTravelDisutility(), //
                         new FreeSpeedTravelTime());
         QuadTree<Link> quadTree = CreateQuadTree.of(network);
