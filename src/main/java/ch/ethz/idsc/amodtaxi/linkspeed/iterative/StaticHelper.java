@@ -96,7 +96,7 @@ import ch.ethz.idsc.tensor.pdf.BinCounts;
 			categoryPlot.setDomainGridlinePosition(CategoryAnchor.START);
 
 			File file = new File(relativeDirectory, "histogram_" + append + ".png");
-			AmodeusChartUtils.saveChartAsPNG(file, jFreeChart, WIDTH, HEIGHT);
+			AmodeusChartUtils.saveAsPNG(jFreeChart, file.toString(), WIDTH, HEIGHT);
 			GlobalAssert.that(file.isFile());
 		} catch (Exception e) {
 			e.printStackTrace();
