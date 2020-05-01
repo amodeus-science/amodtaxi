@@ -44,7 +44,7 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
                 for (PlanElement pElem : plan.getPlanElements()) {
                     if (pElem instanceof Leg) {
                         Leg leg = (Leg) pElem;
-                        GlobalAssert.that(leg.getDepartureTime() >= 0);
+                        GlobalAssert.that(leg.getDepartureTime().seconds() >= 0);
                     }
                 }
             }
