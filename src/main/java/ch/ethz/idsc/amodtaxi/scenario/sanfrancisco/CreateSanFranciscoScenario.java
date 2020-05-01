@@ -47,11 +47,12 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
         /** copy taxi trace files */
         System.out.println("dataDir: " + dataDir.getAbsolutePath());
-        List<File> taxiFiles = new MultiFileReader(new File(dataDir, "cabspottingdata"), "new_").getFolderFiles();
-        List<File> traceFiles = (new TraceFileChoice(taxiFiles)).random(numTraceFiles);
-        // List<File> traceFiles = (new
-        // TraceFileChoice(taxiFiles)).specified("equioc", "onvahe", "epkiapme",
-        // "ippfeip");
+        // List<File> taxiFiles = new MultiFileReader(new File(dataDir, "cabspottingdata"), "new_").getFolderFiles();
+        // List<File> traceFiles = (new TraceFileChoice(taxiFiles)).random(numTraceFiles);
+        // // List<File> traceFiles = (new
+        // // TraceFileChoice(taxiFiles)).specified("equioc", "onvahe", "epkiapme",
+        // // "ippfeip");
+        List<File> traceFiles = TraceFileChoice.getOrDefault(new File(dataDir, "cabspottingdata"), "new_").random(numTraceFiles);
 
         /** copy other scenario files */
         File settingsDir = new File(Locate.repoFolder(CreateSanFranciscoScenario.class, "amodtaxi"), "resources/sanFranciscoScenario");
