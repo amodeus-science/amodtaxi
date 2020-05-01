@@ -32,6 +32,11 @@
 			<artifactId>json</artifactId>
 			<version>20190722</version>
 		</dependency>
+		<dependency>
+			<groupId>org.matsim</groupId>
+			<artifactId>pt2matsim</artifactId>
+			<version>19.11</version>
+		</dependency>
 	</dependencies>
 
 	<repositories>
@@ -42,6 +47,10 @@
 				<enabled>true</enabled>
 				<updatePolicy>always</updatePolicy>
 			</snapshots>
+		</repository>
+		<repository>
+			<id>pt2matsim</id>
+			<url>http://dl.bintray.com/polettif/matsim</url>
 		</repository>
 	</repositories>
 
