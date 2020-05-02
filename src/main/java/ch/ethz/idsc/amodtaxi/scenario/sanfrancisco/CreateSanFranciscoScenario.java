@@ -4,7 +4,6 @@ package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -15,9 +14,6 @@ import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
-import ch.ethz.idsc.amodeus.util.io.CopyFiles;
-import ch.ethz.idsc.amodeus.util.io.Locate;
-import ch.ethz.idsc.amodeus.util.io.MultiFileReader;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodtaxi.osm.StaticMapCreator;
 import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
@@ -42,28 +38,19 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         run(dataDir, processingDir, destinDir);
     }
 
+    // TODO clean-up
+    // TODO make naming consistent with Chicago
     public static void run(File dataDir, File processingDir, File destinDir) throws Exception {
-        SanFranciscoGeoInformation.setup();
+        SanFranciscoSetup.in(processingDir);
+
+        /** download of open street map data to create scenario */
+        StaticMapCreator.now(processingDir);
 
         /** copy taxi trace files */
         System.out.println("dataDir: " + dataDir.getAbsolutePath());
-        // List<File> taxiFiles = new MultiFileReader(new File(dataDir, "cabspottingdata"), "new_").getFolderFiles();
-        // List<File> traceFiles = (new TraceFileChoice(taxiFiles)).random(numTraceFiles);
-        // // List<File> traceFiles = (new
-        // // TraceFileChoice(taxiFiles)).specified("equioc", "onvahe", "epkiapme",
-        // // "ippfeip");
         List<File> traceFiles = TraceFileChoice.getOrDefault(new File(dataDir, "cabspottingdata"), "new_").random(numTraceFiles);
-
-        /** copy other scenario files */
-        File settingsDir = new File(Locate.repoFolder(CreateSanFranciscoScenario.class, "amodtaxi"), "resources/sanFranciscoScenario");
-        CopyFiles.now(settingsDir.getAbsolutePath(), processingDir.getAbsolutePath(), //
-                Arrays.asList(new String[] { "AmodeusOptions.properties", "LPOptions.properties", "config_full.xml", //
-                        "config_fullPublish.xml", "pt2matsim_settings.xml" }),
-                true);
-
-        /** download of open street map data to create scenario map using
-         * pt2matsim */
-        StaticMapCreator.now(processingDir, ScenarioLabels.osmData, ScenarioLabels.amodeusFile, ScenarioLabels.pt2MatSettings);
+        // List<File> traceFiles = //
+        // TraceFileChoice.getOrDefault(new File(dataDir, "cabspottingdata"), "new_").specified("equioc", "onvahe", "epkiapme", "ippfeip");
 
         /** remove all links except car from network */
         Network network = InitialNetworkPreparerSF.run(processingDir);

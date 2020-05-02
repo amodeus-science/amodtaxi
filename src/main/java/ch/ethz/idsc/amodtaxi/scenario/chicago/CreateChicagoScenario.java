@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
+import ch.ethz.idsc.amodtaxi.osm.StaticMapCreator;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.pt2matsim.run.Osm2MultimodalNetwork;
 
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
 import ch.ethz.idsc.amodeus.net.FastLinkLookup;
@@ -28,7 +28,6 @@ import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodtaxi.fleetconvert.ChicagoOnlineTripFleetConverter;
 import ch.ethz.idsc.amodtaxi.fleetconvert.TripFleetConverter;
 import ch.ethz.idsc.amodtaxi.linkspeed.iterative.IterativeLinkSpeedEstimator;
-import ch.ethz.idsc.amodtaxi.osm.OsmLoader;
 import ch.ethz.idsc.amodtaxi.scenario.FinishedScenario;
 import ch.ethz.idsc.amodtaxi.scenario.Scenario;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioBasicNetworkPreparer;
@@ -49,20 +48,14 @@ import ch.ethz.idsc.tensor.qty.Quantity;
     private static final Random RANDOM = new Random(123);
 
     private static void createScenario(File workingDir) throws Exception {
-
         ChicagoSetup.in(workingDir);
 
         // FIXME remove debug loop once done
         boolean debug = false;
 
         /** download of open street map data to create scenario */
-        System.out.println("Downloading open stret map data, this may take a while...");
-        File osmFile = new File(workingDir, ScenarioLabels.osmData);
-        OsmLoader osmLoader = OsmLoader.of(new File(workingDir, ScenarioLabels.amodeusFile));
-        osmLoader.saveIfNotAlreadyExists(osmFile);
-        /** generate a network using pt2Matsim */
-        if (!debug)
-            Osm2MultimodalNetwork.run(workingDir.getAbsolutePath() + "/" + ScenarioLabels.pt2MatSettings);
+        StaticMapCreator.now(workingDir);
+
         /** prepare the network */
         ScenarioBasicNetworkPreparer.run(workingDir);
 

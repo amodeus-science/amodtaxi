@@ -14,7 +14,5 @@ import ch.ethz.idsc.amodtaxi.scenario.ScenarioSetup;
         File resourcesDir = new File(Locate.repoFolder(CreateChicagoScenario.class, "amodtaxi"), //
                 "resources/chicagoScenario");
         ScenarioSetup.in(workingDir, resourcesDir);
-
     }
-
 }
