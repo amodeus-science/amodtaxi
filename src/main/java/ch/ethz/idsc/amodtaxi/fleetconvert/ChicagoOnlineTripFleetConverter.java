@@ -1,6 +1,7 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.fleetconvert;
 
+import java.io.File;
 import java.util.Random;
 
 import org.matsim.api.core.v01.network.Network;
@@ -16,12 +17,12 @@ import ch.ethz.idsc.amodtaxi.tripfilter.TripEndTimeFilter;
 import ch.ethz.idsc.amodtaxi.tripmodif.TaxiDataModifier;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
-public class ChicagoOnlineTripFleetConverter extends TripFleetConverter {
+public class ChicagoOnlineTripFleetConverter extends ReaderTripFleetConverter {
 
     public ChicagoOnlineTripFleetConverter(ScenarioOptions scenarioOptions, Network network, //
             TaxiDataModifier modifier, TaxiDataModifier generalModifier, TaxiTripFilterCollection finalFilters, //
-            TaxiTripsReader tripsReader) {
-        super(scenarioOptions, network, modifier, generalModifier, finalFilters, tripsReader);
+            TaxiTripsReader tripsReader, File tripFile, File targetDirectory) {
+        super(scenarioOptions, network, modifier, generalModifier, finalFilters, tripsReader, tripFile, targetDirectory);
     }
 
     @Override

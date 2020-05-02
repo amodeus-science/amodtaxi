@@ -3,17 +3,11 @@ package ch.ethz.idsc.amodtaxi.fleetconvert;
 
 import java.io.File;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.utils.collections.QuadTree;
 
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
@@ -24,80 +18,61 @@ import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.math.CreateQuadTree;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.population.TripPopulationCreator;
-import ch.ethz.idsc.amodtaxi.scenario.TaxiTripsReader;
+import ch.ethz.idsc.amodtaxi.scenario.TaxiTripsSupplier;
 import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
 import ch.ethz.idsc.amodtaxi.tripmodif.TaxiDataModifier;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.utils.collections.QuadTree;
 
 public abstract class TripFleetConverter {
-
-    protected final ScenarioOptions scenarioOptions;
-    protected final Network network;
-    protected final TaxiTripFilterCollection primaryFilter = new TaxiTripFilterCollection();
-    protected final TaxiDataModifier contentModifier;
-    protected final TaxiDataModifier formatModifier;
-    protected final TaxiTripFilterCollection finalFilters;
-    protected final TaxiTripsReader tripsReader;
-    protected final MatsimAmodeusDatabase db;
-    protected final QuadTree<Link> qt;
-
+    private final TaxiDataModifier contentModifier;
+    private final TaxiTripFilterCollection finalFilters;
+    private final TaxiTripsSupplier taxiTripsSupplier;
     private File finalTripsFile = null;
+    protected final Config config;
+    protected final Network network;
+    protected final MatsimAmodeusDatabase db;
+    protected final QuadTree<Link> qt; // TODO replace by FastLinkLookup
+    protected final File targetDirectory;
+    protected final TaxiTripFilterCollection primaryFilter = new TaxiTripFilterCollection();
 
     public TripFleetConverter(ScenarioOptions scenarioOptions, Network network, //
-            TaxiDataModifier tripModifier, //
-            TaxiDataModifier generalModifier, TaxiTripFilterCollection finalFilters, //
-            TaxiTripsReader tripsReader) {
-        this.scenarioOptions = scenarioOptions;
+            TaxiDataModifier tripModifier, TaxiTripFilterCollection finalFilters, //
+            TaxiTripsSupplier taxiTripsSupplier, File targetDirectory) {
         this.network = network;
         this.contentModifier = tripModifier;
-        this.formatModifier = generalModifier;
         this.finalFilters = finalFilters;
-        this.tripsReader = tripsReader;
+        this.taxiTripsSupplier = taxiTripsSupplier;
+        this.targetDirectory = targetDirectory;
+        this.targetDirectory.mkdirs();
         ReferenceFrame referenceFrame = scenarioOptions.getLocationSpec().referenceFrame();
         this.db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
         this.qt = CreateQuadTree.of(network);
-    }
 
-    public void run(File processingDir, File tripFile, LocalDate simulationDate, AmodeusTimeConvert timeConvert)//
-            throws Exception {
-        GlobalAssert.that(tripFile.isFile());
-
-        /** preparation of necessary data */
         File configFile = new File(scenarioOptions.getPreparerConfigName());
         GlobalAssert.that(configFile.exists());
-        Config configFull = ConfigUtils.loadConfig(configFile.toString());
+        config = ConfigUtils.loadConfig(configFile.toString());
+    }
 
-        /** folder for processing stored files, the folder tripData contains
-         * .csv versions of all processing steps for faster debugging. */
-        File tripDataDir = new File(processingDir, "tripData");
-        tripDataDir.mkdirs();
-        FileUtils.copyFileToDirectory(tripFile, tripDataDir);
-        File newTripFile = new File(tripDataDir, tripFile.getName());
-        System.out.println("NewTripFile: " + newTripFile.getAbsolutePath());
-        GlobalAssert.that(newTripFile.isFile());
+    public void run(File processingDir, String baseName, String extension, LocalDate simulationDate, AmodeusTimeConvert timeConvert) throws Exception {
+        extension = extension.startsWith(".") ? extension : ("." + extension);
 
-        /** initial formal modifications, e.g., replacing certain characters,
-         * other modifications should be done in the third step */
-        File preparedFile = formatModifier.modify(newTripFile);
-        List<TaxiTrip> allTrips = tripsReader.getTrips(preparedFile);
+        Collection<TaxiTrip> allTrips = taxiTripsSupplier.get();
         System.out.println("Before primary filter: " + allTrips.size());
 
         /** filtering of trips, e.g., removal of 0 [s] trips */
         Stream<TaxiTrip> filteredStream = primaryFilter.filterStream(allTrips.stream());
         List<TaxiTrip> primaryFiltered = filteredStream.collect(Collectors.toList());
         System.out.println("Primary filtered: " + primaryFiltered.size());
-        String filteredFileName = FilenameUtils.getBaseName(preparedFile.getPath()) + "_filtered." + //
-                FilenameUtils.getExtension(preparedFile.getPath());
+        String filteredFileName = baseName + "_filtered" + extension;
         primaryFilter.printSummary();
 
-        File filteredFile = new File(preparedFile.getParentFile(), filteredFileName);
+        File filteredFile = new File(targetDirectory, filteredFileName);
         ExportTaxiTrips.toFile(primaryFiltered.stream(), filteredFile);
         GlobalAssert.that(filteredFile.isFile());
-
-        /** save unreadable trips for post-processing, checking */
-        File unreadable = new File(preparedFile.getParentFile(), //
-                FilenameUtils.getBaseName(preparedFile.getAbsolutePath()) + "_unreadable." + //
-                        FilenameUtils.getExtension(preparedFile.getAbsolutePath()));
-        tripsReader.saveUnreadable(unreadable);
 
         /** modifying the trip data, e.g., distributing in 15 minute steps. */
         File modifiedTripsFile = contentModifier.modify(filteredFile);
@@ -105,14 +80,14 @@ public abstract class TripFleetConverter {
 
         /** creating population based on corrected, filtered file */
         TripPopulationCreator populationCreator = //
-                new TripPopulationCreator(processingDir, configFull, network, db, //
+                new TripPopulationCreator(processingDir, config, network, db, //
                         qt, simulationDate, timeConvert, finalFilters);
         populationCreator.process(modifiedTripsFile);
         finalTripsFile = populationCreator.getFinalTripFile();
     }
 
-    public File getFinalTripFile() {
-        return finalTripsFile;
+    public Optional<File> getFinalTripFile() {
+        return Optional.ofNullable(finalTripsFile);
     }
 
     public abstract void setFilters();

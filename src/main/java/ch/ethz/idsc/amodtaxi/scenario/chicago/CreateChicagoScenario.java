@@ -26,7 +26,7 @@ import ch.ethz.idsc.amodeus.util.io.CopyFiles;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodtaxi.fleetconvert.ChicagoOnlineTripFleetConverter;
-import ch.ethz.idsc.amodtaxi.fleetconvert.TripFleetConverter;
+import ch.ethz.idsc.amodtaxi.fleetconvert.ReaderTripFleetConverter;
 import ch.ethz.idsc.amodtaxi.linkspeed.iterative.IterativeLinkSpeedEstimator;
 import ch.ethz.idsc.amodtaxi.scenario.FinishedScenario;
 import ch.ethz.idsc.amodtaxi.scenario.Scenario;
@@ -74,8 +74,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
             processingDir.mkdir();
 
         CopyFiles.now(workingDir.getAbsolutePath(), processingDir.getAbsolutePath(), //
-                Arrays.asList(new String[] { "AmodeusOptions.properties", "config_full.xml", //
-                        "network.xml", "network.xml.gz", "LPOptions.properties" }));
+                Arrays.asList(ScenarioLabels.amodeusFile, ScenarioLabels.config, ScenarioLabels.network, ScenarioLabels.networkGz, ScenarioLabels.LPFile));
         ScenarioOptions scenarioOptions = new ScenarioOptions(processingDir, //
                 ScenarioOptionsBase.getDefault());
         LocalDate simulationDate = LocalDateConvert.ofOptions(scenarioOptions.getString("date"));
@@ -116,11 +115,10 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         File destinDir = new File(workingDir, "CreatedScenario");
         List<TaxiTrip> finalTrips;
         { // prepare final scenario
-            TripFleetConverter converter = //
+            ReaderTripFleetConverter converter = //
                     new ChicagoOnlineTripFleetConverter(scenarioOptions, network, tripModifier, //
-                            new ChicagoFormatModifier(), taxiTripFilterCollection, tripsReader);
-            File finalTripsFile = Scenario.create(workingDir, tripFile, //
-                    converter, workingDir, processingDir, simulationDate, timeConvert);
+                            new ChicagoFormatModifier(), taxiTripFilterCollection, tripsReader, tripFile, new File(processingDir, "tripData"));
+            File finalTripsFile = Scenario.create(workingDir, tripFile, converter, processingDir, simulationDate, timeConvert);
 
             Objects.requireNonNull(finalTripsFile);
 
@@ -138,11 +136,10 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         new IterativeLinkSpeedEstimator(maxIter).compute(processingDir, network, db, finalTrips);
 
         FinishedScenario.copyToDir(processingDir.getAbsolutePath(), //
-                destinDir.getAbsolutePath(),
+                destinDir.getAbsolutePath(), //
                 new String[] { //
-                        "AmodeusOptions.properties", "network.xml.gz", "population.xml.gz", //
-                        "LPOptions.properties", "config_full.xml", //
-                        "virtualNetworkChicago", "linkSpeedData" });
+                        ScenarioLabels.amodeusFile, ScenarioLabels.networkGz, ScenarioLabels.populationGz, //
+                        ScenarioLabels.LPFile, ScenarioLabels.config, "virtualNetworkChicago", ScenarioLabels.linkSpeedData });
         cleanUp(workingDir);
     }
 

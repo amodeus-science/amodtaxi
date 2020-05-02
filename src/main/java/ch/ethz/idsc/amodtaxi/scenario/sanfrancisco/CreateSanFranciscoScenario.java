@@ -8,6 +8,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
+import ch.ethz.idsc.amodeus.options.ScenarioOptions;
+import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
+import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioBasicNetworkPreparer;
 import org.matsim.api.core.v01.network.Network;
 
@@ -22,6 +26,8 @@ import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
 import ch.ethz.idsc.amodtaxi.tripfilter.TripNetworkFilter;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.qty.Quantity;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 
 /* package */ class CreateSanFranciscoScenario {
 
@@ -53,12 +59,20 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         // List<File> traceFiles = //
         // TraceFileChoice.getOrDefault(new File(dataDir, "cabspottingdata"), "new_").specified("equioc", "onvahe", "epkiapme", "ippfeip");
 
-        /** remove all links except car from network */
-        Network network = ScenarioBasicNetworkPreparer.run(processingDir);
-        MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
+        /** prepare the network */
+        ScenarioBasicNetworkPreparer.run(processingDir);
+
+        /** based on the taxi data, create a population and assemble a AMoDeus scenario */
+        ScenarioOptions scenarioOptions = new ScenarioOptions(processingDir, ScenarioOptionsBase.getDefault());
+        File configFile = new File(scenarioOptions.getPreparerConfigName());
+        System.out.println(configFile.getAbsolutePath());
+        GlobalAssert.that(configFile.exists());
+        Config configFull = ConfigUtils.loadConfig(configFile.toString());
+        final Network network = NetworkLoader.fromNetworkFile(new File(processingDir, configFull.network().getInputFile()));
+        MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, scenarioOptions.getLocationSpec().referenceFrame());
+        FastLinkLookup fll = new FastLinkLookup(network, db);
 
         /** get dayTaxiRecord from trace files */
-        FastLinkLookup fll = new FastLinkLookup(network, db);
         DayTaxiRecord dayTaxiRecord = ReadTraceFiles.in(fll, traceFiles, db);
 
         /** create scenario */
