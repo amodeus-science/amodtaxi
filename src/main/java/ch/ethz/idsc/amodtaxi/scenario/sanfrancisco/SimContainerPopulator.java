@@ -21,7 +21,6 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 import ch.ethz.idsc.tensor.io.Serialization;
 
 /* package */ class SimContainerPopulator {
-
     private final MatsimAmodeusDatabase db;
     private final QuadTree<Link> quadTree;
     private final AmodeusTimeConvert timeConvert;
@@ -36,7 +35,6 @@ import ch.ethz.idsc.tensor.io.Serialization;
             SimulationObject simulationObject, //
             GlobalRequestIndex globalReqIndex, //
             LocalDate simulationDate, RequestInserter reqInserter) {
-
         Objects.requireNonNull(taxiStamp);
         Objects.requireNonNull(reqInserter);
 
@@ -56,30 +54,27 @@ import ch.ethz.idsc.tensor.io.Serialization;
         simulationObject.vehicles.add(vc);
 
         /** request containers */
-        if (Objects.nonNull(reqInserter.getReqContainerCopy(taxiStamp)))
-            for (RequestContainer rc : reqInserter.getReqContainerCopy(taxiStamp)) {
-                /** ensure that globally every index occurs only once */
-                LocalDateTime firstValidSubmissionTime = timeConvert.beginOf(simulationDate);
-                if (timeConvert.ldtToAmodeus(firstValidSubmissionTime, simulationDate) <= rc.submissionTime) {
+        for (RequestContainer rc : reqInserter.getReqContainerCopy(taxiStamp)) {
+            /** ensure that globally every index occurs only once */
+            LocalDateTime firstValidSubmissionTime = timeConvert.beginOf(simulationDate);
+            if (timeConvert.ldtToAmodeus(firstValidSubmissionTime, simulationDate) <= rc.submissionTime) {
+                Integer globalIndex = globalReqIndex.add(vehicleIndex, rc.requestIndex);
 
-                    // LocalDateTimes.lessEquals(firstValidSubmissionTime, rc.submissionTime)) {
-                    Integer globalIndex = globalReqIndex.add(vehicleIndex, rc.requestIndex);
-
-                    RequestContainer copy;
-                    try {
-                        copy = Serialization.copy(rc);
-                    } catch (Exception e) {
-                        throw new RuntimeException();
-                    }
-                    // System.out.println("copy submission time: " + copy.submissionTime);
-                    // copy.submissionTime = timeConvert.toAmodeus((int) copy.submissionTime, localDate);
-                    copy.requestIndex = globalIndex;
-                    GlobalAssert.that(copy.submissionTime >= 0);
-                    simulationObject.requests.add(copy);
-                    if (copy.requestStatus.equals(RequestStatus.PICKUP))
-                        simulationObject.total_matchedRequests += 1;
+                RequestContainer copy;
+                try {
+                    copy = Serialization.copy(rc);
+                } catch (Exception e) {
+                    throw new RuntimeException();
                 }
+                // System.out.println("copy submission time: " + copy.submissionTime);
+                // copy.submissionTime = timeConvert.toAmodeus((int) copy.submissionTime, localDate);
+                copy.requestIndex = globalIndex;
+                GlobalAssert.that(copy.submissionTime >= 0);
+                simulationObject.requests.add(copy);
+                if (copy.requestStatus.contains(RequestStatus.PICKUP))
+                    simulationObject.total_matchedRequests += 1;
             }
+        }
     }
 
     public void withEmpty(SimulationObject simulationObject, int vehicleIndex) {
@@ -88,7 +83,6 @@ import ch.ethz.idsc.tensor.io.Serialization;
         vc.vehicleIndex = vehicleIndex;
         vc.linkTrace = new int[] { 1 };
         vc.roboTaxiStatus = RoboTaxiStatus.STAY;
-        GlobalAssert.that(Objects.nonNull(vc.roboTaxiStatus));
         simulationObject.vehicles.add(vc);
     }
 }

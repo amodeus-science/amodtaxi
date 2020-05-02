@@ -11,7 +11,6 @@ import ch.ethz.idsc.amodeus.net.RequestContainer;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
-// TODO refactor why does it have two methods instead of one?
 /* package */ class RequestContainerFactory {
     private final String requestIndex;
     private final int fromLinkIndex;

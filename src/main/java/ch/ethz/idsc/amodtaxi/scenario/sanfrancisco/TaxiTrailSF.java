@@ -16,7 +16,6 @@ import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
-import ch.ethz.idsc.amodeus.util.LocalDateTimes;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.scenario.TaxiTripFinder;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
@@ -85,9 +84,13 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
 
     @Override
     public Collection<TaxiTrip> allTripsBeginningOn(LocalDate localDate) {
-        return taxiTrips.stream()//
-                .filter(t -> LocalDateTimes.lessEquals(localDate.atStartOfDay(), t.pickupTimeDate))//
-                .filter(t -> LocalDateTimes.lessEquals(t.pickupTimeDate, localDate.atTime(23, 59, 59)))//
-                .collect(Collectors.toList());
+        final LocalDateTime endOfDay = localDate.atTime(23, 59, 59);
+        // return taxiTrips.stream()//
+        //         .filter(t -> LocalDateTimes.lessEquals(localDate.atStartOfDay(), t.pickupTimeDate)) //
+        //         .filter(t -> LocalDateTimes.lessEquals(t.pickupTimeDate, endOfDay)) //
+        //         .collect(Collectors.toList());
+        return taxiTrips.stream() //
+                .filter(t -> localDate.atStartOfDay().isEqual(t.pickupTimeDate) || localDate.atStartOfDay().isBefore(t.pickupTimeDate)) //
+                .filter(t -> endOfDay.isEqual(t.pickupTimeDate) || endOfDay.isAfter(t.pickupTimeDate)).collect(Collectors.toList()); // TODO why not < 24:00?
     }
 }

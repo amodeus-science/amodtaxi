@@ -57,9 +57,8 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
 
         /** get dayTaxiRecord from trace files */
-        // QuadTree<Link> qt = CreateQuadTree.of(network, db);
-        FastLinkLookup qt = new FastLinkLookup(network, db);
-        DayTaxiRecord dayTaxiRecord = ReadTraceFiles.in(qt, traceFiles, db);
+        FastLinkLookup fll = new FastLinkLookup(network, db);
+        DayTaxiRecord dayTaxiRecord = ReadTraceFiles.in(fll, traceFiles, db);
 
         /** create scenario */
         HashMap<LocalDate, File> scenarioDirs = new HashMap<>();
@@ -83,19 +82,17 @@ import ch.ethz.idsc.tensor.qty.Quantity;
                 sfc.run(localDate);
 
                 /** copy scenario to new location */
-                String destinDirDayStr = destinDir + "/" + localDate.toString();
-                File destinDirDay = new File(destinDirDayStr);
-                if (!destinDirDay.isDirectory())
-                    destinDirDay.mkdirs();
+                File destinDirDay = new File(destinDir, localDate.toString());
+                destinDirDay.mkdirs();
                 scenarioDirs.put(localDate, destinDirDay);
                 try {
                     ScenarioAssemblerSF.copyFinishedScenario(processingDir.getAbsolutePath(), destinDirDay);
-                } catch (Exception ex) {
-                    System.err.println("failed to copy scenario for " + localDate);
+                } catch (Exception e) {
+                    System.err.println("Failed to copy scenario for " + localDate);
                 }
-            } catch (Exception ex) {
-                System.err.println("could not create scenario for localDate " + localDate);
-                ex.printStackTrace();
+            } catch (Exception e) {
+                System.err.println("Failed to create scenario for localDate " + localDate);
+                e.printStackTrace();
             }
         }
 

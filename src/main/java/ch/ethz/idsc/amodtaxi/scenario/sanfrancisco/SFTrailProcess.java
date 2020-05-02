@@ -10,6 +10,7 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 /* package */ enum SFTrailProcess {
     ;
 
+    // TODO can this be removed as it seems to be applied afterwards in TaxiTrailSF?
     // public final RequestInserter requestInserter;
     //
     // public SFTrailProcess(AmodeusTimeConvert timeConvert, MatsimAmodeusDatabase db, QuadTree<Link> qt, //
@@ -23,16 +24,14 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
     // basicRoboTaxiRequestProcess(timeTaxiStamps);
     // }
 
-    /** based on the @param timeTaxiStamps fill the {@link RoboTaxiStatus} in the TaxiStamps:DRIVINGWITHCUSTOMER if
+    /** based on the
+     * @param timeTaxiStamps fill the {@link RoboTaxiStatus} in the TaxiStamps: DRIVINGWITHCUSTOMER if
      * somebody on board, STAY otherwise** */
     public static void basicRoboTaxiStatusProcess(NavigableMap<LocalDateTime, TaxiStamp> timeTaxiStamps) {
-        for (TaxiStamp taxiStamp : timeTaxiStamps.values()) {
-            if (taxiStamp.occupied == true) {
-                taxiStamp.roboTaxiStatus = RoboTaxiStatus.DRIVEWITHCUSTOMER;
-            } else {
-                taxiStamp.roboTaxiStatus = RoboTaxiStatus.STAY;
-            }
-        }
+        for (TaxiStamp taxiStamp : timeTaxiStamps.values())
+            taxiStamp.roboTaxiStatus = taxiStamp.occupied //
+                    ? RoboTaxiStatus.DRIVEWITHCUSTOMER //
+                    : RoboTaxiStatus.STAY;
     }
 
     // private void basicRoboTaxiRequestProcess(NavigableMap<LocalDateTime, TaxiStamp> timeTaxiStamps)//
