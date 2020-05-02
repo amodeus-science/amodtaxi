@@ -56,7 +56,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         boolean debug = false;
 
         /** download of open street map data to create scenario */
-        System.out.println("Downloading open stret map data, this may take a while...");
+        System.out.println("Downloading open street map data, this may take a while...");
         File osmFile = new File(workingDir, ScenarioLabels.osmData);
         OsmLoader osmLoader = OsmLoader.of(new File(workingDir, ScenarioLabels.amodeusFile));
         osmLoader.saveIfNotAlreadyExists(osmFile);
