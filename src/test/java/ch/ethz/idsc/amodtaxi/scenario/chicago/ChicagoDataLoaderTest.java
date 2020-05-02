@@ -35,7 +35,7 @@ public class ChicagoDataLoaderTest {
         /* Check ChicagoDataLoader */
         File tripFile = ChicagoDataLoader.from(smallProp, settingsDir);
         Assert.assertTrue(tripFile.exists());
-        
+
         /* Clean up */
         Assert.assertTrue(tripFile.delete());
         Assert.assertTrue(smallPropFile.delete());

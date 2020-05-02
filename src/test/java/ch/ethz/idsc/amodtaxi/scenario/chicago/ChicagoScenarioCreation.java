@@ -4,10 +4,13 @@ package ch.ethz.idsc.amodtaxi.scenario.chicago;
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.Test;
+
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 
 /* package */ class ChicagoScenarioCreation {
 
+    @Test
     public void test() throws IOException, Exception {
         File workingDir = MultiFileTools.getDefaultWorkingDirectory();
         StaticHelper.setupTest(workingDir);
