@@ -15,7 +15,7 @@ import ch.ethz.idsc.tensor.io.HomeDirectory;
     public static void main(String[] args) {
 
         // File processingDir = new File("/home/clruch/data/TaxiComparison_SFScenario");
-        // Network network = InitialNetworkPreparerSF.run(processingDir);
+        // Network network = ScenarioBasicNetworkPreparer.run(processingDir);
 
         Network network = NetworkLoader.fromNetworkFile(HomeDirectory.file("data/TaxiComparison_SFScenario/network.xml"));
 

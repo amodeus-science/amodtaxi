@@ -5,13 +5,13 @@ import java.io.File;
 import java.time.ZoneId;
 import java.util.List;
 
+import ch.ethz.idsc.amodtaxi.scenario.ScenarioBasicNetworkPreparer;
 import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.io.MultiFileReader;
-import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.InitialNetworkPreparerSF;
 import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.SanFranciscoGeoInformation;
 import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.SanFranciscoReferenceFrames;
 import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.TraceFileChoice;
@@ -58,7 +58,7 @@ import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.TraceFileChoice;
         // true);
 
         /** remove all links except car from network */
-        Network network = InitialNetworkPreparerSF.run(dataDir);
+        Network network = ScenarioBasicNetworkPreparer.run(dataDir);
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
 
         runStaticAnalysis(processingDir, traceFiles, network, db);

@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import ch.ethz.idsc.amodtaxi.scenario.ScenarioBasicNetworkPreparer;
 import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
@@ -53,7 +54,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         // TraceFileChoice.getOrDefault(new File(dataDir, "cabspottingdata"), "new_").specified("equioc", "onvahe", "epkiapme", "ippfeip");
 
         /** remove all links except car from network */
-        Network network = InitialNetworkPreparerSF.run(processingDir);
+        Network network = ScenarioBasicNetworkPreparer.run(processingDir);
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
 
         /** get dayTaxiRecord from trace files */
