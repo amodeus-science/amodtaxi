@@ -11,31 +11,24 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
 
+import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
 public enum ChicagoDataLoader {
     ;
-
-    public static File from(File properties, File dir, int entryLimit) throws Exception {
-        GlobalAssert.that(properties.isFile());
-        Properties props = new Properties();
-        props.load(new FileInputStream(properties));
-        return from(props, dir, entryLimit);
-    }
-
-    public static File from(File properties, File dir) throws Exception {
-        GlobalAssert.that(properties.isFile());
-        Properties props = new Properties();
-        props.load(new FileInputStream(properties));
-        return from(props, dir, Integer.valueOf(props.getProperty("maxPopulationSize")));
-    }
-
     public static File from(String propertiesName, File dir) throws Exception {
         GlobalAssert.that(dir.isDirectory());
-        return from(new File(dir, propertiesName), dir);
+        File propertiesFile = new File(dir, propertiesName);
+        GlobalAssert.that(propertiesFile.isFile());
+
+        /* Load properties */
+        Properties properties = new Properties();
+        properties.load(new FileInputStream(propertiesFile));
+
+        return from(properties, dir, Integer.valueOf(properties.getProperty(ScenarioOptionsBase.MAXPOPULATIONSIZEIDENTIFIER)));
     }
 
-    public static File from(Properties properties, File dir, int entryLimit) {
+    private static File from(Properties properties, File dir, int entryLimit) {
         File file = null;
         try {
             URL url = getURL(properties, entryLimit);
