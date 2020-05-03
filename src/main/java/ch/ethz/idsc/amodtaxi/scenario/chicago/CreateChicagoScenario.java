@@ -145,8 +145,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         new IterativeLinkSpeedEstimator(maxIter).compute(processingDir, network, db, finalTrips);
 
         FinishedScenario.copyToDir(processingDir.getAbsolutePath(), //
-                destinDir.getAbsolutePath(),
-                new String[] { //
+                destinDir.getAbsolutePath(), new String[] { //
                         "AmodeusOptions.properties", "network.xml.gz", "population.xml.gz", //
                         "LPOptions.properties", "config_full.xml", //
                         "virtualNetworkChicago", "linkSpeedData" });

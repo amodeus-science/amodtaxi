@@ -6,7 +6,7 @@ import java.io.File;
 import ch.ethz.idsc.amodeus.util.io.Locate;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioSetup;
 
-/* package */ enum ChicagoSetup {
+public enum ChicagoSetup {
     ;
 
     public static void in(File workingDir) throws Exception {
