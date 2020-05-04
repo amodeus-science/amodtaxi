@@ -2,7 +2,6 @@
 package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 
 import java.util.HashMap;
-import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
