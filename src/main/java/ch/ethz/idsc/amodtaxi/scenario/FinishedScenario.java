@@ -12,19 +12,16 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
 public enum FinishedScenario {
     ;
 
-    public static void copyToDir(String processingDir, String destinDir, //
-            String[] fileNames) throws IOException {
+    public static void copyToDir(String processingDir, String destinDir, String[] fileNames) throws IOException {
         System.out.println("Copying scenario from : " + processingDir);
         System.out.println("to :                    " + destinDir);
 
         File destinDirFile = new File(destinDir);
-        if (destinDirFile.exists()) {
+        if (destinDirFile.exists())
             DeleteDirectory.of(destinDirFile, 2, 10);
-        }
         destinDirFile.mkdir();
 
-        {// files from processing directory
-
+        { // files from processing directory
             for (String fileName : fileNames) {
                 Path source = Paths.get(processingDir, fileName);
                 Path target = Paths.get(destinDir, fileName);
