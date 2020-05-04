@@ -5,6 +5,7 @@ import java.io.File;
 import java.time.LocalDate;
 import java.util.Collection;
 
+import ch.ethz.idsc.amodtaxi.scenario.Consistency;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;

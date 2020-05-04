@@ -13,6 +13,7 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioBasicNetworkPreparer;
+import ch.ethz.idsc.amodtaxi.trace.ReadTraceFiles;
 import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
@@ -30,11 +31,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
 /* package */ class CreateSanFranciscoScenario {
-
-    private static final Collection<LocalDate> dates = DateSelectSF.specific(06, 04);
+    private static final Collection<LocalDate> dates = DateSelectSF.specific(6, 4);
     private static final int numTraceFiles = 536;// maximum taxis are: 536;
     private static final AmodeusTimeConvert timeConvert = new AmodeusTimeConvert(ZoneId.of("America/Los_Angeles"));
-    private static final ReferenceFrame referenceFrame = SanFranciscoReferenceFrames.SANFRANCISCO;
     private static final Scalar timeStep = Quantity.of(10, "s");
 
     public static void main(String[] args) throws Exception {
@@ -73,7 +72,8 @@ import org.matsim.core.config.ConfigUtils;
         FastLinkLookup fll = new FastLinkLookup(network, db);
 
         /** get dayTaxiRecord from trace files */
-        DayTaxiRecord dayTaxiRecord = ReadTraceFiles.in(fll, traceFiles, db);
+        CsvFleetReaderSF reader = new CsvFleetReaderSF(new DayTaxiRecordSF(db, fll));
+        DayTaxiRecord dayTaxiRecord = ReadTraceFiles.in(traceFiles, reader);
 
         /** create scenario */
         HashMap<LocalDate, File> scenarioDirs = new HashMap<>();

@@ -13,15 +13,14 @@ import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
 import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
 
 /* package */ class DayTaxiRecordSF implements DayTaxiRecord {
-
-    protected final List<TaxiTrail> trails = new ArrayList<>();
+    private final List<TaxiTrail> trails = new ArrayList<>();
     private final IdIntegerDatabase vehicleIdIntegerDatabase = new IdIntegerDatabase();
     private final MatsimAmodeusDatabase db;
     private final FastLinkLookup fastLinkLookup;
 
-    public DayTaxiRecordSF(MatsimAmodeusDatabase db, FastLinkLookup qt) {
+    public DayTaxiRecordSF(MatsimAmodeusDatabase db, FastLinkLookup fastLinkLookup) {
         this.db = db;
-        this.fastLinkLookup = qt;
+        this.fastLinkLookup = fastLinkLookup;
     }
 
     @Override

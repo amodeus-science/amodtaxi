@@ -7,7 +7,9 @@ import java.util.Collections;
 
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import ch.ethz.idsc.amodtaxi.trace.CsvFleetReaderInterface;
 import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
+import ch.ethz.idsc.amodtaxi.trace.ReadTraceFiles;
 import ch.ethz.idsc.amodtaxi.tripmodif.NullModifier;
 import ch.ethz.idsc.amodtaxi.tripmodif.TaxiDataModifier;
 import org.apache.commons.io.FileUtils;
@@ -47,6 +49,10 @@ public class TaxiTripsSuppliers {
                 }
             }
         };
+    }
+
+    public static TaxiTripsSupplier fromTraceFiles(Collection<File> trcFls, CsvFleetReaderInterface reader, LocalDate localDate) throws Exception {
+        return fromDayTaxiRecord(ReadTraceFiles.in(trcFls, reader), localDate);
     }
 
     public static TaxiTripsSupplier fromDayTaxiRecord(DayTaxiRecord dayTaxiRecord, LocalDate localDate) {

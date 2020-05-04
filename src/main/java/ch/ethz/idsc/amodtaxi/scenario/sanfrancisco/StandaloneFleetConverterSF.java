@@ -31,13 +31,12 @@ import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
 import ch.ethz.idsc.tensor.Scalar;
 
 /* package */ class StandaloneFleetConverterSF {
-
     private final File workingDirectory;
     private final MatsimAmodeusDatabase db;
     private final Network network;
     private final File configFile;
     private final Config configFull;
-    private final int maxIter = 100000; // 10'000 need 1 hour
+    private final int maxIter = 100; // 10'000 need 1 hour // TODO make customizable
     private DayTaxiRecord dayTaxiRecord;
     private ScenarioOptions simOptions;
     private final TaxiTripFilterCollection speedEstimationTripFilter;
@@ -70,7 +69,6 @@ import ch.ethz.idsc.tensor.Scalar;
     }
 
     public void run(LocalDate simulationDate) throws Exception {
-
         /** STEP 0: Prepare Environment and load all configuration files */
         outputDirectory = StaticHelper.prepareFolder(workingDirectory, new File(workingDirectory, configFull.controler().getOutputDirectory()));
 
