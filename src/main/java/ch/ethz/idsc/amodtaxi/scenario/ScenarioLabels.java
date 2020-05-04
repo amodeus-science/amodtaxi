@@ -12,4 +12,7 @@ public enum ScenarioLabels {
     public static String osmData = "map.osm";
     public static String network = "network.xml";
     public static String networkGz = network + ".gz";
+    public static String population = "population.xml";
+    public static String populationGz = population + ".gz";
+    public static String linkSpeedData = "linkSpeedData";
 }

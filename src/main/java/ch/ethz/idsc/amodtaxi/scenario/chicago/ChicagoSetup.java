@@ -14,7 +14,5 @@ public enum ChicagoSetup {
         File resourcesDir = new File(Locate.repoFolder(CreateChicagoScenario.class, "amodtaxi"), //
                 "resources/chicagoScenario");
         ScenarioSetup.in(workingDir, resourcesDir);
-
     }
-
 }

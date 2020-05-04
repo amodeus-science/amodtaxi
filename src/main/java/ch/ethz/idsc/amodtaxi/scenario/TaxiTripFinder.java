@@ -11,17 +11,14 @@ import java.util.NavigableMap;
 import ch.ethz.idsc.amodeus.net.TensorCoords;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
-import ch.ethz.idsc.tensor.Scalar;
 
 public enum TaxiTripFinder {
     ;
 
-    /** @return {@link Collection} with all {@link TaxiTrip}s found in the @param timeTaxiStamps
-     *         containing the recorded steps for taxi with @param taxiId
-     * 
-     * @throws Exception */
-    public static Collection<TaxiTrip> in(NavigableMap<LocalDateTime, TaxiStamp> timeTaxiStamps, //
-            String taxiId) throws Exception {
+    /** @return {@link Collection} with all {@link TaxiTrip}s found in the
+     * @param timeTaxiStamps containing the recorded steps for taxi with
+     * @param taxiId */
+    public static Collection<TaxiTrip> in(NavigableMap<LocalDateTime, TaxiStamp> timeTaxiStamps, String taxiId) {
         List<TaxiTrip> taxiTrips = new ArrayList<>();
         int requestIndex = 0;
         boolean occLast = false;
@@ -34,12 +31,11 @@ public enum TaxiTripFinder {
             if ((occLast && !occNow) || //
                     (entry.getKey().equals(timeTaxiStamps.lastKey()) && occNow)) { /** driving ended */
                 stampEnd = entry.getValue();
-                Scalar distance = null;
                 LocalDateTime pickupDateTime = stampStart.globalTime;
                 LocalDateTime dropOffDateTime = stampEnd.globalTime;
 
                 TaxiTrip taxiTrip = TaxiTrip.of(Integer.toString(requestIndex), taxiId, //
-                        TensorCoords.toTensor(stampStart.gps), TensorCoords.toTensor(stampEnd.gps), distance, //
+                        TensorCoords.toTensor(stampStart.gps), TensorCoords.toTensor(stampEnd.gps), null, //
                         null, pickupDateTime, dropOffDateTime);
                 taxiTrips.add(taxiTrip);
                 ++requestIndex;

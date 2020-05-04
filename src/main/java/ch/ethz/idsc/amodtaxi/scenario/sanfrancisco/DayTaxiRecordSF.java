@@ -4,8 +4,6 @@ package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NavigableSet;
-import java.util.TreeSet;
 
 import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import ch.ethz.idsc.amodeus.net.IdIntegerDatabase;
@@ -15,23 +13,21 @@ import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
 import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
 
 /* package */ class DayTaxiRecordSF implements DayTaxiRecord {
-
-    protected final List<TaxiTrail> trails = new ArrayList<>();
+    private final List<TaxiTrail> trails = new ArrayList<>();
     private final IdIntegerDatabase vehicleIdIntegerDatabase = new IdIntegerDatabase();
     private final MatsimAmodeusDatabase db;
-    private final FastLinkLookup qt;
+    private final FastLinkLookup fastLinkLookup;
 
-    public DayTaxiRecordSF(MatsimAmodeusDatabase db, FastLinkLookup qt) {
+    public DayTaxiRecordSF(MatsimAmodeusDatabase db, FastLinkLookup fastLinkLookup) {
         this.db = db;
-        this.qt = qt;
+        this.fastLinkLookup = fastLinkLookup;
     }
 
     @Override
     public void insert(List<String> list, int taxiStampID, String id) {
-
         final int taxiStamp_id = vehicleIdIntegerDatabase.getId(Integer.toString(taxiStampID));
         if (taxiStamp_id == trails.size()) {
-            trails.add(new TaxiTrailSF(id, db, qt));
+            trails.add(new TaxiTrailSF(id, db, fastLinkLookup));
             System.out.println("Trails: " + trails.size());
         }
         trails.get(taxiStamp_id).insert(list);
@@ -46,7 +42,7 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
 
             // GlobalAssert.that(taxiTrail instanceof TaxiTrailSF);
             // TaxiTrailSF taxiTrailSF = (TaxiTrailSF) taxiTrail;
-            // int requestIndexUsed = taxiTrailSF.setRequestContainers(requestIndex, db, qt);
+            // int requestIndexUsed = taxiTrailSF.setRequestContainers(requestIndex, db, fastLinkLookup);
             // requestIndex = requestIndexUsed + 1;
             // GlobalAssert.that(requestIndex >= 0);
         }
@@ -67,12 +63,7 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
 
     @Override
     public LocalDateTime getMaxTime() {
-        NavigableSet<LocalDateTime> times = new TreeSet<>();
-        for (TaxiTrail tt : trails) {
-            times.add(tt.getMaxTime());
-        }
-        return times.last();
-
+        return trails.stream().map(TaxiTrail::getMaxTime).max(LocalDateTime::compareTo).get();
     }
 
     @Override
@@ -83,12 +74,10 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
     @Override
     public List<TaxiTrail> getTrails() {
         return trails;
-
     }
 
     @Override
     public TaxiTrail get(int vehicleIndex) {
         return trails.get(vehicleIndex);
     }
-
 }

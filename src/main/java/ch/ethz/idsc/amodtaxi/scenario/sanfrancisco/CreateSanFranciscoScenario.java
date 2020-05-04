@@ -4,20 +4,22 @@ package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
+import ch.ethz.idsc.amodeus.options.ScenarioOptions;
+import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
+import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import ch.ethz.idsc.amodtaxi.scenario.ScenarioBasicNetworkPreparer;
+import ch.ethz.idsc.amodtaxi.trace.ReadTraceFiles;
 import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
-import ch.ethz.idsc.amodeus.util.io.CopyFiles;
-import ch.ethz.idsc.amodeus.util.io.Locate;
-import ch.ethz.idsc.amodeus.util.io.MultiFileReader;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodtaxi.osm.StaticMapCreator;
 import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
@@ -25,13 +27,13 @@ import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
 import ch.ethz.idsc.amodtaxi.tripfilter.TripNetworkFilter;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.qty.Quantity;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 
 /* package */ class CreateSanFranciscoScenario {
-
-    private static final Collection<LocalDate> dates = DateSelectSF.specific(06, 04);
+    private static final Collection<LocalDate> dates = DateSelectSF.specific(6, 4);
     private static final int numTraceFiles = 536;// maximum taxis are: 536;
     private static final AmodeusTimeConvert timeConvert = new AmodeusTimeConvert(ZoneId.of("America/Los_Angeles"));
-    private static final ReferenceFrame referenceFrame = SanFranciscoReferenceFrames.SANFRANCISCO;
     private static final Scalar timeStep = Quantity.of(10, "s");
 
     public static void main(String[] args) throws Exception {
@@ -42,36 +44,36 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         run(dataDir, processingDir, destinDir);
     }
 
+    // TODO clean-up
+    // TODO make naming consistent with Chicago
     public static void run(File dataDir, File processingDir, File destinDir) throws Exception {
-        SanFranciscoGeoInformation.setup();
+        SanFranciscoSetup.in(processingDir);
+
+        /** download of open street map data to create scenario */
+        StaticMapCreator.now(processingDir);
 
         /** copy taxi trace files */
         System.out.println("dataDir: " + dataDir.getAbsolutePath());
-        List<File> taxiFiles = new MultiFileReader(new File(dataDir, "cabspottingdata"), "new_").getFolderFiles();
-        List<File> traceFiles = (new TraceFileChoice(taxiFiles)).random(numTraceFiles);
-        // List<File> traceFiles = (new
-        // TraceFileChoice(taxiFiles)).specified("equioc", "onvahe", "epkiapme",
-        // "ippfeip");
+        List<File> traceFiles = TraceFileChoice.getOrDefault(new File(dataDir, "cabspottingdata"), "new_").random(numTraceFiles);
+        // List<File> traceFiles = //
+        // TraceFileChoice.getOrDefault(new File(dataDir, "cabspottingdata"), "new_").specified("equioc", "onvahe", "epkiapme", "ippfeip");
 
-        /** copy other scenario files */
-        File settingsDir = new File(Locate.repoFolder(CreateSanFranciscoScenario.class, "amodtaxi"), "resources/sanFranciscoScenario");
-        CopyFiles.now(settingsDir.getAbsolutePath(), processingDir.getAbsolutePath(), //
-                Arrays.asList(new String[] { "AmodeusOptions.properties", "LPOptions.properties", "config_full.xml", //
-                        "config_fullPublish.xml", "pt2matsim_settings.xml" }),
-                true);
+        /** prepare the network */
+        ScenarioBasicNetworkPreparer.run(processingDir);
 
-        /** download of open street map data to create scenario map using
-         * pt2matsim */
-        StaticMapCreator.now(processingDir, ScenarioLabels.osmData, ScenarioLabels.amodeusFile, ScenarioLabels.pt2MatSettings);
-
-        /** remove all links except car from network */
-        Network network = InitialNetworkPreparerSF.run(processingDir);
-        MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
+        /** based on the taxi data, create a population and assemble a AMoDeus scenario */
+        ScenarioOptions scenarioOptions = new ScenarioOptions(processingDir, ScenarioOptionsBase.getDefault());
+        File configFile = new File(scenarioOptions.getPreparerConfigName());
+        System.out.println(configFile.getAbsolutePath());
+        GlobalAssert.that(configFile.exists());
+        Config configFull = ConfigUtils.loadConfig(configFile.toString());
+        final Network network = NetworkLoader.fromNetworkFile(new File(processingDir, configFull.network().getInputFile()));
+        MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, scenarioOptions.getLocationSpec().referenceFrame());
+        FastLinkLookup fll = new FastLinkLookup(network, db);
 
         /** get dayTaxiRecord from trace files */
-        // QuadTree<Link> qt = CreateQuadTree.of(network, db);
-        FastLinkLookup qt = new FastLinkLookup(network, db);
-        DayTaxiRecord dayTaxiRecord = ReadTraceFiles.in(qt, traceFiles, db);
+        CsvFleetReaderSF reader = new CsvFleetReaderSF(new DayTaxiRecordSF(db, fll));
+        DayTaxiRecord dayTaxiRecord = ReadTraceFiles.in(traceFiles, reader);
 
         /** create scenario */
         HashMap<LocalDate, File> scenarioDirs = new HashMap<>();
@@ -95,19 +97,17 @@ import ch.ethz.idsc.tensor.qty.Quantity;
                 sfc.run(localDate);
 
                 /** copy scenario to new location */
-                String destinDirDayStr = destinDir + "/" + localDate.toString();
-                File destinDirDay = new File(destinDirDayStr);
-                if (!destinDirDay.isDirectory())
-                    destinDirDay.mkdirs();
+                File destinDirDay = new File(destinDir, localDate.toString());
+                destinDirDay.mkdirs();
                 scenarioDirs.put(localDate, destinDirDay);
                 try {
                     ScenarioAssemblerSF.copyFinishedScenario(processingDir.getAbsolutePath(), destinDirDay);
-                } catch (Exception ex) {
-                    System.err.println("failed to copy scenario for " + localDate);
+                } catch (Exception e) {
+                    System.err.println("Failed to copy scenario for " + localDate);
                 }
-            } catch (Exception ex) {
-                System.err.println("could not create scenario for localDate " + localDate);
-                ex.printStackTrace();
+            } catch (Exception e) {
+                System.err.println("Failed to create scenario for localDate " + localDate);
+                e.printStackTrace();
             }
         }
 

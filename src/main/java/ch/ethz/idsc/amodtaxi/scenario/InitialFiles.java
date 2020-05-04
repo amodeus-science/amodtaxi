@@ -16,7 +16,6 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
     ;
 
     public static void copyToDir(File procDir, File dataDir) throws Exception {
-
         System.out.println("Copying data files from : " + dataDir);
         System.out.println("to:                       " + procDir);
 
@@ -38,7 +37,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
                 StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES };
 
         String[] fileNames = new String[] { //
-                "AmodeusOptions.properties", "av.xml", "config_full.xml", "network.xml", "network.xml.gz" };
+                ScenarioLabels.amodeusFile, ScenarioLabels.avFile, ScenarioLabels.LPFile, ScenarioLabels.config, ScenarioLabels.network, ScenarioLabels.networkGz };
 
         for (String fileName : fileNames) {
             File sourceFile = new File(dataDir, fileName);

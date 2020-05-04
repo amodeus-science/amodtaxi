@@ -9,7 +9,6 @@ import java.util.List;
  * 
  * @author clruch */
 public interface DayTaxiRecord {
-
     /** part 1: filling with data */
     /** @param list timestamp in data */
     void insert(List<String> list, int taxiNumber, String id);

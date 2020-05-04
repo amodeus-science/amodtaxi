@@ -1,7 +1,6 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
-package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
+package ch.ethz.idsc.amodtaxi.scenario;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -15,40 +14,28 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
 
-/* package */ enum Consistency {
+public enum Consistency {
     ;
 
     public static void checkTrail(List<TaxiTrail> trails) {
         /** are all values recorded properly */
-        for (TaxiTrail taxiTrailSF : trails) {
-            for (TaxiStamp taxiStamp : taxiTrailSF.getTaxiStamps().values()) {
+        for (TaxiTrail taxiTrail : trails)
+            for (TaxiStamp taxiStamp : taxiTrail.getTaxiStamps().values()) {
                 GlobalAssert.that(Objects.nonNull(taxiStamp.roboTaxiStatus));
                 GlobalAssert.that(Objects.nonNull(taxiStamp.gps));
+                // if (taxiStamp.roboTaxiStatus == RoboTaxiStatus.DRIVEWITHCUSTOMER)
+                //     GlobalAssert.that(taxiStamp.requestStatus == RequestStatus.DRIVING); // deprecated
             }
-        }
-
-        /** any step with RoboTaxiStauts==DWC must have a requeststatus driving */
-        for (TaxiTrail taxiTrail : trails) {
-            for (@SuppressWarnings("unused")
-            LocalDateTime time : taxiTrail.getTaxiStamps().keySet()) {
-                // TODO
-                // ---
-            }
-        }
     }
 
     public static void check(Population population) {
         /** leg departure times */
-        for (Person person : population.getPersons().values()) {
-            for (Plan plan : person.getPlans()) {
-                for (PlanElement pElem : plan.getPlanElements()) {
+        for (Person person : population.getPersons().values())
+            for (Plan plan : person.getPlans())
+                for (PlanElement pElem : plan.getPlanElements())
                     if (pElem instanceof Leg) {
                         Leg leg = (Leg) pElem;
                         GlobalAssert.that(leg.getDepartureTime().seconds() >= 0);
                     }
-                }
-            }
-        }
     }
-
 }

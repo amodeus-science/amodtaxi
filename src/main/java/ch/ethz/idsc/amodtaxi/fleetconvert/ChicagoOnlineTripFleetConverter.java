@@ -1,8 +1,10 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.fleetconvert;
 
+import java.io.File;
 import java.util.Random;
 
+import ch.ethz.idsc.amodtaxi.scenario.TaxiTripsSuppliers;
 import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
@@ -20,8 +22,8 @@ public class ChicagoOnlineTripFleetConverter extends TripFleetConverter {
 
     public ChicagoOnlineTripFleetConverter(ScenarioOptions scenarioOptions, Network network, //
             TaxiDataModifier modifier, TaxiDataModifier generalModifier, TaxiTripFilterCollection finalFilters, //
-            TaxiTripsReader tripsReader) {
-        super(scenarioOptions, network, modifier, generalModifier, finalFilters, tripsReader);
+            TaxiTripsReader tripsReader, File tripFile, File targetDirectory) {
+        super(scenarioOptions, network, modifier, finalFilters, TaxiTripsSuppliers.fromReader(tripFile, targetDirectory, tripsReader, generalModifier), targetDirectory);
     }
 
     @Override

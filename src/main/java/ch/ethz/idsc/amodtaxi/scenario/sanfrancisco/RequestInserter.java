@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Coord;
 
@@ -18,7 +20,6 @@ import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.RequestContainer;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
-import ch.ethz.idsc.amodeus.util.LocalDateTimes;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 
@@ -41,12 +42,8 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 
     /** Function computes all required {@link RequestContainer}s from the inserted
      * map @param timeTaxiStamps. Every request belongs to the date of its submission, even
-     * if its arrival is on the next day!
-     * 
-     * @throws Exception */
-    public void insert( //
-            NavigableMap<LocalDateTime, TaxiStamp> timeTaxiStamps, //
-            Collection<TaxiTrip> taxiTrips) throws Exception {
+     * if its arrival is on the next day! */
+    public void insert(NavigableMap<LocalDateTime, TaxiStamp> timeTaxiStamps, Collection<TaxiTrip> taxiTrips) {
         // Collection<TaxiTrip> taxiTrips = TaxiTripFinder.in(timeTaxiStamps, taxiId);
         System.err.println("found " + taxiTrips.size() + " taxi trips.");
 
@@ -56,17 +53,9 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
                     StaticHelper.getRequestTimes(taxiTrip.pickupTimeDate, timeTaxiStamps);
 
             /** basic setup of RequestContainer */
-            LocalDateTime submissionTime = reqTimes.get(RequestStatus.REQUESTED);
-            if (Objects.isNull(submissionTime))
-                submissionTime = reqTimes.get(RequestStatus.ASSIGNED);
-            if (Objects.isNull(submissionTime))
-                submissionTime = reqTimes.get(RequestStatus.PICKUPDRIVE);
-            if (Objects.isNull(submissionTime))
-                submissionTime = reqTimes.get(RequestStatus.PICKUP);
-            if (Objects.isNull(submissionTime))
-                submissionTime = reqTimes.get(RequestStatus.DRIVING);
-            LocalDate submissionDay = submissionTime.toLocalDate();
-            Objects.requireNonNull(submissionDay);
+            LocalDateTime submissionTime = Stream.of(RequestStatus.REQUESTED, RequestStatus.ASSIGNED, RequestStatus.PICKUPDRIVE, RequestStatus.PICKUP, RequestStatus.DRIVING) //
+                    .map(reqTimes::get).filter(Objects::nonNull).findFirst().get();
+            LocalDate submissionDay = Objects.requireNonNull(submissionTime.toLocalDate());
 
             /** from link */
             Coord position = db.referenceFrame.coords_fromWGS84().transform(timeTaxiStamps.get(taxiTrip.pickupTimeDate).gps);
@@ -77,22 +66,16 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
             Coord positionEnd = db.referenceFrame.coords_fromWGS84().transform(timeTaxiStamps.get(lastDriveTimeSTep).gps);
             int toLinkIndex = fastLinkLookup.getLinkIndexFromXY(positionEnd);
 
-            RequestContainerFactory requestContainerFactory = new RequestContainerFactory(//
+            RequestContainerFactory requestContainerFactory = new RequestContainerFactory( //
                     taxiTrip.localId, fromLinkIndex, toLinkIndex, //
                     submissionTime, timeConvert);
 
             /** add request containers before driving */
-            Collection<RequestStatus> statii = new ArrayList<>();
-            statii.add(RequestStatus.REQUESTED);
-            statii.add(RequestStatus.ASSIGNED);
-            statii.add(RequestStatus.PICKUPDRIVE);
-            statii.add(RequestStatus.PICKUP);
-            for (RequestStatus status : statii) {
+            for (RequestStatus status : new RequestStatus[]{ RequestStatus.REQUESTED, RequestStatus.ASSIGNED, RequestStatus.PICKUPDRIVE, RequestStatus.PICKUP })
                 if (Objects.nonNull(reqTimes.get(status))) {
                     RequestContainer container = requestContainerFactory.create(status, submissionDay);
                     addContainer(timeTaxiStamps.get(reqTimes.get(status)), container);
                 }
-            }
 
             /** add request containers while driving */
             LocalDateTime time = taxiTrip.pickupTimeDate;
@@ -100,7 +83,7 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
                 RequestContainer container = requestContainerFactory.create(RequestStatus.DRIVING, submissionDay);
                 addContainer(timeTaxiStamps.get(time), container);
                 time = timeTaxiStamps.higherKey(time);
-            } while (Objects.nonNull(time) && LocalDateTimes.lessEquals(time, taxiTrip.dropoffTimeDate));
+            } while (Objects.nonNull(time) && (time.isEqual(taxiTrip.dropoffTimeDate) || time.isBefore(taxiTrip.dropoffTimeDate)));
 
             /** add request containers after driving */
             RequestContainer container = requestContainerFactory.create(RequestStatus.DROPOFF, submissionDay);
@@ -111,33 +94,24 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
          * saved in a {@link SimulationObject}, therefore if the below condition is
          * not met there must be a problem in the computation. */
         GlobalAssert.that(reqContainers.size() >= taxiTrips.size());
-
     }
 
     private void addContainer(TaxiStamp stamp, RequestContainer container) {
-        if (reqContainers.containsKey(stamp)) {
-            reqContainers.get(stamp).add(container);
-        } else {
-            reqContainers.put(stamp, new ArrayList<>());
-            reqContainers.get(stamp).add(container);
-        }
+        reqContainers.computeIfAbsent(stamp, s -> new ArrayList<>()).add(container);
     }
 
     public Collection<RequestContainer> getReqContainerCopy(TaxiStamp taxiStamp) {
-        if (!reqContainers.containsKey(taxiStamp)) {
-            return null;
-        }
-        Collection<RequestContainer> reqContainer = reqContainers.get(taxiStamp);
-        Collection<RequestContainer> colCopy = new ArrayList<>();
-        for (RequestContainer rc : reqContainer) {
-            RequestContainer copy = new RequestContainer();
-            copy.fromLinkIndex = rc.fromLinkIndex;
-            copy.toLinkIndex = rc.toLinkIndex;
-            copy.submissionTime = rc.submissionTime;
-            copy.requestIndex = rc.requestIndex;
-            copy.requestStatus = rc.requestStatus;
-            colCopy.add(copy);
-        }
-        return colCopy;
+        Collection<RequestContainer> reqContainer = reqContainers.getOrDefault(taxiStamp, new ArrayList<>());
+        return reqContainer.stream().map(RequestInserter::copy).collect(Collectors.toList());
+    }
+
+    private static RequestContainer copy(RequestContainer requestContainer) {
+        RequestContainer copy = new RequestContainer();
+        copy.fromLinkIndex = requestContainer.fromLinkIndex;
+        copy.toLinkIndex = requestContainer.toLinkIndex;
+        copy.submissionTime = requestContainer.submissionTime;
+        copy.requestIndex = requestContainer.requestIndex;
+        copy.requestStatus = requestContainer.requestStatus;
+        return copy;
     }
 }

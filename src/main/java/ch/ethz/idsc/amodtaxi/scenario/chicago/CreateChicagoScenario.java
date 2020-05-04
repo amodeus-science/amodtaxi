@@ -9,10 +9,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
+import ch.ethz.idsc.amodtaxi.fleetconvert.TripFleetConverter;
+import ch.ethz.idsc.amodtaxi.osm.StaticMapCreator;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.pt2matsim.run.Osm2MultimodalNetwork;
 
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
 import ch.ethz.idsc.amodeus.net.FastLinkLookup;
@@ -26,9 +27,7 @@ import ch.ethz.idsc.amodeus.util.io.CopyFiles;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodtaxi.fleetconvert.ChicagoOnlineTripFleetConverter;
-import ch.ethz.idsc.amodtaxi.fleetconvert.TripFleetConverter;
 import ch.ethz.idsc.amodtaxi.linkspeed.iterative.IterativeLinkSpeedEstimator;
-import ch.ethz.idsc.amodtaxi.osm.OsmLoader;
 import ch.ethz.idsc.amodtaxi.scenario.FinishedScenario;
 import ch.ethz.idsc.amodtaxi.scenario.Scenario;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioBasicNetworkPreparer;
@@ -49,20 +48,14 @@ import ch.ethz.idsc.tensor.qty.Quantity;
     private static final Random RANDOM = new Random(123);
 
     private static void createScenario(File workingDir) throws Exception {
-
         ChicagoSetup.in(workingDir);
 
         // FIXME remove debug loop once done
         boolean debug = false;
 
         /** download of open street map data to create scenario */
-        System.out.println("Downloading open street map data, this may take a while...");
-        File osmFile = new File(workingDir, ScenarioLabels.osmData);
-        OsmLoader osmLoader = OsmLoader.of(new File(workingDir, ScenarioLabels.amodeusFile));
-        osmLoader.saveIfNotAlreadyExists(osmFile);
-        /** generate a network using pt2Matsim */
-        if (!debug)
-            Osm2MultimodalNetwork.run(workingDir.getAbsolutePath() + "/" + ScenarioLabels.pt2MatSettings);
+        StaticMapCreator.now(workingDir);
+
         /** prepare the network */
         ScenarioBasicNetworkPreparer.run(workingDir);
 
@@ -81,8 +74,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
             processingDir.mkdir();
 
         CopyFiles.now(workingDir.getAbsolutePath(), processingDir.getAbsolutePath(), //
-                Arrays.asList(new String[] { "AmodeusOptions.properties", "config_full.xml", //
-                        "network.xml", "network.xml.gz", "LPOptions.properties" }));
+                Arrays.asList(ScenarioLabels.amodeusFile, ScenarioLabels.config, ScenarioLabels.network, ScenarioLabels.networkGz, ScenarioLabels.LPFile));
         ScenarioOptions scenarioOptions = new ScenarioOptions(processingDir, //
                 ScenarioOptionsBase.getDefault());
         LocalDate simulationDate = LocalDateConvert.ofOptions(scenarioOptions.getString("date"));
@@ -125,9 +117,8 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         { // prepare final scenario
             TripFleetConverter converter = //
                     new ChicagoOnlineTripFleetConverter(scenarioOptions, network, tripModifier, //
-                            new ChicagoFormatModifier(), taxiTripFilterCollection, tripsReader);
-            File finalTripsFile = Scenario.create(workingDir, tripFile, //
-                    converter, workingDir, processingDir, simulationDate, timeConvert);
+                            new ChicagoFormatModifier(), taxiTripFilterCollection, tripsReader, tripFile, new File(processingDir, "tripData"));
+            File finalTripsFile = Scenario.create(workingDir, tripFile, converter, processingDir, simulationDate, timeConvert);
 
             Objects.requireNonNull(finalTripsFile);
 
@@ -145,10 +136,10 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         new IterativeLinkSpeedEstimator(maxIter).compute(processingDir, network, db, finalTrips);
 
         FinishedScenario.copyToDir(processingDir.getAbsolutePath(), //
-                destinDir.getAbsolutePath(), new String[] { //
-                        "AmodeusOptions.properties", "network.xml.gz", "population.xml.gz", //
-                        "LPOptions.properties", "config_full.xml", //
-                        "virtualNetworkChicago", "linkSpeedData" });
+                destinDir.getAbsolutePath(), //
+                new String[] { //
+                        ScenarioLabels.amodeusFile, ScenarioLabels.networkGz, ScenarioLabels.populationGz, //
+                        ScenarioLabels.LPFile, ScenarioLabels.config, "virtualNetworkChicago", ScenarioLabels.linkSpeedData });
         cleanUp(workingDir);
     }
 

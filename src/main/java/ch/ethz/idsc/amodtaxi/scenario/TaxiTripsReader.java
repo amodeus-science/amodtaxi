@@ -91,7 +91,7 @@ public abstract class TaxiTripsReader {
         System.err.println("Number of unreadable rows:  " + unreadable.size());
         System.err.println("Saving unreadable lines to: " + file.getAbsolutePath());
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
-            unreadable.stream().forEach(s -> {
+            unreadable.forEach(s -> {
                 try {
                     bufferedWriter.write(s + "\n");
                 } catch (IOException e) {
