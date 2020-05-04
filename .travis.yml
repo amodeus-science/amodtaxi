@@ -1,0 +1,15 @@
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install swig
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:resources/3rdparty/glpk/lib/jni
+
+language: java
+jdk:
+  - openjdk11
+
+notifications:
+  email: false
+
+script:
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
+  - mvn test -B -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
