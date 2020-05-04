@@ -8,12 +8,12 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.util.Properties;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
 import ch.ethz.idsc.amodeus.util.io.Locate;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
+import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
 public class OsmLoaderTest {
 
@@ -30,7 +30,7 @@ public class OsmLoaderTest {
         /* Reduce boundingbox size in Properties */
         Properties properties = new Properties();
         properties.load(new FileInputStream(new File(resourcesDir, ScenarioLabels.amodeusFile)));
-        properties.setProperty("boundingBox", "{8.54673, 47.37397, 8.55252, 47.37916}"); // test box with area of ETH
+        properties.setProperty("boundingBox", "{8.54773, 47.37697, 8.54952, 47.37916}"); // test box with area of ETH
         FileOutputStream out = new FileOutputStream(amodeusFile);
         properties.store(out, null);
         out.close();
@@ -49,7 +49,7 @@ public class OsmLoaderTest {
         bufferedReader.close();
         fileReader.close();
         Assert.assertTrue(workingDir.exists());
-        FileUtils.deleteDirectory(workingDir);
+        DeleteDirectory.of(workingDir, 2, 14);
         Assert.assertFalse(workingDir.exists());
     }
 }

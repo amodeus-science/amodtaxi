@@ -52,11 +52,6 @@
 			<id>pt2matsim</id>
 			<url>http://dl.bintray.com/polettif/matsim</url>
 		</repository>
-		<repository>
-			<id>osgeo</id>
-			<name>Geotools repository</name>
-			<url>https://repo.osgeo.org/repository/release/</url>
-		</repository>
 	</repositories>
 
 	<build>

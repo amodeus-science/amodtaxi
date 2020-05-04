@@ -3,11 +3,11 @@ package ch.ethz.idsc.amodtaxi.scenario;
 
 import java.io.File;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
 import ch.ethz.idsc.amodeus.util.io.Locate;
+import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
 public class ScenarioSetupTest {
 
@@ -31,7 +31,7 @@ public class ScenarioSetupTest {
 
         /* Clean up */
         Assert.assertTrue(workingDir.exists());
-        FileUtils.deleteDirectory(workingDir);
+        DeleteDirectory.of(workingDir, 2, 14);
         Assert.assertFalse(workingDir.exists());
 
     }
