@@ -19,8 +19,7 @@ public class ChicagoDataLoaderTest {
 
     @Test
     public void test() throws Exception {
-        File settingsDir = //
-                new File(Locate.repoFolder(CreateChicagoScenario.class, "amodtaxi"), "resources/chicagoScenario");
+        File settingsDir = new File(Locate.repoFolder(CreateChicagoScenario.class, "amodtaxi"), "resources/chicagoScenario");
 
         /* Reduce population size in Properties */
         String smallProp = "Manipulated_" + ScenarioLabels.amodeusFile;

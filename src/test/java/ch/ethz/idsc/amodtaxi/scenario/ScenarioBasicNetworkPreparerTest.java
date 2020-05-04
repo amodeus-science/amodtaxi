@@ -26,8 +26,8 @@ public class ScenarioBasicNetworkPreparerTest {
         ScenarioBasicNetworkPreparer.run(workingDir);
 
         /* Check functionality */
-        Assert.assertTrue(new File(workingDir + "/network.xml").exists());
-        Assert.assertTrue(new File(workingDir + "/network.xml.gz").exists());
+        Assert.assertTrue(new File(workingDir, ScenarioLabels.network).exists());
+        Assert.assertTrue(new File(workingDir, ScenarioLabels.networkGz).exists());
 
         /* Clean up */
         Assert.assertTrue(workingDir.exists());

@@ -1,14 +1,19 @@
-/* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
+/* amodtaxi - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.scenario.chicago;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.Random;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -22,6 +27,7 @@ import ch.ethz.idsc.amodeus.taxitrip.ImportTaxiTrips;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.io.CopyFiles;
+import ch.ethz.idsc.amodeus.util.io.Locate;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodtaxi.fleetconvert.ChicagoOnlineTripFleetConverter;
@@ -29,9 +35,11 @@ import ch.ethz.idsc.amodtaxi.fleetconvert.TripFleetConverter;
 import ch.ethz.idsc.amodtaxi.linkspeed.iterative.IterativeLinkSpeedEstimator;
 import ch.ethz.idsc.amodtaxi.osm.StaticMapCreator;
 import ch.ethz.idsc.amodtaxi.scenario.FinishedScenario;
+import ch.ethz.idsc.amodtaxi.scenario.Pt2MatsimXML;
 import ch.ethz.idsc.amodtaxi.scenario.Scenario;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioBasicNetworkPreparer;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
+import ch.ethz.idsc.amodtaxi.scenario.ScenarioSetup;
 import ch.ethz.idsc.amodtaxi.scenario.TaxiTripsReader;
 import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
 import ch.ethz.idsc.amodtaxi.tripfilter.TripNetworkFilter;
@@ -43,12 +51,30 @@ import ch.ethz.idsc.amodtaxi.tripmodif.TripStartTimeShiftResampling;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
-/* package */ class CreateChicagoScenario {
+/** Tests if data for the creation of the Chicago taxi scenario is accessible from the
+ * web API. */
+public class CreateChicagoScenarioTest {
     private static final AmodeusTimeConvert timeConvert = new AmodeusTimeConvert(ZoneId.of("America/Chicago"));
     private static final Random RANDOM = new Random(123);
 
-    private static void createScenario(File workingDir) throws Exception {
-        ChicagoSetup.in(workingDir);
+    @Test
+    public void test() throws Exception {
+        /* Init */
+        File workingDir = new File(Locate.repoFolder(Pt2MatsimXML.class, "amodtaxi"), "test");
+        File resourcesDir = new File(Locate.repoFolder(Pt2MatsimXML.class, "amodtaxi"), "resources/chicagoScenario");
+        Assert.assertTrue(workingDir.exists() || workingDir.mkdir());
+        ChicagoGeoInformation.setup();
+        ScenarioSetup.in(workingDir, resourcesDir);
+
+        /* Reduce population size in Properties */
+        String smallProp = ScenarioLabels.amodeusFile;
+        File smallPropFile = new File(workingDir, smallProp);
+        Properties properties = new Properties();
+        properties.load(new FileInputStream(new File(workingDir, ScenarioLabels.amodeusFile)));
+        properties.setProperty(ScenarioOptionsBase.MAXPOPULATIONSIZEIDENTIFIER, "100");
+        FileOutputStream out = new FileOutputStream(smallPropFile);
+        properties.store(out, null);
+        out.close();
 
         /* Download of open street map data to create scenario */
         StaticMapCreator.now(workingDir);
@@ -127,7 +153,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         /** loading final trips */
         finalTrips = ImportTaxiTrips.fromFile(finalTripsFile);
 
-        final int maxIter = 100000;
+        final int maxIter = 1000;
         new IterativeLinkSpeedEstimator(maxIter).compute(processingDir, network, db, finalTrips);
 
         FinishedScenario.copyToDir(processingDir.getAbsolutePath(), //
@@ -135,27 +161,10 @@ import ch.ethz.idsc.tensor.qty.Quantity;
                 new String[] { //
                         ScenarioLabels.amodeusFile, ScenarioLabels.networkGz, ScenarioLabels.populationGz, //
                         ScenarioLabels.LPFile, ScenarioLabels.config, "virtualNetworkChicago", ScenarioLabels.linkSpeedData });
-        cleanUp(workingDir);
-    }
 
-    static private void cleanUp(File workingDir) {
-        /** delete unneeded files */
-        // DeleteDirectory.of(new File(workingDir, "Scenario"), 2, 14);
-        // DeleteDirectory.of(new File(workingDir, ScenarioLabels.amodeusFile), 0, 1);
-        // DeleteDirectory.of(new File(workingDir, ScenarioLabels.avFile), 0, 1);
-        // DeleteDirectory.of(new File(workingDir, ScenarioLabels.config), 0, 1);
-        // DeleteDirectory.of(new File(workingDir, ScenarioLabels.pt2MatSettings), 0, 1);
-        // DeleteDirectory.of(new File(workingDir, ScenarioLabels.network), 0, 1);
-    }
-
-    /** in @param args[0] working directory (empty directory), this main function will create
-     * an AMoDeus scenario based on the Chicago taxi dataset available online.
-     * Settings can afterwards be changed in the AmodeusOptions.properties file located
-     * in the directory.
-     * 
-     * @throws Exception */
-    public static void main(String[] args) throws Exception {
-        File workingDir = new File(args[0]);
-        createScenario(workingDir);
+        /* Clean up */
+        // Assert.assertTrue(workingDir.exists());
+        // DeleteDirectory.of(workingDir, 2, 14);
+        // Assert.assertFalse(workingDir.exists());
     }
 }

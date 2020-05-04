@@ -14,10 +14,8 @@ public class ScenarioSetupTest {
     @Test
     public void test() throws Exception {
         /* Init */
-        File workingDir = new File(Locate.repoFolder(ScenarioSetup.class, "amodtaxi"), //
-                "test");
-        File resourcesDir = new File(Locate.repoFolder(ScenarioSetup.class, "amodtaxi"), //
-                "resources/chicagoScenario");
+        File workingDir = new File(Locate.repoFolder(ScenarioSetup.class, "amodtaxi"), "test");
+        File resourcesDir = new File(Locate.repoFolder(ScenarioSetup.class, "amodtaxi"), "resources/chicagoScenario");
         Assert.assertTrue(workingDir.exists() || workingDir.mkdir());
 
         /* Run function of interest */
