@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.Coord;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 
-/* package */ enum ZurichLocationSpecs implements LocationSpec {
+public enum ZurichLocationSpecs implements LocationSpec {
     ZURICHTAXI( //
             ZurichReferenceFrames.SWITZERLAND_EPSG, //
             new Coord(2683600.0, 1251400.0)), //

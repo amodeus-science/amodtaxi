@@ -2,9 +2,8 @@
 package ch.ethz.idsc.amodtaxi.scenario;
 
 import java.io.File;
-import java.util.List;
+import java.util.Map;
 
-import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 
@@ -22,20 +21,36 @@ public enum Pt2MatsimXML {
             Element rootNode = doc.getRootElement();
             Element module = rootNode.getChild("module");
 
-            List<Element> children = module.getChildren();
-
-            for (Element element : children) {
-                List<Attribute> theAttributes = element.getAttributes();
-
-                if (theAttributes.get(0).getValue().equals("osmFile")) {
-                    String old = theAttributes.get(1).getValue();
-                    theAttributes.get(1).setValue(systemSpecificPath + "/" + old);
-                    System.out.println(theAttributes.get(1).getValue());
+            for (Element element : module.getChildren()) {
+                String nameValue = element.getAttributeValue("name");
+                String oldValue = element.getAttributeValue("value");
+                if (nameValue == null)
+                    continue;
+                if (nameValue.equals("osmFile")) {
+                    element.setAttribute("value", systemSpecificPath + "/" + oldValue);
                 }
+                if (nameValue.equals("outputNetworkFile")) {
+                    element.setAttribute("value", systemSpecificPath + "/" + oldValue);
+                }
+            }
+        }
+    }
 
-                if (theAttributes.get(0).getValue().equals("outputNetworkFile")) {
-                    String old = theAttributes.get(1).getValue();
-                    theAttributes.get(1).setValue(systemSpecificPath + "/" + old);
+    public static void changeAttributes(File xmlFile, Map<String, String> map) throws Exception {
+
+        System.out.println("xml file " + xmlFile.getAbsolutePath());
+
+        try (XmlCustomModifier xmlModifier = new XmlCustomModifier(xmlFile)) {
+            Document doc = xmlModifier.getDocument();
+            Element rootNode = doc.getRootElement();
+            Element module = rootNode.getChild("module");
+
+            for (Element element : module.getChildren()) {
+                String nameValue = element.getAttributeValue("name");
+                if (nameValue == null)
+                    continue;
+                if (map.containsKey(nameValue)) {
+                    element.setAttribute("value", map.get(nameValue));
                 }
             }
         }
