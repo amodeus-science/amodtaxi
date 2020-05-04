@@ -45,7 +45,7 @@ import org.matsim.core.config.ConfigUtils;
     }
 
     // TODO clean-up
-    // TODO make naming consistent with Chicago
+    // TODO make naming consistent with Chicago!
     public static void run(File dataDir, File processingDir, File destinDir) throws Exception {
         SanFranciscoSetup.in(processingDir);
 
