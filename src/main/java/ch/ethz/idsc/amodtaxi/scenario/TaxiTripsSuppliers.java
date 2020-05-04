@@ -1,31 +1,24 @@
-/* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
-package ch.ethz.idsc.amodtaxi.fleetconvert;
+package ch.ethz.idsc.amodtaxi.scenario;
 
 import java.io.File;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Collections;
 
-import ch.ethz.idsc.amodtaxi.scenario.TaxiTripsSupplier;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.matsim.api.core.v01.network.Network;
-
-import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.idsc.amodtaxi.scenario.TaxiTripsReader;
-import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
+import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
+import ch.ethz.idsc.amodtaxi.tripmodif.NullModifier;
 import ch.ethz.idsc.amodtaxi.tripmodif.TaxiDataModifier;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 
-public abstract class ReaderTripFleetConverter extends TripFleetConverter {
-    public ReaderTripFleetConverter(ScenarioOptions scenarioOptions, Network network, //
-            TaxiDataModifier tripModifier, //
-            TaxiDataModifier generalModifier, TaxiTripFilterCollection finalFilters, //
-            TaxiTripsReader tripsReader, File tripFile, File targetDirectory) {
-        super(scenarioOptions, network, tripModifier, finalFilters, createSupplier(tripFile, targetDirectory, tripsReader, generalModifier), targetDirectory);
+public class TaxiTripsSuppliers {
+    public static TaxiTripsSupplier fromReader(File tripFile, File targetDirectory, TaxiTripsReader tripsReader) {
+        return fromReader(tripFile, targetDirectory, tripsReader, NullModifier.INSTANCE);
     }
 
-    private static TaxiTripsSupplier createSupplier(File tripFile, File targetDirectory, TaxiTripsReader tripsReader, TaxiDataModifier modifier) {
+    public static TaxiTripsSupplier fromReader(File tripFile, File targetDirectory, TaxiTripsReader tripsReader, TaxiDataModifier modifier) {
         return new TaxiTripsSupplier() {
             @Override
             public Collection<TaxiTrip> get() {
@@ -54,5 +47,9 @@ public abstract class ReaderTripFleetConverter extends TripFleetConverter {
                 }
             }
         };
+    }
+
+    public static TaxiTripsSupplier fromDayTaxiRecord(DayTaxiRecord dayTaxiRecord, LocalDate localDate) {
+        return () -> AllTaxiTrips.in(dayTaxiRecord).on(localDate);
     }
 }

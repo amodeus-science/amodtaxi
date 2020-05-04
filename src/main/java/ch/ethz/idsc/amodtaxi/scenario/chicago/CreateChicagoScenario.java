@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
+import ch.ethz.idsc.amodtaxi.fleetconvert.TripFleetConverter;
 import ch.ethz.idsc.amodtaxi.osm.StaticMapCreator;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -26,7 +27,6 @@ import ch.ethz.idsc.amodeus.util.io.CopyFiles;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodtaxi.fleetconvert.ChicagoOnlineTripFleetConverter;
-import ch.ethz.idsc.amodtaxi.fleetconvert.ReaderTripFleetConverter;
 import ch.ethz.idsc.amodtaxi.linkspeed.iterative.IterativeLinkSpeedEstimator;
 import ch.ethz.idsc.amodtaxi.scenario.FinishedScenario;
 import ch.ethz.idsc.amodtaxi.scenario.Scenario;
@@ -115,7 +115,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         File destinDir = new File(workingDir, "CreatedScenario");
         List<TaxiTrip> finalTrips;
         { // prepare final scenario
-            ReaderTripFleetConverter converter = //
+            TripFleetConverter converter = //
                     new ChicagoOnlineTripFleetConverter(scenarioOptions, network, tripModifier, //
                             new ChicagoFormatModifier(), taxiTripFilterCollection, tripsReader, tripFile, new File(processingDir, "tripData"));
             File finalTripsFile = Scenario.create(workingDir, tripFile, converter, processingDir, simulationDate, timeConvert);

@@ -5,7 +5,7 @@ import java.io.File;
 
 import org.apache.commons.io.FileUtils;
 
-/* package */ enum NullModifier implements TaxiDataModifier {
+public enum NullModifier implements TaxiDataModifier {
     INSTANCE;
 
     @Override
