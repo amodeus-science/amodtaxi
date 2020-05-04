@@ -48,7 +48,6 @@ public abstract class TripFleetConverter {
         this.finalFilters = finalFilters;
         this.taxiTripsSupplier = taxiTripsSupplier;
         this.targetDirectory = targetDirectory;
-        this.targetDirectory.mkdirs();
         ReferenceFrame referenceFrame = scenarioOptions.getLocationSpec().referenceFrame();
         this.db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
         this.qt = CreateQuadTree.of(network);
@@ -59,6 +58,8 @@ public abstract class TripFleetConverter {
     }
 
     public void run(File processingDir, NamingConvention convention, LocalDate simulationDate, AmodeusTimeConvert timeConvert) throws Exception {
+        targetDirectory.mkdirs();
+
         Collection<TaxiTrip> allTrips = taxiTripsSupplier.get();
         System.out.println("Before primary filter: " + allTrips.size());
 
@@ -70,7 +71,7 @@ public abstract class TripFleetConverter {
         primaryFilter.printSummary();
 
         File filteredFile = new File(targetDirectory, filteredFileName);
-        ExportTaxiTrips.toFile(primaryFiltered.stream(), filteredFile);
+        ExportTaxiTrips.toFile(primaryFiltered.stream(), filteredFile); // parent directory must exist beforehand
         GlobalAssert.that(filteredFile.isFile());
 
         /** modifying the trip data, e.g., distributing in 15 minute steps. */
@@ -78,9 +79,7 @@ public abstract class TripFleetConverter {
         GlobalAssert.that(modifiedTripsFile.isFile());
 
         /** creating population based on corrected, filtered file */
-        TripPopulationCreator populationCreator = //
-                new TripPopulationCreator(processingDir, config, network, db, //
-                        qt, simulationDate, timeConvert, finalFilters);
+        TripPopulationCreator populationCreator = new TripPopulationCreator(processingDir, config, network, db, qt, simulationDate, timeConvert, finalFilters);
         populationCreator.process(modifiedTripsFile);
         finalTripsFile = populationCreator.getFinalTripFile();
     }

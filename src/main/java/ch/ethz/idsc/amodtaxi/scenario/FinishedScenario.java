@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
 public enum FinishedScenario {
@@ -20,6 +21,7 @@ public enum FinishedScenario {
         if (destinDirFile.exists())
             DeleteDirectory.of(destinDirFile, 2, 10);
         destinDirFile.mkdir();
+        GlobalAssert.that(destinDirFile.isDirectory());
 
         { // files from processing directory
             for (String fileName : fileNames) {

@@ -69,7 +69,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
         File processingDir = new File(workingDir, "Scenario");
         if (processingDir.isDirectory())
-            DeleteDirectory.of(processingDir, 2, 25);
+            DeleteDirectory.of(processingDir, 2, 26);
         if (!processingDir.isDirectory())
             processingDir.mkdir();
 
@@ -132,7 +132,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
             /** loading final trips */
             finalTrips = ImportTaxiTrips.fromFile(finalTripsFile);
         }
-        final int maxIter = 100000;
+        final int maxIter = 100; // TODO make customizable
         new IterativeLinkSpeedEstimator(maxIter).compute(processingDir, network, db, finalTrips);
 
         FinishedScenario.copyToDir(processingDir.getAbsolutePath(), //
