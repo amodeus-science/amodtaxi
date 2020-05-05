@@ -22,13 +22,9 @@ import ch.ethz.idsc.amodtaxi.scenario.FinishedScenario;
 import ch.ethz.idsc.amodtaxi.scenario.Scenario;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioBasicNetworkPreparer;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
-import ch.ethz.idsc.amodtaxi.scenario.TaxiTripsSuppliers;
-import ch.ethz.idsc.amodtaxi.scenario.chicago.ScenarioConstants;
 import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
 import ch.ethz.idsc.amodtaxi.trace.ReadTraceFiles;
 import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
-import ch.ethz.idsc.amodtaxi.tripfilter.TripDurationFilter;
-import ch.ethz.idsc.amodtaxi.tripfilter.TripEndTimeFilter;
 import ch.ethz.idsc.amodtaxi.tripfilter.TripNetworkFilter;
 import ch.ethz.idsc.amodtaxi.tripmodif.NullModifier;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
@@ -89,20 +85,11 @@ public class SanFranciscoScenarioTest {
         TaxiTripFilterCollection tripFilter = new TaxiTripFilterCollection();
         /** trips which are faster than the network freeflow speeds would allow are removed */
         tripFilter.addFilter(new TripNetworkFilter(network, db, //
-                Quantity.of(2.235200008, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m"), true));
+                Quantity.of(2.235200008, SI.VELOCITY), Quantity.of(3600, SI.SECOND), Quantity.of(200, SI.METER), true));
 
         File outputDirectory = new File(DIRECTORY, simulationDate.toString());
-        TripFleetConverter converter = new TripFleetConverter(scenarioOptions, network, NullModifier.INSTANCE,tripFilter, //
-                TaxiTripsSuppliers.fromDayTaxiRecord(dayTaxiRecord, simulationDate), outputDirectory) {
-            @Override
-            public void setFilters() {
-                /** trips outside the range [150[s], 30[h]] are removed */
-                primaryFilter.addFilter(new TripDurationFilter(Quantity.of(150, SI.SECOND), Quantity.of(10800, SI.SECOND)));
-
-                /** trips which end after the maximum end time are rejected */
-                primaryFilter.addFilter(new TripEndTimeFilter(ScenarioConstants.maxEndTime));
-            }
-        };
+        TripFleetConverter converter = new SanFranciscoTripFleetConverter( //
+                scenarioOptions, network, dayTaxiRecord, simulationDate, NullModifier.INSTANCE, tripFilter, outputDirectory);
         File finalTripsFile = Scenario.create(DIRECTORY, converter, processingDir, simulationDate, new AmodeusTimeConvert(ZoneId.of("America/Los_Angeles")));
 
         // List<TaxiTrip> finalTrips = ImportTaxiTrips.fromFile(finalTripsFile);

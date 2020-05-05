@@ -7,23 +7,23 @@ import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
+import ch.ethz.idsc.amodeus.taxitrip.ImportTaxiTrips;
+import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.io.CopyFiles;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodtaxi.fleetconvert.TripFleetConverter;
+import ch.ethz.idsc.amodtaxi.linkspeed.iterative.IterativeLinkSpeedEstimator;
 import ch.ethz.idsc.amodtaxi.scenario.FinishedScenario;
 import ch.ethz.idsc.amodtaxi.scenario.Scenario;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioBasicNetworkPreparer;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
-import ch.ethz.idsc.amodtaxi.scenario.TaxiTripsSuppliers;
-import ch.ethz.idsc.amodtaxi.scenario.chicago.ScenarioConstants;
 import ch.ethz.idsc.amodtaxi.trace.ReadTraceFiles;
-import ch.ethz.idsc.amodtaxi.tripfilter.TripDurationFilter;
-import ch.ethz.idsc.amodtaxi.tripfilter.TripEndTimeFilter;
 import ch.ethz.idsc.amodtaxi.tripmodif.RenumerationModifier;
 import ch.ethz.idsc.amodtaxi.tripmodif.TaxiDataModifier;
 import ch.ethz.idsc.amodtaxi.tripmodif.TaxiDataModifierCollection;
@@ -38,16 +38,15 @@ import ch.ethz.idsc.amodtaxi.osm.StaticMapCreator;
 import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
 import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
 import ch.ethz.idsc.amodtaxi.tripfilter.TripNetworkFilter;
-import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.qty.Quantity;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
 /* package */ class CreateSanFranciscoScenario {
-    private static final Collection<LocalDate> dates = DateSelectSF.specific(6, 4);
-    private static final int numTraceFiles = 536; // maximum taxis are: 536;
-    private static final AmodeusTimeConvert timeConvert = new AmodeusTimeConvert(ZoneId.of("America/Los_Angeles"));
-    private static final Scalar timeStep = Quantity.of(10, "s");
+    private static final Collection<LocalDate> DATES = DateSelectSF.specific(6, 4);
+    private static final int NUM_TRACE_FILES = 536; // maximum taxis are: 536;
+    private static final AmodeusTimeConvert TIME_CONVERT = new AmodeusTimeConvert(ZoneId.of("America/Los_Angeles"));
+    private static final int MAX_ITER = 100_000;
 
     public static void main(String[] args) throws Exception {
         File dataDir = new File(args[0]);
@@ -62,7 +61,7 @@ import org.matsim.core.config.ConfigUtils;
 
         /** copy taxi trace files */
         System.out.println("dataDir: " + dataDir.getAbsolutePath());
-        List<File> traceFiles = TraceFileChoice.getOrDefault(new File(dataDir, "cabspottingdata"), "new_").random(numTraceFiles);
+        List<File> traceFiles = TraceFileChoice.getOrDefault(new File(dataDir, "cabspottingdata"), "new_").random(NUM_TRACE_FILES);
         // List<File> traceFiles = //
         // TraceFileChoice.getOrDefault(new File(dataDir, "cabspottingdata"), "new_").specified("equioc", "onvahe", "epkiapme", "ippfeip");
 
@@ -91,7 +90,7 @@ import org.matsim.core.config.ConfigUtils;
         DayTaxiRecord dayTaxiRecord = ReadTraceFiles.in(traceFiles, reader);
 
         /** create scenario */
-        for (LocalDate localDate : dates) {
+        for (LocalDate localDate : DATES) {
         //     try {
         //         /** compute scenario */
         //
@@ -106,7 +105,7 @@ import org.matsim.core.config.ConfigUtils;
         //                 Quantity.of(2.235200008, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m"), false));
         //
         //         StandaloneFleetConverterSF sfc = new StandaloneFleetConverterSF(processingDir, //
-        //                 dayTaxiRecord, db, network, timeStep, timeConvert, speedEstimationTripFilter, //
+        //                 dayTaxiRecord, db, network, timeStep, TIME_CONVERT, speedEstimationTripFilter, //
         //                 finalPopulationTripFilter);
         //         sfc.run(localDate);
         //
@@ -133,27 +132,22 @@ import org.matsim.core.config.ConfigUtils;
             TaxiTripFilterCollection tripFilter = new TaxiTripFilterCollection();
             /** trips which are faster than the network freeflow speeds would allow are removed */
             tripFilter.addFilter(new TripNetworkFilter(network, db, //
-                    Quantity.of(2.235200008, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m"), true));
+                    Quantity.of(2.235200008, SI.VELOCITY), Quantity.of(3600, SI.SECOND), Quantity.of(200, SI.METER), true));
 
             File destinDir = new File(workingDir, localDate.toString());
+            List<TaxiTrip> finalTrips;
+            { // prepare final scenario
+                TripFleetConverter converter = new SanFranciscoTripFleetConverter( //
+                        scenarioOptions, network, dayTaxiRecord, localDate, tripModifier, tripFilter, new File(processingDir, "tripData"));
+                File finalTripsFile = Objects.requireNonNull(Scenario.create(workingDir, converter, processingDir, localDate, TIME_CONVERT));
 
-            // TODO create seperate class (also replace in test)
-            TripFleetConverter converter = new TripFleetConverter(scenarioOptions, network, tripModifier, tripFilter, //
-                    TaxiTripsSuppliers.fromDayTaxiRecord(dayTaxiRecord, localDate), new File(processingDir, "tripData")) {
-                @Override
-                public void setFilters() {
-                    /** trips outside the range [150[s], 30[h]] are removed */
-                    primaryFilter.addFilter(new TripDurationFilter(Quantity.of(150, SI.SECOND), Quantity.of(10800, SI.SECOND)));
+                System.out.println("The final trips file is: "+ finalTripsFile.getAbsolutePath());
 
-                    /** trips which end after the maximum end time are rejected */
-                    primaryFilter.addFilter(new TripEndTimeFilter(ScenarioConstants.maxEndTime));
-                }
-            };
-            File finalTripsFile = Scenario.create(workingDir, converter, processingDir, localDate, new AmodeusTimeConvert(ZoneId.of("America/Los_Angeles")));
-
-            // List<TaxiTrip> finalTrips = ImportTaxiTrips.fromFile(finalTripsFile);
-            // final int maxIter = 100;
-            // new IterativeLinkSpeedEstimator(maxIter).compute(processingDir, network, db, finalTrips);
+                /** loading final trips */
+                finalTrips = ImportTaxiTrips.fromFile(finalTripsFile);
+            }
+            if (MAX_ITER > 0)
+                new IterativeLinkSpeedEstimator(MAX_ITER).compute(processingDir, network, db, finalTrips);
 
             FinishedScenario.copyToDir(processingDir.getAbsolutePath(), destinDir.getAbsolutePath(), //
                     new String[] { //

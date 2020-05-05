@@ -48,6 +48,7 @@ import ch.ethz.idsc.tensor.Scalar;
 
     private final Scalar TIME_STEP;
 
+    @Deprecated
     public StandaloneFleetConverterSF(File workingDirectory, DayTaxiRecord dayTaxiRecord, //
             MatsimAmodeusDatabase db, Network network, Scalar TIME_STEP, //
             AmodeusTimeConvert timeConvert, TaxiTripFilterCollection taxiTripFilter, //
