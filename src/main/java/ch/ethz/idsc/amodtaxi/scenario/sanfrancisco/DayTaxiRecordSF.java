@@ -7,7 +7,6 @@ import java.util.List;
 
 import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import ch.ethz.idsc.amodeus.net.IdIntegerDatabase;
-import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
 import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
@@ -15,11 +14,9 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
 /* package */ class DayTaxiRecordSF implements DayTaxiRecord {
     private final List<TaxiTrail> trails = new ArrayList<>();
     private final IdIntegerDatabase vehicleIdIntegerDatabase = new IdIntegerDatabase();
-    private final MatsimAmodeusDatabase db;
     private final FastLinkLookup fastLinkLookup;
 
-    public DayTaxiRecordSF(MatsimAmodeusDatabase db, FastLinkLookup fastLinkLookup) {
-        this.db = db;
+    public DayTaxiRecordSF(FastLinkLookup fastLinkLookup) {
         this.fastLinkLookup = fastLinkLookup;
     }
 
@@ -27,7 +24,7 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
     public void insert(List<String> list, int taxiStampID, String id) {
         final int taxiStamp_id = vehicleIdIntegerDatabase.getId(Integer.toString(taxiStampID));
         if (taxiStamp_id == trails.size()) {
-            trails.add(new TaxiTrailSF(id, db, fastLinkLookup));
+            trails.add(new TaxiTrailSF(id, fastLinkLookup));
             System.out.println("Trails: " + trails.size());
         }
         trails.get(taxiStamp_id).insert(list);

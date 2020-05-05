@@ -41,13 +41,13 @@ public class OsmLoaderTest {
         osmLoader.saveIfNotAlreadyExists(osmFile);
 
         /* Check functionality */
-        FileReader fileReader = new FileReader(osmFile);
-        BufferedReader bufferedReader = new BufferedReader(fileReader);
-        Assert.assertTrue(bufferedReader.lines().anyMatch(line -> line.contains("ETH/Universitätsspital")));
+        try ( //
+                FileReader fileReader = new FileReader(osmFile);
+                BufferedReader bufferedReader = new BufferedReader(fileReader)) {
+            Assert.assertTrue(bufferedReader.lines().anyMatch(line -> line.contains("ETH/Universitätsspital")));
+        }
 
         /* Clean up */
-        bufferedReader.close();
-        fileReader.close();
         Assert.assertTrue(workingDir.exists());
         FileUtils.deleteDirectory(workingDir);
         Assert.assertFalse(workingDir.exists());

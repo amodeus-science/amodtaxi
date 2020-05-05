@@ -9,20 +9,11 @@ import java.io.OutputStreamWriter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Set;
 
-import org.apache.commons.lang3.tuple.Pair;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.utils.collections.QuadTree;
+import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 
-import ch.ethz.idsc.amodeus.dispatcher.core.RequestStatus;
-import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationObject;
 import ch.ethz.idsc.amodeus.net.StorageSubscriber;
 import ch.ethz.idsc.amodeus.net.StorageUtils;
@@ -36,21 +27,18 @@ import ch.ethz.idsc.tensor.Scalar;
 
 public class SimulationFleetDumperSF {
     private final Scalar tStepSize;
-    private Set<List<Pair<Integer, RequestStatus>>> requestTrails = new HashSet<>();
-    private LinkedHashSet<Pair<Integer, Integer>> requestMap = new LinkedHashSet<>();
     private final AmodeusTimeConvert timeConvert;
     private final SimContainerPopulator populator;
+    // private Set<List<Pair<Integer, RequestStatus>>> requestTrails = new HashSet<>();
+    // private LinkedHashSet<Pair<Integer, Integer>> requestMap = new LinkedHashSet<>();
 
-    public SimulationFleetDumperSF(MatsimAmodeusDatabase db, Network network, Scalar tStepSize, //
-            QuadTree<Link> qt, AmodeusTimeConvert timeConvert) {
+    public SimulationFleetDumperSF(FastLinkLookup fastLinkLookup, Scalar tStepSize, AmodeusTimeConvert timeConvert) {
         this.tStepSize = tStepSize;
         this.timeConvert = timeConvert;
-        this.populator = new SimContainerPopulator(db, qt, timeConvert);
+        this.populator = new SimContainerPopulator(fastLinkLookup, timeConvert);
     }
 
-    public void createDumpOf(DayTaxiRecord dayTaxiRecord, File outputFolder, //
-            LocalDate simulationDate) throws IOException {
-
+    public void createDumpOf(DayTaxiRecord dayTaxiRecord, File outputFolder, LocalDate simulationDate) throws IOException {
         System.out.println("INFO number of dayTaxiRecords: " + dayTaxiRecord.numTaxis());
         System.out.println("outputfolder for storage utils: " + outputFolder.getAbsolutePath());
 

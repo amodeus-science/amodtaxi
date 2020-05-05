@@ -5,13 +5,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.collections.QuadTree;
+import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 
 import ch.ethz.idsc.amodeus.dispatcher.core.RequestStatus;
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxiStatus;
-import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.RequestContainer;
 import ch.ethz.idsc.amodeus.net.SimulationObject;
 import ch.ethz.idsc.amodeus.net.VehicleContainer;
@@ -21,13 +18,11 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 import ch.ethz.idsc.tensor.io.Serialization;
 
 /* package */ class SimContainerPopulator {
-    private final MatsimAmodeusDatabase db;
-    private final QuadTree<Link> quadTree;
+    private final FastLinkLookup fastLinkLookup;
     private final AmodeusTimeConvert timeConvert;
 
-    public SimContainerPopulator(MatsimAmodeusDatabase db, QuadTree<Link> quadTree, AmodeusTimeConvert timeConvert) {
-        this.db = db;
-        this.quadTree = quadTree;
+    public SimContainerPopulator(FastLinkLookup fastLinkLookup, AmodeusTimeConvert timeConvert) {
+        this.fastLinkLookup = fastLinkLookup;
         this.timeConvert = timeConvert;
     }
 
@@ -38,11 +33,7 @@ import ch.ethz.idsc.tensor.io.Serialization;
         Objects.requireNonNull(taxiStamp);
         Objects.requireNonNull(reqInserter);
 
-        Coord position = db.referenceFrame.coords_fromWGS84().transform(taxiStamp.gps);
-        GlobalAssert.that(Objects.nonNull(position));
-        Link center = quadTree.getClosest(position.getX(), position.getY());
-        GlobalAssert.that(Objects.nonNull(center));
-        int linkIndex = db.getLinkIndex(center);
+        int linkIndex = fastLinkLookup.indexFromWGS84(taxiStamp.gps);
 
         /** initialize and add VehicleContainer */
         VehicleContainer vc = new VehicleContainer();

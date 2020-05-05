@@ -8,6 +8,7 @@ import java.util.List;
 import ch.ethz.idsc.amodeus.taxitrip.ExportTaxiTrips;
 import ch.ethz.idsc.amodeus.taxitrip.ImportTaxiTrips;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
+import ch.ethz.idsc.amodtaxi.util.NamingConvention;
 
 public class TaxiDataModifierCollection implements TaxiDataModifier {
 
@@ -34,7 +35,7 @@ public class TaxiDataModifierCollection implements TaxiDataModifier {
                 changed = tripModifier.modify(changed);
             modified.add(changed);
         });
-        File outFile = new File(taxiData.getAbsolutePath().replace(".csv", "_modified.csv"));
+        File outFile = new File(taxiData.getParentFile(), NamingConvention.similarTo(taxiData).apply("modified"));
         ExportTaxiTrips.toFile(modified.stream(), outFile);
         return outFile;
     }

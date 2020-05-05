@@ -9,8 +9,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import ch.ethz.idsc.amodeus.taxitrip.ImportTaxiTrips;
-import org.matsim.api.core.v01.network.Link;
+import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
+import ch.ethz.idsc.amodtaxi.util.NamingConvention;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -18,23 +20,17 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationWriter;
-import org.matsim.core.utils.collections.QuadTree;
 
-import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.taxitrip.ExportTaxiTrips;
 import ch.ethz.idsc.amodeus.taxitrip.PersonCreate;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
-import ch.ethz.idsc.amodeus.util.geo.ClosestLinkSelect;
-import ch.ethz.idsc.amodeus.util.io.CsvReader;
 import ch.ethz.idsc.amodeus.util.io.GZHandler;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
 
 public class TripPopulationCreator {
-
-    private final String fileName = "population.xml";
-    private final ClosestLinkSelect linkSelect;
+    private final FastLinkLookup fastLinkLookup;
     private final LocalDate simulationDate;
     private final AmodeusTimeConvert timeConvert;
     private final Config config;
@@ -45,18 +41,17 @@ public class TripPopulationCreator {
     private final TaxiDistanceCalculator distCalc;
     private File finalTripFile;
 
-    public TripPopulationCreator(File processingDir, Config config, Network network, //
-            MatsimAmodeusDatabase db, QuadTree<Link> qt, //
+    public TripPopulationCreator(File processingDir, Config config, Network network, FastLinkLookup fastLinkLookup, //
             LocalDate simualtionDate, AmodeusTimeConvert timeConvert, TaxiTripFilterCollection finalFilters) {
-        this.linkSelect = new ClosestLinkSelect(db, qt);
+        this.fastLinkLookup = fastLinkLookup;
         this.simulationDate = simualtionDate;
         this.timeConvert = timeConvert;
         this.config = config;
         this.network = network;
         this.finalFilters = finalFilters;
-        this.distCalc = new TaxiDistanceCalculator(processingDir, network, linkSelect);
-        populationFile = new File(processingDir, fileName);
-        populationFileGz = new File(processingDir, fileName + ".gz");
+        this.distCalc = new TaxiDistanceCalculator(processingDir, network, fastLinkLookup);
+        populationFile = new File(processingDir, ScenarioLabels.population);
+        populationFileGz = new File(processingDir, ScenarioLabels.populationGz);
     }
 
     public void process(File inFile) throws MalformedURLException, Exception {
@@ -68,7 +63,7 @@ public class TripPopulationCreator {
         System.out.println(inFile.getAbsolutePath());
         List<TaxiTrip> trips = ImportTaxiTrips.fromFile(inFile);
 
-        File finalTripFile = new File(inFile.getAbsolutePath().replace(".csv", "_final.csv"));
+        File finalTripFile = new File(inFile.getParentFile(), NamingConvention.similarTo(inFile).apply("final"));
         process(trips, finalTripFile);
     }
 
@@ -86,7 +81,7 @@ public class TripPopulationCreator {
         // create persons
         filtered.forEach(taxiTrip -> {
             Person person = PersonCreate.fromTrip(taxiTrip, taxiTrip.localId, populationFactory, //
-                    linkSelect, simulationDate, timeConvert);
+                    fastLinkLookup, simulationDate, timeConvert);
             population.addPerson(person);
             distCalc.addTrip(taxiTrip);
             finalFilteredTrips.add(taxiTrip);

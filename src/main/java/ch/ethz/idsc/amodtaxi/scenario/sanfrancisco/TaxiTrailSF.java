@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import ch.ethz.idsc.amodeus.dispatcher.core.RequestStatus;
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxiStatus;
 import ch.ethz.idsc.amodeus.net.FastLinkLookup;
-import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
@@ -31,11 +30,11 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
     public final RequestInserter requestInserter;
     private Collection<TaxiTrip> taxiTrips;
 
-    public TaxiTrailSF(String id, MatsimAmodeusDatabase db, FastLinkLookup qt) {
+    public TaxiTrailSF(String id, FastLinkLookup fastLinkLookup) {
         this.id = id;
         timeConvert = new AmodeusTimeConvert(ZoneId.of("America/Los_Angeles"));
         // sfTrailProcess = new SFTrailProcess(timeConvert, db, qt, id);
-        requestInserter = new RequestInserter(timeConvert, db, qt, id);
+        requestInserter = new RequestInserter(timeConvert, fastLinkLookup, id);
     }
 
     /** adding addtional TaxiStamp */

@@ -4,7 +4,7 @@ import java.util.Iterator;
 
 import junit.framework.TestCase;
 
-public class GlobalRequestndexTest extends TestCase {
+public class GlobalRequestIndexTest extends TestCase {
     public void test() {
         GlobalRequestIndex index = new GlobalRequestIndex();
         int first = index.add(1, 1);

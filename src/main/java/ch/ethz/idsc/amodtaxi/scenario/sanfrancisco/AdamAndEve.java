@@ -5,36 +5,28 @@ import java.io.File;
 import java.time.LocalDate;
 import java.util.Collection;
 
+import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import ch.ethz.idsc.amodtaxi.scenario.Consistency;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationWriter;
-import org.matsim.core.utils.collections.QuadTree;
 
-import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
-import ch.ethz.idsc.amodeus.util.geo.ClosestLinkSelect;
 import ch.ethz.idsc.amodeus.util.io.GZHandler;
 
 /* package */ enum AdamAndEve {
     ;
 
-    public static void create(File workingDirectory, Collection<TaxiTrip> trips, Network network, //
-            MatsimAmodeusDatabase db, //
-            AmodeusTimeConvert timeConvert, QuadTree<Link> quadTree, LocalDate simulationDate, //
-            String nameAdd)//
-            throws Exception {
-
+    public static void create(File workingDirectory, Collection<TaxiTrip> trips, Network network, FastLinkLookup fastLinkLookup, //
+            AmodeusTimeConvert timeConvert, LocalDate simulationDate, String nameAdd) throws Exception {
         /** create a new {@link Population} */
         Population population = PopulationUtils.createPopulation(new PlansConfigGroup(), network);
 
         /** fill with {@link TaxiTrip}s */
-        ClosestLinkSelect linkSelect = new ClosestLinkSelect(db, quadTree);
-        (new Populator(population, timeConvert, linkSelect, simulationDate)).convert(trips);
+        (new Populator(population, timeConvert, fastLinkLookup, simulationDate)).convert(trips);
         Consistency.check(population);
 
         /** write created {@link Population} to file */
@@ -50,5 +42,4 @@ import ch.ethz.idsc.amodeus.util.io.GZHandler;
         GZHandler.extract(populationGzFile, populationFile);
         System.out.println("INFO successfully created population");
     }
-
 }
