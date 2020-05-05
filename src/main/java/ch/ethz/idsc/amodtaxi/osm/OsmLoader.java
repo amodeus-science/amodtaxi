@@ -21,7 +21,9 @@ import ch.ethz.idsc.tensor.Tensors;
 public class OsmLoader {
     public static OsmLoader of(File propertiesFile) throws FileNotFoundException, IOException {
         Properties props = new Properties();
-        props.load(new FileInputStream(propertiesFile));
+        try (FileInputStream fis = new FileInputStream(propertiesFile)) {
+            props.load(fis);
+        }
         GlobalAssert.that(propertiesFile.exists());
         System.out.println(propertiesFile.getAbsolutePath());
         Tensor boundBox = Tensors.fromString(props.getProperty("boundingBox"));

@@ -53,7 +53,6 @@ public class SanFranciscoScenarioTest {
         Assert.assertTrue(!traceFiles.isEmpty());
 
         /** prepare the network */
-        // ScenarioBasicNetworkPreparer.run(DIRECTORY);
         File processingDir = new File(DIRECTORY, "Scenario");
         processingDir.mkdir();
 
