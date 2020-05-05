@@ -41,7 +41,6 @@ import ch.ethz.idsc.amodtaxi.scenario.Pt2MatsimXML;
 import ch.ethz.idsc.amodtaxi.scenario.Scenario;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioBasicNetworkPreparer;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
-import ch.ethz.idsc.amodtaxi.scenario.ScenarioSetup;
 import ch.ethz.idsc.amodtaxi.scenario.TaxiTripsReader;
 import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
 import ch.ethz.idsc.amodtaxi.tripfilter.TripNetworkFilter;
@@ -63,11 +62,9 @@ public class CreateChicagoScenarioTest {
     public void test() throws Exception {
         /* Init */
         File workingDir = new File(Locate.repoFolder(Pt2MatsimXML.class, "amodtaxi"), "test");
-        File resourcesDir = new File(Locate.repoFolder(Pt2MatsimXML.class, "amodtaxi"), "resources/chicagoScenario");
         File osmFile = new File(Locate.repoFolder(Pt2MatsimXML.class, "amodtaxi"), "resources/testScenario/mapChicago.osm");
         Assert.assertTrue(workingDir.exists() || workingDir.mkdir());
-        ChicagoGeoInformation.setup();
-        ScenarioSetup.in(workingDir, resourcesDir);
+        ChicagoSetup.in(workingDir);
 
         /* Reduce population size in Properties */
         String smallProp = ScenarioLabels.amodeusFile;
