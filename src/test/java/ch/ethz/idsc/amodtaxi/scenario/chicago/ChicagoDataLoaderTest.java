@@ -27,9 +27,9 @@ public class ChicagoDataLoaderTest {
         Properties properties = new Properties();
         properties.load(new FileInputStream(new File(settingsDir, ScenarioLabels.amodeusFile)));
         properties.setProperty(ScenarioOptionsBase.MAXPOPULATIONSIZEIDENTIFIER, "100");
-        FileOutputStream out = new FileOutputStream(smallPropFile);
-        properties.store(out, null);
-        out.close();
+        try (FileOutputStream out = new FileOutputStream(smallPropFile)) {
+            properties.store(out, null);
+        }
 
         /* Check ChicagoDataLoader */
         File tripFile = ChicagoDataLoader.from(smallProp, settingsDir);
