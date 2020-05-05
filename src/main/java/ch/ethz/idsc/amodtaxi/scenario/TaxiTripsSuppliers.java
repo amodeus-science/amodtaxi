@@ -12,8 +12,8 @@ import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
 import ch.ethz.idsc.amodtaxi.trace.ReadTraceFiles;
 import ch.ethz.idsc.amodtaxi.tripmodif.NullModifier;
 import ch.ethz.idsc.amodtaxi.tripmodif.TaxiDataModifier;
+import ch.ethz.idsc.amodtaxi.util.NamingConvention;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 
 public class TaxiTripsSuppliers {
     public static TaxiTripsSupplier fromReader(File tripFile, File targetDirectory, TaxiTripsReader tripsReader) {
@@ -37,9 +37,7 @@ public class TaxiTripsSuppliers {
                     File preparedFile = modifier.modify(newTripFile);
 
                     /** save unreadable trips for post-processing, checking */
-                    File unreadable = new File(preparedFile.getParentFile(), //
-                            FilenameUtils.getBaseName(preparedFile.getAbsolutePath()) + "_unreadable." + //
-                                    FilenameUtils.getExtension(preparedFile.getAbsolutePath()));
+                    File unreadable = new File(preparedFile.getParentFile(), NamingConvention.similarTo(preparedFile).apply("unreadable"));
                     tripsReader.saveUnreadable(unreadable);
 
                     return tripsReader.getTrips(preparedFile);

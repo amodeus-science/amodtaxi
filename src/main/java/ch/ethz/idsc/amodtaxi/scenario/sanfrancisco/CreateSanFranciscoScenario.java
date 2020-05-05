@@ -86,7 +86,7 @@ import org.matsim.core.config.ConfigUtils;
         FastLinkLookup fll = new FastLinkLookup(network, db);
 
         /** get dayTaxiRecord from trace files */
-        CsvFleetReaderSF reader = new CsvFleetReaderSF(new DayTaxiRecordSF(db, fll));
+        CsvFleetReaderSF reader = new CsvFleetReaderSF(new DayTaxiRecordSF(fll));
         DayTaxiRecord dayTaxiRecord = ReadTraceFiles.in(traceFiles, reader);
 
         /** create scenario */

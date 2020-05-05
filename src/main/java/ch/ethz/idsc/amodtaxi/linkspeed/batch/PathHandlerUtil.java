@@ -7,7 +7,6 @@ import java.util.Objects;
 import org.matsim.api.core.v01.network.Link;
 
 import ch.ethz.idsc.amodeus.net.FastLinkLookup;
-import ch.ethz.idsc.amodeus.net.TensorCoords;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.LocalDateTimes;
@@ -31,8 +30,8 @@ public enum PathHandlerUtil {
         GlobalAssert.that(LocalDateTimes.lessEquals(simulationDate.atStartOfDay(), taxiTrip.dropoffTimeDate));
         GlobalAssert.that(LocalDateTimes.lessEquals(taxiTrip.pickupTimeDate, taxiTrip.dropoffTimeDate));
         GlobalAssert.that(Scalars.lessEquals(Quantity.of(0, SI.SECOND), taxiTrip.driveTime));
-        Link pickupLink = fll.getLinkFromWGS84(TensorCoords.toCoord(taxiTrip.pickupLoc));
-        Link dropOffLink = fll.getLinkFromWGS84(TensorCoords.toCoord(taxiTrip.dropoffLoc));
+        Link pickupLink = fll.linkFromWGS84(taxiTrip.pickupLoc);
+        Link dropOffLink = fll.linkFromWGS84(taxiTrip.dropoffLoc);
         Objects.requireNonNull(pickupLink);
         Objects.requireNonNull(dropOffLink);
     }

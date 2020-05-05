@@ -3,13 +3,13 @@ package ch.ethz.idsc.amodtaxi.tripmodif;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -17,7 +17,6 @@ import org.matsim.api.core.v01.network.Node;
 
 import ch.ethz.idsc.amodeus.dispatcher.util.TensorLocation;
 import ch.ethz.idsc.amodeus.net.FastLinkLookup;
-import ch.ethz.idsc.amodeus.net.TensorCoords;
 import ch.ethz.idsc.amodeus.prep.NetworkCreatorUtils;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.network.NodeAdjacencyMap;
@@ -27,7 +26,6 @@ import ch.ethz.idsc.amodeus.virtualnetwork.core.VirtualNetworkIO;
 import ch.ethz.idsc.tensor.Tensor;
 
 public class OriginDestinationCentroidResampling implements TripModifier {
-
     private final Random random;
     private final Network network;
     private final FastLinkLookup fastLinkLookup;
@@ -59,9 +57,8 @@ public class OriginDestinationCentroidResampling implements TripModifier {
             // add airport links to ensure airport related traffic stays in
             // small concentrated node
             for (Link link : network.getLinks().values()) {
-                if (airportBoundaryLinks.contains(link.getId().toString())) {
-                    uniqueLocations.add(fastLinkLookup.getWGS84fromLink(link));
-                }
+                if (airportBoundaryLinks.contains(link.getId().toString()))
+                    uniqueLocations.add(fastLinkLookup.wgs84fromLink(link));
             }
 
             // do everything that needs to be done once the first time
@@ -81,8 +78,8 @@ public class OriginDestinationCentroidResampling implements TripModifier {
         Tensor origin = originalTrip.pickupLoc;
         Tensor destin = originalTrip.dropoffLoc;
         // get origin /destination links
-        Link lOrigin = fastLinkLookup.getLinkFromWGS84(TensorCoords.toCoord(origin));
-        Link lDestin = fastLinkLookup.getLinkFromWGS84(TensorCoords.toCoord(destin));
+        Link lOrigin = fastLinkLookup.linkFromWGS84(origin);
+        Link lDestin = fastLinkLookup.linkFromWGS84(destin);
         // using virtual node of lOrigin / lDestin, randomly distribute in virtual Node
 
         // origin
@@ -98,8 +95,8 @@ public class OriginDestinationCentroidResampling implements TripModifier {
         return TaxiTrip.of( //
                 originalTrip.localId, //
                 originalTrip.taxiId, //
-                fastLinkLookup.getWGS84fromLink(lOriginDist), //
-                fastLinkLookup.getWGS84fromLink(lDestinDist), //
+                fastLinkLookup.wgs84fromLink(lOriginDist), //
+                fastLinkLookup.wgs84fromLink(lDestinDist), //
                 originalTrip.distance, //
                 originalTrip.submissionTimeDate, //
                 originalTrip.pickupTimeDate, //
@@ -120,11 +117,7 @@ public class OriginDestinationCentroidResampling implements TripModifier {
         Map<Node, Set<Link>> uElements = NodeAdjacencyMap.of(network);
 
         /** generate the link centroids based on the unique locations */
-        List<Link> centroids = new ArrayList<>();
-        uniqueLocations.stream().forEach(loc -> {
-            Link link = fastLinkLookup.getLinkFromWGS84(TensorCoords.toCoord(loc));
-            centroids.add(link);
-        });
+        List<Link> centroids = uniqueLocations.stream().map(fastLinkLookup::linkFromWGS84).collect(Collectors.toList());
 
         /** create the virtual network using the centroidvirtualNetworkCreator */
 
@@ -132,7 +125,5 @@ public class OriginDestinationCentroidResampling implements TripModifier {
                 elements, centroids, TensorLocation::of, NetworkCreatorUtils::linkToID, uElements, true);
 
         return vnc.getVirtualNetwork();
-
     }
-
 }

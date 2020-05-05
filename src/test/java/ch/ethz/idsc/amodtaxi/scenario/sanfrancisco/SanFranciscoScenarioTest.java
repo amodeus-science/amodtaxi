@@ -77,7 +77,7 @@ public class SanFranciscoScenarioTest {
         /** get dayTaxiRecord from trace files */
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, scenarioOptions.getLocationSpec().referenceFrame());
         FastLinkLookup fll = new FastLinkLookup(network, db);
-        CsvFleetReaderSF reader = new CsvFleetReaderSF(new DayTaxiRecordSF(db, fll));
+        CsvFleetReaderSF reader = new CsvFleetReaderSF(new DayTaxiRecordSF(fll));
         DayTaxiRecord dayTaxiRecord = ReadTraceFiles.in(traceFiles, reader);
         Assert.assertEquals(NUM_TAXIS, dayTaxiRecord.numTaxis());
 

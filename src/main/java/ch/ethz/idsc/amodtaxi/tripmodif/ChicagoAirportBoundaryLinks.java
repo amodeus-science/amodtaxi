@@ -35,7 +35,7 @@ import ch.ethz.idsc.tensor.Tensors;
     public static Set<String> get(FastLinkLookup fastLinkLookup) {
         return LOCATIONS.stream() //
                 .map(TensorCoords::toCoord) //
-                .map(fastLinkLookup::getLinkFromWGS84) //
+                .map(fastLinkLookup::linkFromWGS84) //
                 .map(Link::getId) //
                 .map(Object::toString) //
                 .collect(Collectors.toSet());

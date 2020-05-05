@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
+import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import ch.ethz.idsc.tensor.red.Total;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -20,7 +21,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
-import ch.ethz.idsc.amodeus.util.geo.ClosestLinkSelect;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
@@ -32,14 +32,14 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
     private final Map<String, NavigableSet<TaxiTrip>> tripMap = new HashMap<>();
     private final LeastCostPathCalculator lcpc;
-    private final ClosestLinkSelect linkSelect;
+    private final FastLinkLookup fastLinkLookup;
     private final File exportFolder;
 
-    public TaxiDistanceCalculator(File exportFolder, Network network, ClosestLinkSelect linkSelect) {
+    public TaxiDistanceCalculator(File exportFolder, Network network, FastLinkLookup fastLinkLookup) {
         this.exportFolder = exportFolder;
         this.lcpc = new FastAStarLandmarksFactory(Runtime.getRuntime().availableProcessors()).createPathCalculator( //
                 network, new DistanceAsTravelDisutility(), new FreeSpeedTravelTime());
-        this.linkSelect = linkSelect;
+        this.fastLinkLookup = fastLinkLookup;
     }
 
     public void addTrip(TaxiTrip taxiTrip) {
@@ -58,13 +58,13 @@ import ch.ethz.idsc.tensor.qty.Quantity;
             TaxiTrip tripBefore = null;
             for (TaxiTrip trip : trips) {
                 // distance of current trip
-                Link tStart = linkSelect.linkFromWGS84(trip.pickupLoc);
-                Link tDesti = linkSelect.linkFromWGS84(trip.dropoffLoc);
+                Link tStart = fastLinkLookup.linkFromWGS84(trip.pickupLoc);
+                Link tDesti = fastLinkLookup.linkFromWGS84(trip.dropoffLoc);
                 Scalar tripDist = shortPathDistance(tStart, tDesti);
                 taxiTotDist = taxiTotDist.add(tripDist);
                 if (Objects.nonNull(tripBefore)) {
                     // intra trip distance
-                    Link tDestidBefore = linkSelect.linkFromWGS84(tripBefore.dropoffLoc);
+                    Link tDestidBefore = fastLinkLookup.linkFromWGS84(tripBefore.dropoffLoc);
                     Scalar intraTripDist = shortPathDistance(tDestidBefore, tStart);
                     taxiTotDist = taxiTotDist.add(intraTripDist);
                     taxiEmptyDistance = taxiEmptyDistance.add(intraTripDist);
