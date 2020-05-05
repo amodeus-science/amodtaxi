@@ -21,6 +21,7 @@ import ch.ethz.idsc.amodtaxi.population.TripPopulationCreator;
 import ch.ethz.idsc.amodtaxi.scenario.TaxiTripsSupplier;
 import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
 import ch.ethz.idsc.amodtaxi.tripmodif.TaxiDataModifier;
+import ch.ethz.idsc.amodtaxi.util.NamingConvention;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -47,7 +48,6 @@ public abstract class TripFleetConverter {
         this.finalFilters = finalFilters;
         this.taxiTripsSupplier = taxiTripsSupplier;
         this.targetDirectory = targetDirectory;
-        this.targetDirectory.mkdirs();
         ReferenceFrame referenceFrame = scenarioOptions.getLocationSpec().referenceFrame();
         this.db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
         this.qt = CreateQuadTree.of(network);
@@ -57,8 +57,8 @@ public abstract class TripFleetConverter {
         config = ConfigUtils.loadConfig(configFile.toString());
     }
 
-    public void run(File processingDir, String baseName, String extension, LocalDate simulationDate, AmodeusTimeConvert timeConvert) throws Exception {
-        extension = extension.startsWith(".") ? extension : ("." + extension);
+    public void run(File processingDir, NamingConvention convention, LocalDate simulationDate, AmodeusTimeConvert timeConvert) throws Exception {
+        targetDirectory.mkdirs();
 
         Collection<TaxiTrip> allTrips = taxiTripsSupplier.get();
         System.out.println("Before primary filter: " + allTrips.size());
@@ -67,11 +67,11 @@ public abstract class TripFleetConverter {
         Stream<TaxiTrip> filteredStream = primaryFilter.filterStream(allTrips.stream());
         List<TaxiTrip> primaryFiltered = filteredStream.collect(Collectors.toList());
         System.out.println("Primary filtered: " + primaryFiltered.size());
-        String filteredFileName = baseName + "_filtered" + extension;
+        String filteredFileName = convention.apply("filtered");
         primaryFilter.printSummary();
 
         File filteredFile = new File(targetDirectory, filteredFileName);
-        ExportTaxiTrips.toFile(primaryFiltered.stream(), filteredFile);
+        ExportTaxiTrips.toFile(primaryFiltered.stream(), filteredFile); // parent directory must exist beforehand
         GlobalAssert.that(filteredFile.isFile());
 
         /** modifying the trip data, e.g., distributing in 15 minute steps. */
@@ -79,9 +79,7 @@ public abstract class TripFleetConverter {
         GlobalAssert.that(modifiedTripsFile.isFile());
 
         /** creating population based on corrected, filtered file */
-        TripPopulationCreator populationCreator = //
-                new TripPopulationCreator(processingDir, config, network, db, //
-                        qt, simulationDate, timeConvert, finalFilters);
+        TripPopulationCreator populationCreator = new TripPopulationCreator(processingDir, config, network, db, qt, simulationDate, timeConvert, finalFilters);
         populationCreator.process(modifiedTripsFile);
         finalTripsFile = populationCreator.getFinalTripFile();
     }

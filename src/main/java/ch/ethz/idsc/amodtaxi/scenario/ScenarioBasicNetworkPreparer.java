@@ -30,8 +30,8 @@ public enum ScenarioBasicNetworkPreparer {
         new NetworkCleaner().run(filteredNetwork);
 
         // save the network
-        final File fileExport = new File(processingDir, "network.xml");
-        final File fileExportGz = new File(processingDir, "network.xml.gz");
+        final File fileExport = new File(processingDir, ScenarioLabels.network);
+        final File fileExportGz = new File(processingDir, ScenarioLabels.networkGz);
         {
             // write the modified population to file
             NetworkWriter nw = new NetworkWriter(filteredNetwork);

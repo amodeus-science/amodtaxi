@@ -44,8 +44,9 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
 /* package */ class CreateChicagoScenario {
-    private static final AmodeusTimeConvert timeConvert = new AmodeusTimeConvert(ZoneId.of("America/Chicago"));
+    private static final AmodeusTimeConvert TIME_CONVERT = new AmodeusTimeConvert(ZoneId.of("America/Chicago"));
     private static final Random RANDOM = new Random(123);
+    private static final int MAX_ITER = 100_000;
 
     private static void createScenario(File workingDir) throws Exception {
         ChicagoSetup.in(workingDir);
@@ -69,7 +70,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
         File processingDir = new File(workingDir, "Scenario");
         if (processingDir.isDirectory())
-            DeleteDirectory.of(processingDir, 2, 25);
+            DeleteDirectory.of(processingDir, 2, 26);
         if (!processingDir.isDirectory())
             processingDir.mkdir();
 
@@ -118,12 +119,9 @@ import ch.ethz.idsc.tensor.qty.Quantity;
             TripFleetConverter converter = //
                     new ChicagoOnlineTripFleetConverter(scenarioOptions, network, tripModifier, //
                             new ChicagoFormatModifier(), taxiTripFilterCollection, tripsReader, tripFile, new File(processingDir, "tripData"));
-            File finalTripsFile = Scenario.create(workingDir, tripFile, converter, processingDir, simulationDate, timeConvert);
+            File finalTripsFile = Objects.requireNonNull(Scenario.create(workingDir, tripFile, converter, processingDir, simulationDate, TIME_CONVERT));
 
-            Objects.requireNonNull(finalTripsFile);
-
-            System.out.println("The final trips file is: ");
-            System.out.println(finalTripsFile.getAbsolutePath());
+            System.out.println("The final trips file is: " + finalTripsFile.getAbsolutePath());
 
             // this is the old LP-based code
             // ChicagoLinkSpeeds.compute(processingDir, finalTripsFile);
@@ -132,8 +130,8 @@ import ch.ethz.idsc.tensor.qty.Quantity;
             /** loading final trips */
             finalTrips = ImportTaxiTrips.fromFile(finalTripsFile);
         }
-        final int maxIter = 100000;
-        new IterativeLinkSpeedEstimator(maxIter).compute(processingDir, network, db, finalTrips);
+        if (MAX_ITER > 0)
+            new IterativeLinkSpeedEstimator(MAX_ITER).compute(processingDir, network, db, finalTrips);
 
         FinishedScenario.copyToDir(processingDir.getAbsolutePath(), //
                 destinDir.getAbsolutePath(), //
