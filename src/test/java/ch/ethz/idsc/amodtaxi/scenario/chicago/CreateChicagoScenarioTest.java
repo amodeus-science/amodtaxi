@@ -128,7 +128,7 @@ public class CreateChicagoScenarioTest {
         TaxiTripFilterCollection taxiTripFilterCollection = new TaxiTripFilterCollection();
         /** trips which are faster than the network freeflow speeds would allow are removed */
         taxiTripFilterCollection.addFilter(new TripNetworkFilter(network, db, //
-                Quantity.of(2.235200008, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m"), true));
+                Quantity.of(2.235200008, SI.VELOCITY), Quantity.of(3600, SI.SECOND), Quantity.of(200, SI.METER), true));
 
         // TODO eventually remove, this did not improve the fit.
         // finalFilters.addFilter(new TripMaxSpeedFilter(network, db, ScenarioConstants.maxAllowedSpeed));
