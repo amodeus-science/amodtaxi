@@ -163,8 +163,8 @@ public class CreateChicagoScenarioTest {
                         ScenarioLabels.LPFile, ScenarioLabels.config, "virtualNetworkChicago", ScenarioLabels.linkSpeedData });
 
         /* Clean up */
-        // Assert.assertTrue(workingDir.exists());
-        // DeleteDirectory.of(workingDir, 4, 200);
-        // Assert.assertFalse(workingDir.exists());
+        Assert.assertTrue(workingDir.exists());
+        DeleteDirectory.of(workingDir, 4, 200);
+        Assert.assertFalse(workingDir.exists());
     }
 }

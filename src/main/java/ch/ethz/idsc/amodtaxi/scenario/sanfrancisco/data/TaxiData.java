@@ -19,7 +19,7 @@ import org.matsim.core.utils.collections.QuadTree;
 
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
-import ch.ethz.idsc.amodeus.util.math.CreateQuadTree;
+import ch.ethz.idsc.amodeus.util.geo.FastQuadTree;
 
 // TODO is this generic? if yes, move to super package
 public class TaxiData {
@@ -56,7 +56,7 @@ public class TaxiData {
         LeastCostPathCalculator leastCostPathCalculator = new FastAStarLandmarksFactory(Runtime.getRuntime().availableProcessors())//
                 .createPathCalculator(network, new DistanceAsTravelDisutility(), //
                         new FreeSpeedTravelTime());
-        QuadTree<Link> quadTree = CreateQuadTree.of(network);
+        QuadTree<Link> quadTree = FastQuadTree.of(network);
         for (LocalDate localDate : localDates) {
             Integer totReq = ScenarioDataHelper.processLocalDate(localDate, readers.values(), //
                     saveDirectory, db, network, leastCostPathCalculator, quadTree, timeConvert);
