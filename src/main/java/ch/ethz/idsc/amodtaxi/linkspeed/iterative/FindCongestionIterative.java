@@ -32,7 +32,7 @@ import ch.ethz.idsc.tensor.Scalars;
     private final MatsimAmodeusDatabase db;
     /** this is a value in (0,1] which determines the convergence
      * speed of the algorithm, a value close to 1 may lead to
-     * loss of convergence, it is adviced to chose slow. No changes
+     * loss of convergence, it is advised to chose slow. No changes
      * are applied for epsilon == 0. */
     private final Scalar epsilon1;
     /** probability of taking a new trip */

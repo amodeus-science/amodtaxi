@@ -7,6 +7,7 @@ import java.io.File;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import ch.ethz.idsc.amodeus.net.FastLinkLookup;
@@ -77,7 +78,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
         System.exit(1);
 
-        new IterativeLinkSpeedEstimator(maxIter).compute(workingDir, network, db, fitForTrafficEstimation);
+        new IterativeLinkSpeedEstimator(maxIter, new Random(123)).compute(workingDir, network, db, fitForTrafficEstimation);
 
         FinishedScenario.copyToDir(workingDir.getAbsolutePath(), destinDir.getAbsolutePath(), //
                 new String[] { "AmodeusOptions.properties", "network.xml.gz", "population.xml.gz", //

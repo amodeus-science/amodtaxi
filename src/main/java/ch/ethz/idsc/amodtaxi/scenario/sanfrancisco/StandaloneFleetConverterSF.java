@@ -6,15 +6,15 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.stream.Collectors;
 
-import ch.ethz.idsc.amodeus.net.FastLinkLookup;
-import ch.ethz.idsc.amodtaxi.scenario.AllTaxiTrips;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
 import ch.ethz.idsc.amodeus.analysis.Analysis;
+import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
@@ -24,6 +24,7 @@ import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.linkspeed.LinkSpeedsExport;
 import ch.ethz.idsc.amodtaxi.linkspeed.iterative.IterativeLinkSpeedEstimator;
+import ch.ethz.idsc.amodtaxi.scenario.AllTaxiTrips;
 import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
 import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
 import ch.ethz.idsc.tensor.Scalar;
@@ -119,7 +120,7 @@ import ch.ethz.idsc.tensor.Scalar;
             // TaxiLinkSpeedEstimator lsCalc = new FlowTimeInvLinkSpeed(trips, network, db, GLPKLinOptDelayCalculator.INSTANCE);
 
             // iterative
-            IterativeLinkSpeedEstimator lsCalc = new IterativeLinkSpeedEstimator(maxIter);
+            IterativeLinkSpeedEstimator lsCalc = new IterativeLinkSpeedEstimator(maxIter, new Random(123));
             lsCalc.compute(workingDirectory, network, db, tripsSpeedEstimation);
 
             File linkSpeedsFile = new File(simOptions.getLinkSpeedDataName() + "");

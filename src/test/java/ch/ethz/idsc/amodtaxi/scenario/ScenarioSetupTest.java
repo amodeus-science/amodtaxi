@@ -3,21 +3,19 @@ package ch.ethz.idsc.amodtaxi.scenario;
 
 import java.io.File;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
 import ch.ethz.idsc.amodeus.util.io.Locate;
+import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
 public class ScenarioSetupTest {
 
     @Test
     public void test() throws Exception {
         /* Init */
-        File workingDir = new File(Locate.repoFolder(ScenarioSetup.class, "amodtaxi"), //
-                "test");
-        File resourcesDir = new File(Locate.repoFolder(ScenarioSetup.class, "amodtaxi"), //
-                "resources/chicagoScenario");
+        File workingDir = new File(Locate.repoFolder(ScenarioSetup.class, "amodtaxi"), "test");
+        File resourcesDir = new File(Locate.repoFolder(ScenarioSetup.class, "amodtaxi"), "resources/chicagoScenario");
         Assert.assertTrue(workingDir.exists() || workingDir.mkdir());
 
         /* Run function of interest */
@@ -31,7 +29,7 @@ public class ScenarioSetupTest {
 
         /* Clean up */
         Assert.assertTrue(workingDir.exists());
-        FileUtils.deleteDirectory(workingDir);
+        DeleteDirectory.of(workingDir, 2, 14);
         Assert.assertFalse(workingDir.exists());
 
     }

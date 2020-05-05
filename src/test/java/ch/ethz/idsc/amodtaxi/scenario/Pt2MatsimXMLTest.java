@@ -5,7 +5,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.junit.Assert;
@@ -15,6 +14,7 @@ import com.google.common.io.Files;
 
 import ch.ethz.idsc.amodeus.matsim.xml.XmlCustomModifier;
 import ch.ethz.idsc.amodeus.util.io.Locate;
+import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
 public class Pt2MatsimXMLTest {
 
@@ -52,7 +52,7 @@ public class Pt2MatsimXMLTest {
 
         /* Clean up */
         Assert.assertTrue(workingDir.exists());
-        FileUtils.deleteDirectory(workingDir);
+        DeleteDirectory.of(workingDir, 2, 14);
         Assert.assertFalse(workingDir.exists());
     }
 
@@ -90,7 +90,7 @@ public class Pt2MatsimXMLTest {
 
         /* Clean up */
         Assert.assertTrue(workingDir.exists());
-        FileUtils.deleteDirectory(workingDir);
+        DeleteDirectory.of(workingDir, 2, 14);
         Assert.assertFalse(workingDir.exists());
     }
 }

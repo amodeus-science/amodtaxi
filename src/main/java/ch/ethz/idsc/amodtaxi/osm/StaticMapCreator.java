@@ -6,11 +6,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Optional;
 
-import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.pt2matsim.config.OsmConverterConfigGroup;
 import org.matsim.pt2matsim.run.Osm2MultimodalNetwork;
+
+import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
 
 public enum StaticMapCreator {
     ;
@@ -30,7 +31,6 @@ public enum StaticMapCreator {
             return;
 
         File pt2MatsimSettings = new File(directory, pt2MatsimSettingsName);
-        System.out.println(pt2MatsimSettings.getAbsolutePath());
         Osm2MultimodalNetwork.run(pt2MatsimSettings.getAbsolutePath());
     }
 
