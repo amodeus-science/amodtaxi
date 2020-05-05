@@ -12,11 +12,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.matsim.api.core.v01.Coord;
-
 import ch.ethz.idsc.amodeus.dispatcher.core.RequestStatus;
 import ch.ethz.idsc.amodeus.net.FastLinkLookup;
-import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.RequestContainer;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
@@ -24,17 +21,13 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 
 /* package */ class RequestInserter {
-
     private final AmodeusTimeConvert timeConvert;
-    private final MatsimAmodeusDatabase db;
     private final FastLinkLookup fastLinkLookup;
     // private final String taxiId;
     private Map<TaxiStamp, Collection<RequestContainer>> reqContainers = new HashMap<>();
 
-    public RequestInserter(AmodeusTimeConvert timeConvert, MatsimAmodeusDatabase db, //
-            FastLinkLookup fastLinkLookup, String taxiId) {
+    public RequestInserter(AmodeusTimeConvert timeConvert, FastLinkLookup fastLinkLookup, String taxiId) {
         this.timeConvert = timeConvert;
-        this.db = db;
         this.fastLinkLookup = fastLinkLookup;
         // TODO taxi id is not used
         // this.taxiId = taxiId;
@@ -58,13 +51,11 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
             LocalDate submissionDay = Objects.requireNonNull(submissionTime.toLocalDate());
 
             /** from link */
-            Coord position = db.referenceFrame.coords_fromWGS84().transform(timeTaxiStamps.get(taxiTrip.pickupTimeDate).gps);
-            int fromLinkIndex = fastLinkLookup.getLinkIndexFromXY(position);
+            int fromLinkIndex = fastLinkLookup.indexFromWGS84(timeTaxiStamps.get(taxiTrip.pickupTimeDate).gps);
 
             /** to link */
             LocalDateTime lastDriveTimeSTep = timeTaxiStamps.lowerKey(taxiTrip.dropoffTimeDate);
-            Coord positionEnd = db.referenceFrame.coords_fromWGS84().transform(timeTaxiStamps.get(lastDriveTimeSTep).gps);
-            int toLinkIndex = fastLinkLookup.getLinkIndexFromXY(positionEnd);
+            int toLinkIndex = fastLinkLookup.indexFromWGS84(timeTaxiStamps.get(lastDriveTimeSTep).gps);
 
             RequestContainerFactory requestContainerFactory = new RequestContainerFactory( //
                     taxiTrip.localId, fromLinkIndex, toLinkIndex, //

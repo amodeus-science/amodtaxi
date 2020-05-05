@@ -9,20 +9,11 @@ import java.io.OutputStreamWriter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Set;
 
-import org.apache.commons.lang3.tuple.Pair;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.utils.collections.QuadTree;
+import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 
-import ch.ethz.idsc.amodeus.dispatcher.core.RequestStatus;
-import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationObject;
 import ch.ethz.idsc.amodeus.net.StorageSubscriber;
 import ch.ethz.idsc.amodeus.net.StorageUtils;
@@ -34,36 +25,30 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
 import ch.ethz.idsc.tensor.Scalar;
 
-/* package */ class SimulationFleetDumperSF {
-
-    private int totalMatchedRequests;
+public class SimulationFleetDumperSF {
     private final Scalar tStepSize;
-    private Set<List<Pair<Integer, RequestStatus>>> requestTrails = new HashSet<>();
-    private LinkedHashSet<Pair<Integer, Integer>> requestMap = new LinkedHashSet<>();
     private final AmodeusTimeConvert timeConvert;
     private final SimContainerPopulator populator;
+    // private Set<List<Pair<Integer, RequestStatus>>> requestTrails = new HashSet<>();
+    // private LinkedHashSet<Pair<Integer, Integer>> requestMap = new LinkedHashSet<>();
 
-    public SimulationFleetDumperSF(MatsimAmodeusDatabase db, Network network, Scalar tStepSize, //
-            QuadTree<Link> qt, AmodeusTimeConvert timeConvert) {
+    public SimulationFleetDumperSF(FastLinkLookup fastLinkLookup, Scalar tStepSize, AmodeusTimeConvert timeConvert) {
         this.tStepSize = tStepSize;
         this.timeConvert = timeConvert;
-        this.populator = new SimContainerPopulator(db, qt, timeConvert);
+        this.populator = new SimContainerPopulator(fastLinkLookup, timeConvert);
     }
 
-    public void createDumpOf(DayTaxiRecord dayTaxiRecord, File outputFolder, //
-            LocalDate simulationDate) throws IOException {
-
+    public void createDumpOf(DayTaxiRecord dayTaxiRecord, File outputFolder, LocalDate simulationDate) throws IOException {
         System.out.println("INFO number of dayTaxiRecords: " + dayTaxiRecord.numTaxis());
         System.out.println("outputfolder for storage utils: " + outputFolder.getAbsolutePath());
 
         StorageUtils storageUtils = new StorageUtils(outputFolder);
-        GlobalAssert.that(Objects.nonNull(storageUtils));
 
-        totalMatchedRequests = 0;
+        int totalMatchedRequests = 0;
         GlobalRequestIndex globalReqIndex = new GlobalRequestIndex();
 
         LocalDateTime maxTime = timeConvert.endOf(simulationDate);
-        for (LocalDateTime glblTime = timeConvert.beginOf(simulationDate); LocalDateTimes.lessEquals(glblTime, maxTime); //
+        for (LocalDateTime glblTime = timeConvert.beginOf(simulationDate); glblTime.isEqual(maxTime) || glblTime.isBefore(maxTime); //
                 glblTime = LocalDateTimes.addTo(glblTime, tStepSize)) {
 
             // if (glblTime % 10000 == 0)
@@ -76,7 +61,6 @@ import ch.ethz.idsc.tensor.Scalar;
 
             /** VehicleContainer and RequestContainer **/
             for (int vehicleIndex = 0; vehicleIndex < dayTaxiRecord.numTaxis(); ++vehicleIndex) {
-                // try {
                 TaxiTrail taxiTrail = dayTaxiRecord.get(vehicleIndex);
 
                 Entry<LocalDateTime, TaxiStamp> taxiStampEntry = taxiTrail.getTaxiStamps().floorEntry(glblTime);
@@ -91,10 +75,6 @@ import ch.ethz.idsc.tensor.Scalar;
                 } else {
                     populator.withEmpty(simulationObject, vehicleIndex);
                 }
-                // } catch (Exception ex) {
-                // System.err.println("severe problem with file: " + //
-                // dayTaxiRecord.get(vehicleIndex).getID());
-                // }
             }
             totalMatchedRequests = simulationObject.total_matchedRequests;
 
@@ -105,7 +85,6 @@ import ch.ethz.idsc.tensor.Scalar;
 
         File file = new File(superFolder + "/info" + simulationDate.toString());
         try (BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)))) {
-
             for (int vehicleIndex = 0; vehicleIndex < dayTaxiRecord.numTaxis(); ++vehicleIndex) {
                 out.write("=====\n");
                 out.write("Entries in simulationObject part: \n");
@@ -113,7 +92,6 @@ import ch.ethz.idsc.tensor.Scalar;
                 out.write("LocalDate: " + simulationDate + "\n");
                 out.write("=====\n");
             }
-
         }
 
         System.out.println("totalMatchedRequests =" + totalMatchedRequests);
@@ -126,7 +104,5 @@ import ch.ethz.idsc.tensor.Scalar;
         // FleetLogUtils.writeRequestMap(outputFolder, requestMap);
         // FleetLogUtils.countAllRequests(requestTrails);
         // FleetLogUtils.writeRequestSummary(new File(outputFolder + "/RequestSummary.txt"), requestTrails);
-
     }
-
 }

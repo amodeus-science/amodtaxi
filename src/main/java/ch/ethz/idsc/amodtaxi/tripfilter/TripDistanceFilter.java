@@ -10,12 +10,10 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
-import ch.ethz.idsc.amodeus.net.TensorCoords;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.tensor.Scalar;
 
 /* package */ class TripDistanceFilter extends AbstractConsciousFilter {
-
     private final FastLinkLookup fll;
     private final LeastCostPathCalculator lcpc;
     private final Scalar minDistance;
@@ -31,8 +29,8 @@ import ch.ethz.idsc.tensor.Scalar;
     @Override
     public boolean testInternal(TaxiTrip trip) {
         /** get origin and destination */
-        Link origin = fll.getLinkFromWGS84(TensorCoords.toCoord(trip.pickupLoc));
-        Link destin = fll.getLinkFromWGS84(TensorCoords.toCoord(trip.dropoffLoc));
+        Link origin = fll.linkFromWGS84(trip.pickupLoc);
+        Link destin = fll.linkFromWGS84(trip.dropoffLoc);
 
         /** compute minimal network distance */
         // lcpc.

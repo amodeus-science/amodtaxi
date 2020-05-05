@@ -10,22 +10,21 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
+import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.taxitrip.ExportTaxiTrips;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
-import ch.ethz.idsc.amodeus.util.math.CreateQuadTree;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.population.TripPopulationCreator;
 import ch.ethz.idsc.amodtaxi.scenario.TaxiTripsSupplier;
 import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
 import ch.ethz.idsc.amodtaxi.tripmodif.TaxiDataModifier;
-import org.matsim.api.core.v01.network.Link;
+import ch.ethz.idsc.amodtaxi.util.NamingConvention;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.utils.collections.QuadTree;
 
 public abstract class TripFleetConverter {
     private final TaxiDataModifier contentModifier;
@@ -35,7 +34,7 @@ public abstract class TripFleetConverter {
     protected final Config config;
     protected final Network network;
     protected final MatsimAmodeusDatabase db;
-    protected final QuadTree<Link> qt; // TODO replace by FastLinkLookup
+    protected final FastLinkLookup fastLinkLookup;
     protected final File targetDirectory;
     protected final TaxiTripFilterCollection primaryFilter = new TaxiTripFilterCollection();
 
@@ -47,18 +46,17 @@ public abstract class TripFleetConverter {
         this.finalFilters = finalFilters;
         this.taxiTripsSupplier = taxiTripsSupplier;
         this.targetDirectory = targetDirectory;
-        this.targetDirectory.mkdirs();
         ReferenceFrame referenceFrame = scenarioOptions.getLocationSpec().referenceFrame();
-        this.db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
-        this.qt = CreateQuadTree.of(network);
+        db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
+        fastLinkLookup = new FastLinkLookup(network, db);
 
         File configFile = new File(scenarioOptions.getPreparerConfigName());
         GlobalAssert.that(configFile.exists());
         config = ConfigUtils.loadConfig(configFile.toString());
     }
 
-    public void run(File processingDir, String baseName, String extension, LocalDate simulationDate, AmodeusTimeConvert timeConvert) throws Exception {
-        extension = extension.startsWith(".") ? extension : ("." + extension);
+    public void run(File processingDir, NamingConvention convention, LocalDate simulationDate, AmodeusTimeConvert timeConvert) throws Exception {
+        targetDirectory.mkdirs();
 
         Collection<TaxiTrip> allTrips = taxiTripsSupplier.get();
         System.out.println("Before primary filter: " + allTrips.size());
@@ -67,11 +65,11 @@ public abstract class TripFleetConverter {
         Stream<TaxiTrip> filteredStream = primaryFilter.filterStream(allTrips.stream());
         List<TaxiTrip> primaryFiltered = filteredStream.collect(Collectors.toList());
         System.out.println("Primary filtered: " + primaryFiltered.size());
-        String filteredFileName = baseName + "_filtered" + extension;
+        String filteredFileName = convention.apply("filtered");
         primaryFilter.printSummary();
 
         File filteredFile = new File(targetDirectory, filteredFileName);
-        ExportTaxiTrips.toFile(primaryFiltered.stream(), filteredFile);
+        ExportTaxiTrips.toFile(primaryFiltered.stream(), filteredFile); // parent directory must exist beforehand
         GlobalAssert.that(filteredFile.isFile());
 
         /** modifying the trip data, e.g., distributing in 15 minute steps. */
@@ -79,9 +77,7 @@ public abstract class TripFleetConverter {
         GlobalAssert.that(modifiedTripsFile.isFile());
 
         /** creating population based on corrected, filtered file */
-        TripPopulationCreator populationCreator = //
-                new TripPopulationCreator(processingDir, config, network, db, //
-                        qt, simulationDate, timeConvert, finalFilters);
+        TripPopulationCreator populationCreator = new TripPopulationCreator(processingDir, config, network, fastLinkLookup, simulationDate, timeConvert, finalFilters);
         populationCreator.process(modifiedTripsFile);
         finalTripsFile = populationCreator.getFinalTripFile();
     }

@@ -9,20 +9,18 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.utils.collections.QuadTree;
 
 import ch.ethz.idsc.amodeus.analysis.Analysis;
+import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.taxitrip.ExportTaxiTrips;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
-import ch.ethz.idsc.amodeus.util.math.CreateQuadTree;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.linkspeed.LinkSpeedsExport;
 import ch.ethz.idsc.amodtaxi.linkspeed.iterative.IterativeLinkSpeedEstimator;
@@ -31,6 +29,7 @@ import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
 import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
 import ch.ethz.idsc.tensor.Scalar;
 
+@Deprecated
 /* package */ class StandaloneFleetConverterSF {
     private final File workingDirectory;
     private final MatsimAmodeusDatabase db;
@@ -43,20 +42,20 @@ import ch.ethz.idsc.tensor.Scalar;
     private final TaxiTripFilterCollection speedEstimationTripFilter;
     private final TaxiTripFilterCollection populationTripFilter;
 
-    private final QuadTree<Link> qt;
+    private final FastLinkLookup fastLinkLookup;
     private File outputDirectory;
     private final AmodeusTimeConvert timeConvert;
 
-    private final Scalar TIME_STEP;
+    private final Scalar timeStep;
 
     public StandaloneFleetConverterSF(File workingDirectory, DayTaxiRecord dayTaxiRecord, //
-            MatsimAmodeusDatabase db, Network network, Scalar TIME_STEP, //
+            MatsimAmodeusDatabase db, Network network, Scalar timeStep, //
             AmodeusTimeConvert timeConvert, TaxiTripFilterCollection taxiTripFilter, //
             TaxiTripFilterCollection populationTripFilter) throws Exception {
         this.workingDirectory = workingDirectory;
         this.dayTaxiRecord = dayTaxiRecord;
         this.db = db;
-        this.TIME_STEP = TIME_STEP;
+        this.timeStep = timeStep;
         this.timeConvert = timeConvert;
         this.speedEstimationTripFilter = taxiTripFilter;
         this.populationTripFilter = populationTripFilter;
@@ -66,7 +65,7 @@ import ch.ethz.idsc.tensor.Scalar;
         configFull = ConfigUtils.loadConfig(configFile.toString());
         this.network = network;
         GlobalAssert.that(Objects.nonNull(network));
-        qt = CreateQuadTree.of(network);
+        fastLinkLookup = new FastLinkLookup(network, db);
     }
 
     public void run(LocalDate simulationDate) throws Exception {
@@ -74,7 +73,7 @@ import ch.ethz.idsc.tensor.Scalar;
         outputDirectory = StaticHelper.prepareFolder(workingDirectory, new File(workingDirectory, configFull.controler().getOutputDirectory()));
 
         /** STEP 1: Generate simobjs from daytaxirecords for visualization */
-        SimulationFleetDumperSF sfd = new SimulationFleetDumperSF(db, network, TIME_STEP, qt, timeConvert);
+        SimulationFleetDumperSF sfd = new SimulationFleetDumperSF(fastLinkLookup, timeStep, timeConvert);
         outputDirectory.mkdirs();
         GlobalAssert.that(outputDirectory.isDirectory());
         sfd.createDumpOf(dayTaxiRecord, outputDirectory, simulationDate);
@@ -89,7 +88,7 @@ import ch.ethz.idsc.tensor.Scalar;
 
         /** STEP 4: Export final taxi trips and estimation trip population */
         ExportTaxiTrips.toFile(tripsSpeedEstimation.stream(), new File(workingDirectory, "finalTripsEstimation.csv"));
-        AdamAndEve.create(workingDirectory, tripsSpeedEstimation, network, db, timeConvert, qt, simulationDate, "_speedEst");
+        AdamAndEve.create(workingDirectory, tripsSpeedEstimation, network, fastLinkLookup, timeConvert, simulationDate, "_speedEst");
 
         // taxiTripFilter.
         // ClosestLinkSelect linkSelect = new ClosestLinkSelect(db, qt);
@@ -102,7 +101,7 @@ import ch.ethz.idsc.tensor.Scalar;
         System.out.println("Trips after filtering:  " + tripsForPopulation.size());
         populationTripFilter.printSummary();
 
-        AdamAndEve.create(workingDirectory, tripsForPopulation, network, db, timeConvert, qt, simulationDate, "");
+        AdamAndEve.create(workingDirectory, tripsForPopulation, network, fastLinkLookup, timeConvert, simulationDate, "");
         ExportTaxiTrips.toFile(tripsForPopulation.stream(), new File(workingDirectory, "finalTripsPopulation.csv"));
 
         /** STEP 6: Generate the report */

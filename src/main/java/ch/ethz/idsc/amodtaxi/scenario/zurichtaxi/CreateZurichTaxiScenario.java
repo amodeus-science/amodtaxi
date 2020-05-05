@@ -10,11 +10,11 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import org.matsim.api.core.v01.network.Link;
+import ch.ethz.idsc.amodeus.net.FastLinkLookup;
+import ch.ethz.idsc.amodeus.util.math.SI;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.pt2matsim.run.Osm2MultimodalNetwork;
 
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
@@ -25,7 +25,6 @@ import ch.ethz.idsc.amodeus.taxitrip.ExportTaxiTrips;
 import ch.ethz.idsc.amodeus.taxitrip.ImportTaxiTrips;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
-import ch.ethz.idsc.amodeus.util.math.CreateQuadTree;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.linkspeed.iterative.IterativeLinkSpeedEstimator;
 import ch.ethz.idsc.amodtaxi.osm.OsmLoader;
@@ -70,8 +69,8 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         TaxiTripFilterCollection finalTripFilter = new TaxiTripFilterCollection();
         /** trips which are faster than the network freeflow speeds would allow are removed */
         finalTripFilter.addFilter(new TripNetworkFilter(network, db, //
-                Quantity.of(0.0000001, "m*s^-1"), Quantity.of(100000, "s"), Quantity.of(0.000001, "m"), true));
-        finalTripFilter.addFilter(new TripDurationFilter(Quantity.of(1, "s"), Quantity.of(Double.MAX_VALUE, "s")));
+                Quantity.of(0.0000001, SI.VELOCITY), Quantity.of(100000, SI.SECOND), Quantity.of(0.000001, SI.METER), true));
+        finalTripFilter.addFilter(new TripDurationFilter(Quantity.of(1, SI.SECOND), Quantity.of(Double.MAX_VALUE, SI.SECOND)));
         List<TaxiTrip> fitForTrafficEstimation = finalTripFilter.filterStream(finalTrips.stream()).collect(Collectors.toList());
         finalTripFilter.printSummary();
         ExportTaxiTrips.toFile(fitForTrafficEstimation.stream(), new File(workingDir, "estimationTrips.csv"));
@@ -106,9 +105,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         File tripsFile = new File("/home/clruch/Downloads/tripsJune21_best_new.csv");
         ZurichTaxiTripReader reader = new ZurichTaxiTripReader(",");
         List<TaxiTrip> allTrips = reader.getTrips(tripsFile);
-        allTrips.stream().forEach(t -> {
-            System.out.println(t.toString());
-        });
+        allTrips.stream().map(TaxiTrip::toString).forEach(System.out::println);
 
         ScenarioOptions scenarioOptions = new ScenarioOptions(workingDir, //
                 ScenarioOptionsBase.getDefault());
@@ -122,11 +119,10 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
         TaxiTripFilterCollection finalTripFilter = new TaxiTripFilterCollection();
 
-        QuadTree<Link> qt = CreateQuadTree.of(network);
         TripPopulationCreator populationCreator = //
-                new TripPopulationCreator(workingDir, configFull, network, db, qt, //
+                new TripPopulationCreator(workingDir, configFull, network, new FastLinkLookup(network, db), //
                         simualtionDate, timeConvert, finalTripFilter);
-        populationCreator.process(allTrips, new File(workingDir, "/finalTrips.csv"));
+        populationCreator.process(allTrips, new File(workingDir, "finalTrips.csv"));
         finalTripsFile = populationCreator.getFinalTripFile();
     }
 
@@ -135,5 +131,4 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         File workingDir = new File(args[0]);
         new CreateZurichTaxiScenario(workingDir);
     }
-
 }

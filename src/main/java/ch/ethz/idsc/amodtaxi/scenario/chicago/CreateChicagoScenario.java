@@ -44,9 +44,10 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
 /* package */ class CreateChicagoScenario {
-    private static final AmodeusTimeConvert timeConvert = new AmodeusTimeConvert(ZoneId.of("America/Chicago"));
+    private static final AmodeusTimeConvert TIME_CONVERT = new AmodeusTimeConvert(ZoneId.of("America/Chicago"));
     // TODO load random with a seed over scenarioOptions
     private static final Random RANDOM = new Random(123);
+    private static final int MAX_ITER = 100_000;
 
     private static void createScenario(File workingDir) throws Exception {
         ChicagoSetup.in(workingDir);
@@ -63,7 +64,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         /* Create empty scenario folder */
         File processingDir = new File(workingDir, "Scenario");
         if (processingDir.isDirectory())
-            DeleteDirectory.of(processingDir, 2, 100);
+            DeleteDirectory.of(processingDir, 2, 50);
         if (!processingDir.isDirectory())
             processingDir.mkdir();
 
@@ -110,26 +111,22 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         File destinDir = new File(workingDir, "CreatedScenario");
         List<TaxiTrip> finalTrips;
 
-        // prepare final scenario
-        TripFleetConverter converter = //
-                new ChicagoOnlineTripFleetConverter(scenarioOptions, network, tripModifier, //
-                        new ChicagoFormatModifier(), taxiTripFilterCollection, tripsReader, tripFile, new File(processingDir, "tripData"));
-        File finalTripsFile = Scenario.create(workingDir, tripFile, converter, processingDir, simulationDate, timeConvert);
+        { // prepare final scenario
+            TripFleetConverter converter = //
+                    new ChicagoOnlineTripFleetConverter(scenarioOptions, network, tripModifier, //
+                            new ChicagoFormatModifier(), taxiTripFilterCollection, tripsReader, tripFile, new File(processingDir, "tripData"));
+            File finalTripsFile = Objects.requireNonNull(Scenario.create(workingDir, tripFile, converter, processingDir, simulationDate, TIME_CONVERT));
 
-        Objects.requireNonNull(finalTripsFile);
+            System.out.println("The final trips file is: " + finalTripsFile.getAbsolutePath());
 
-        System.out.println("The final trips file is: ");
-        System.out.println(finalTripsFile.getAbsolutePath());
+            /** loading final trips */
+            finalTrips = ImportTaxiTrips.fromFile(finalTripsFile);
 
-        // this is the old LP-based code
-        // ChicagoLinkSpeeds.compute(processingDir, finalTripsFile);
-        // new code
-
-        /** loading final trips */
-        finalTrips = ImportTaxiTrips.fromFile(finalTripsFile);
-
-        final int maxIter = 100000;
-        new IterativeLinkSpeedEstimator(maxIter, RANDOM).compute(processingDir, network, db, finalTrips);
+            /** loading final trips */
+            finalTrips = ImportTaxiTrips.fromFile(finalTripsFile);
+        }
+        if (MAX_ITER > 0)
+            new IterativeLinkSpeedEstimator(MAX_ITER, RANDOM).compute(processingDir, network, db, finalTrips);
 
         FinishedScenario.copyToDir(processingDir.getAbsolutePath(), //
                 destinDir.getAbsolutePath(), //

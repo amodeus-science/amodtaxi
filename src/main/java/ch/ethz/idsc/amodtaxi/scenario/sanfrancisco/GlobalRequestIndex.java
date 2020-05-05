@@ -2,14 +2,13 @@
 package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 
 import java.util.HashMap;
-import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
 public class GlobalRequestIndex {
-    private int globalReqIndex = 0;
     private HashMap<VehReqPair, Integer> reqMap = new HashMap<>();
 
     /** adds request for vehicle with index
@@ -19,22 +18,11 @@ public class GlobalRequestIndex {
      * @return associated globalReqIndex */
     public Integer add(int vehicleIndex, int vehReqIndex) {
         VehReqPair vrp = new VehReqPair(vehicleIndex, vehReqIndex);
-
-        if (reqMap.containsKey(vrp)) {
-            return reqMap.get(vrp);
-        }
-        globalReqIndex = reqMap.size() + 1;
-        Integer prevVal = reqMap.put(vrp, globalReqIndex);
-        GlobalAssert.that(Objects.isNull(prevVal));
-        return reqMap.get(vrp);
+        return reqMap.computeIfAbsent(vrp, v -> reqMap.size() + 1);
     }
 
+    // TODO check if actually needed
     public SortedSet<Integer> getGlobalIDs() {
-        TreeSet<Integer> globalIDs = new TreeSet<>();
-        for (Integer globalID : reqMap.values()) {
-            globalIDs.add(globalID);
-        }
-        return globalIDs;
+        return reqMap.values().stream().sorted().collect(Collectors.toCollection(TreeSet::new));
     }
-
 }

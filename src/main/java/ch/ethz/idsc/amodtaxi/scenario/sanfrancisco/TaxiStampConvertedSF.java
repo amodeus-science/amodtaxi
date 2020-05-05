@@ -19,15 +19,13 @@ public enum TaxiStampConvertedSF implements TaxiStampConverted {
     public TaxiStamp from(List<String> dataFileRow, AmodeusTimeConvert timeConvert) {
         GlobalAssert.that(dataFileRow.size() == 4);
         TaxiStamp taxiStamp = new TaxiStamp();
+
         /** time */
         taxiStamp.globalTime = timeConvert.getLdt(Integer.parseInt(dataFileRow.get(3)));
+
         /** occupancy status */
-        Integer occStat = Integer.parseInt(dataFileRow.get(2));
-        if (occStat == 1) {
-            taxiStamp.occupied = true;
-        } else {
-            taxiStamp.occupied = false;
-        }
+        taxiStamp.occupied = Integer.parseInt(dataFileRow.get(2)) == 1;
+
         /** coordinate */
         taxiStamp.gps = new Coord( //
                 Double.parseDouble(dataFileRow.get(1)), //
