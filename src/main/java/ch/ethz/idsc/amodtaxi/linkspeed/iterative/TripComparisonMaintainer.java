@@ -32,7 +32,7 @@ import ch.ethz.idsc.tensor.Scalar;
             TaxiTrip trip = randomTrips.nextRandom();
             DurationCompare compare = new DurationCompare(trip, calc);
             Scalar pathDurationratio = compare.nwPathDurationRatio;
-            randomTrips.addRecordedRatio(compare.nwPathDurationRatio);
+            randomTrips.addRecordedRatio(pathDurationratio);
             ratioLookupMap.put(trip, pathDurationratio);
             Scalar cost = pathDurationratio.subtract(RealScalar.ONE).abs();
             ratioSortedMap.put(cost, trip);
@@ -46,6 +46,7 @@ import ch.ethz.idsc.tensor.Scalar;
         Scalar costBefore = ratioBefore.subtract(RealScalar.ONE).abs();
         // update worst trip
         if (!ratioSortedMap.remove(costBefore, trip)) {
+            GlobalAssert.that(false); // TODO To check why should this happen?
             System.out.println("Cleansing sorted map...");
             // if not removed successfully, remove all values associated to this trip.
             NavigableMap<Scalar, TaxiTrip> ratioSortedMapOld = ratioSortedMap;

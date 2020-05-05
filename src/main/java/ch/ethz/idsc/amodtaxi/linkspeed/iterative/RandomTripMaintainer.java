@@ -17,7 +17,7 @@ import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 
-/* package */ class RandomTripMaintainer {
+public class RandomTripMaintainer {
 
     /** random generator */
     private final Random random;
@@ -41,10 +41,7 @@ import ch.ethz.idsc.tensor.Tensors;
 
         /** fill query map */
         Collections.shuffle(allTrips, random);
-        queryMap.put(0, new HashSet<TaxiTrip>());
-        allTrips.stream().forEach(tt -> {
-            queryMap.firstEntry().getValue().add(tt);
-        });
+        queryMap.put(0, new HashSet<TaxiTrip>(allTrips));
         GlobalAssert.that(allTrips.size() == queryMap.firstEntry().getValue().size());
     }
 
@@ -60,7 +57,6 @@ import ch.ethz.idsc.tensor.Tensors;
 
         // select random trip from it
         TaxiTrip selected = leastChecked.stream().skip(random.nextInt(leastChecked.size())).findFirst().get();
-
         // move to set with +1 checks
         GlobalAssert.that(leastChecked.remove(selected));
         if (queryMap.lastKey() == numChecks) {

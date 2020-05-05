@@ -45,6 +45,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
 /* package */ class CreateChicagoScenario {
     private static final AmodeusTimeConvert timeConvert = new AmodeusTimeConvert(ZoneId.of("America/Chicago"));
+    // TODO load random with a seed over scenarioOptions
     private static final Random RANDOM = new Random(123);
 
     private static void createScenario(File workingDir) throws Exception {
@@ -62,7 +63,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         /* Create empty scenario folder */
         File processingDir = new File(workingDir, "Scenario");
         if (processingDir.isDirectory())
-            DeleteDirectory.of(processingDir, 2, 25);
+            DeleteDirectory.of(processingDir, 2, 100);
         if (!processingDir.isDirectory())
             processingDir.mkdir();
 
@@ -128,7 +129,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         finalTrips = ImportTaxiTrips.fromFile(finalTripsFile);
 
         final int maxIter = 100000;
-        new IterativeLinkSpeedEstimator(maxIter).compute(processingDir, network, db, finalTrips);
+        new IterativeLinkSpeedEstimator(maxIter, RANDOM).compute(processingDir, network, db, finalTrips);
 
         FinishedScenario.copyToDir(processingDir.getAbsolutePath(), //
                 destinDir.getAbsolutePath(), //

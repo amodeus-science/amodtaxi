@@ -33,16 +33,17 @@ public class IterativeLinkSpeedEstimator implements TaxiLinkSpeedEstimator {
     private final Scalar tolerance = RealScalar.of(0.005);
     /** this is a value in (0,1] which determines the convergence
      * speed of the algorithm, a value close to 1 may lead to
-     * loss of convergence, it is advised o chose slow values for
+     * loss of convergence, it is advised to choose slow values for
      * epsilon. No changes are applied for epsilon == 0. */
     private final Scalar epsilon1 = RealScalar.of(0.05);
     /** probability of taking a new trip */
     private final Scalar epsilon2 = RealScalar.of(0.8);
-    private final Random random = new Random(123);
+    private final Random random;
     private final int dt = 450;
 
-    public IterativeLinkSpeedEstimator(int maxIter) {
+    public IterativeLinkSpeedEstimator(int maxIter, Random random) {
         this.maxIter = maxIter;
+        this.random = random;
     }
 
     public void compute(File processingDir, Network network, MatsimAmodeusDatabase db, List<TaxiTrip> trips) {
@@ -64,7 +65,6 @@ public class IterativeLinkSpeedEstimator implements TaxiLinkSpeedEstimator {
         /** load initial trips */
 
         System.out.println("Number of trips: " + trips.size());
-
         new FindCongestionIterative(network, db, processingDir, lsData, trips, maxIter, //
                 tolerance, epsilon1, epsilon2, random, dt, Cost::max, trips.size());
 
@@ -102,7 +102,7 @@ public class IterativeLinkSpeedEstimator implements TaxiLinkSpeedEstimator {
         // List<TaxiTrip> trips = new ArrayList<>();
         // ImportTaxiTrips.fromFile(finalTripsFile).forEach(trips::add);
         List<TaxiTrip> trips = new ArrayList<>(ImportTaxiTrips.fromFile(finalTripsFile));
-        new IterativeLinkSpeedEstimator(200000).compute(processingDir, network, db, trips);
+        new IterativeLinkSpeedEstimator(200000, new Random(123)).compute(processingDir, network, db, trips);
     }
 
 }

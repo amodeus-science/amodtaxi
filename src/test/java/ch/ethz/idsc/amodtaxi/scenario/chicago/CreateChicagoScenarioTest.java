@@ -88,7 +88,7 @@ public class CreateChicagoScenarioTest {
         /* Create empty scenario folder */
         File processingDir = new File(workingDir, "Scenario");
         if (processingDir.isDirectory())
-            DeleteDirectory.of(processingDir, 2, 25);
+            DeleteDirectory.of(processingDir, 2, 100);
         if (!processingDir.isDirectory())
             processingDir.mkdir();
 
@@ -154,7 +154,7 @@ public class CreateChicagoScenarioTest {
         finalTrips = ImportTaxiTrips.fromFile(finalTripsFile);
 
         final int maxIter = 1000;
-        new IterativeLinkSpeedEstimator(maxIter).compute(processingDir, network, db, finalTrips);
+        new IterativeLinkSpeedEstimator(maxIter, RANDOM).compute(processingDir, network, db, finalTrips);
 
         FinishedScenario.copyToDir(processingDir.getAbsolutePath(), //
                 destinDir.getAbsolutePath(), //
@@ -164,7 +164,7 @@ public class CreateChicagoScenarioTest {
 
         /* Clean up */
         // Assert.assertTrue(workingDir.exists());
-        // DeleteDirectory.of(workingDir, 2, 14);
+        // DeleteDirectory.of(workingDir, 4, 200);
         // Assert.assertFalse(workingDir.exists());
     }
 }

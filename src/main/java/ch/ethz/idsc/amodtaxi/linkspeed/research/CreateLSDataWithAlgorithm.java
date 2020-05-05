@@ -31,7 +31,7 @@ import ch.ethz.idsc.amodtaxi.scenario.chicago.ChicagoReferenceFrames;
 
         /** compute lsData with algorithm */
         List<TaxiTrip> finalTrips = ImportTaxiTrips.fromFile(tripFile);
-        new IterativeLinkSpeedEstimator(maxIter).compute(processingDir, network, db, finalTrips);
+        new IterativeLinkSpeedEstimator(maxIter, random).compute(processingDir, network, db, finalTrips);
 
     }
 }
