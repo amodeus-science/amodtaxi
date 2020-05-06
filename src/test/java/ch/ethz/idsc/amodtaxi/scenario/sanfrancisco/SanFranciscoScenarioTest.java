@@ -16,6 +16,7 @@ import ch.ethz.idsc.amodeus.util.io.CopyFiles;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.math.SI;
+import ch.ethz.idsc.amodtaxi.fleetconvert.SanFranciscoTripFleetConverter;
 import ch.ethz.idsc.amodtaxi.fleetconvert.TripFleetConverter;
 import ch.ethz.idsc.amodtaxi.scenario.FinishedScenario;
 import ch.ethz.idsc.amodtaxi.scenario.Scenario;

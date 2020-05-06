@@ -52,6 +52,7 @@
 			<id>pt2matsim</id>
 			<url>http://dl.bintray.com/polettif/matsim</url>
 		</repository>
+		<!-- should in the future be handled by amodeus -->
 		<repository>
 			<id>osgeo</id>
 			<name>Geotools repository</name>

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
+import ch.ethz.idsc.amodtaxi.fleetconvert.SanFranciscoTripFleetConverter;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
