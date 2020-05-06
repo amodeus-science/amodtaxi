@@ -2,33 +2,36 @@
 package ch.ethz.idsc.amodtaxi.scenario.chicago;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.google.common.io.Files;
-
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
-import ch.ethz.idsc.amodeus.util.io.Locate;
-import ch.ethz.idsc.amodtaxi.scenario.Pt2MatsimXML;
+import ch.ethz.idsc.amodeus.util.io.CopyFiles;
+import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.scenario.TaxiTripsReader;
+import ch.ethz.idsc.amodtaxi.scenario.TestDirectories;
 import ch.ethz.idsc.amodtaxi.tripmodif.ChicagoFormatModifier;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
 public class TripsReaderChicagoTest {
     private static final String TRIPFILENAME = "tripsChicago.csv";
 
+    @BeforeClass
+    public static void setUp() throws Exception {
+        GlobalAssert.that(TestDirectories.WORKING.mkdirs());
+        CopyFiles.now(TestDirectories.CHICAGO.getAbsolutePath(), //
+                TestDirectories.WORKING.getAbsolutePath(), Arrays.asList(TRIPFILENAME), true);
+    }
+
     @Test
     public void test() throws Exception {
         /* Init */
-        File workingDir = new File(Locate.repoFolder(Pt2MatsimXML.class, "amodtaxi"), "test");
-        File resourcesDir = new File(Locate.repoFolder(Pt2MatsimXML.class, "amodtaxi"), "resources/testScenario");
-        File tripFile = new File(workingDir, TRIPFILENAME);
-        Assert.assertTrue(workingDir.exists() || workingDir.mkdir());
-        Files.copy(new File(resourcesDir, TRIPFILENAME), tripFile);
-        // ChicagoGeoInformation.setup();
-        // ScenarioSetup.in(workingDir, resourcesDir);
+        File tripFile = new File(TestDirectories.WORKING, TRIPFILENAME);
 
         /* Run function of interest */
         File preparedFile = new ChicagoFormatModifier().modify(tripFile);
@@ -37,10 +40,10 @@ public class TripsReaderChicagoTest {
 
         /* Check functionality */
         Assert.assertEquals(taxiTrips.size(), 89);
+    }
 
-        /* Clean up */
-        Assert.assertTrue(workingDir.exists());
-        DeleteDirectory.of(workingDir, 3, 100);
-        Assert.assertFalse(workingDir.exists());
+    @AfterClass
+    public static void cleanUp() throws Exception {
+        DeleteDirectory.of(TestDirectories.WORKING, 3, 100);
     }
 }
