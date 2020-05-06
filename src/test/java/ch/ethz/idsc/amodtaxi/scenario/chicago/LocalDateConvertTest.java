@@ -4,15 +4,16 @@ package ch.ethz.idsc.amodtaxi.scenario.chicago;
 import java.time.LocalDate;
 import java.time.Month;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class LocalDateConvertTest extends TestCase {
-
+public class LocalDateConvertTest {
+    @Test
     public void testSimple() {
         LocalDate localDate = LocalDateConvert.ofOptions("2014/11/18");
-        assertEquals(localDate.getYear(), 2014);
-        assertEquals(localDate.getMonth(), Month.NOVEMBER);
-        assertEquals(localDate.getDayOfMonth(), 18);
+        Assert.assertEquals(localDate.getYear(), 2014);
+        Assert.assertEquals(localDate.getMonth(), Month.NOVEMBER);
+        Assert.assertEquals(localDate.getDayOfMonth(), 18);
     }
 
 }

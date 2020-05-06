@@ -3,34 +3,34 @@ package ch.ethz.idsc.amodtaxi.scenario;
 
 import java.io.File;
 
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ch.ethz.idsc.amodeus.util.io.Locate;
+import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
 public class ScenarioSetupTest {
+    @BeforeClass
+    public static void setUp() throws Exception {
+        GlobalAssert.that(TestDirectories.WORKING.mkdirs());
+    }
 
     @Test
     public void test() throws Exception {
-        /* Init */
-        File workingDir = new File(Locate.repoFolder(ScenarioSetup.class, "amodtaxi"), "test");
-        File resourcesDir = new File(Locate.repoFolder(ScenarioSetup.class, "amodtaxi"), "resources/chicagoScenario");
-        Assert.assertTrue(workingDir.exists() || workingDir.mkdir());
-
         /* Run function of interest */
-        ScenarioSetup.in(workingDir, resourcesDir);
+        ScenarioSetup.in(TestDirectories.WORKING, TestDirectories.MINI);
 
         /* Check functionality */
-        Assert.assertTrue(new File(workingDir, ScenarioLabels.config).exists());
-        Assert.assertTrue(new File(workingDir, ScenarioLabels.pt2MatSettings).exists());
-        Assert.assertTrue(new File(workingDir, ScenarioLabels.LPFile).exists());
-        Assert.assertTrue(new File(workingDir, ScenarioLabels.amodeusFile).exists());
+        Assert.assertTrue(new File(TestDirectories.WORKING, ScenarioLabels.config).exists());
+        Assert.assertTrue(new File(TestDirectories.WORKING, ScenarioLabels.pt2MatSettings).exists());
+        Assert.assertTrue(new File(TestDirectories.WORKING, ScenarioLabels.LPFile).exists());
+        Assert.assertTrue(new File(TestDirectories.WORKING, ScenarioLabels.amodeusFile).exists());
+    }
 
-        /* Clean up */
-        Assert.assertTrue(workingDir.exists());
-        DeleteDirectory.of(workingDir, 2, 14);
-        Assert.assertFalse(workingDir.exists());
-
+    @AfterClass
+    public static void cleanUp() throws Exception {
+        DeleteDirectory.of(TestDirectories.WORKING, 2, 14);
     }
 }

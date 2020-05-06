@@ -2,9 +2,11 @@ package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 
 import java.util.Iterator;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class GlobalRequestIndexTest extends TestCase {
+public class GlobalRequestIndexTest {
+    @Test
     public void test() {
         GlobalRequestIndex index = new GlobalRequestIndex();
         int first = index.add(1, 1);
@@ -12,16 +14,16 @@ public class GlobalRequestIndexTest extends TestCase {
         int third = index.add(2, 1);
         int fourth = index.add(2, 2);
 
-        assertEquals(1, first);
-        assertEquals(2, second);
-        assertEquals(3, third);
-        assertEquals(4, fourth);
+        Assert.assertEquals(1, first);
+        Assert.assertEquals(2, second);
+        Assert.assertEquals(3, third);
+        Assert.assertEquals(4, fourth);
 
-        assertEquals(second, (int) index.add(1, 2));
+        Assert.assertEquals(second, (int) index.add(1, 2));
 
         Iterator<Integer> actual = index.getGlobalIDs().iterator();
         for (int i = 1; i < 5; i++)
-            assertEquals(i, (int) actual.next());
-        assertTrue(!actual.hasNext());
+            Assert.assertEquals(i, (int) actual.next());
+        Assert.assertTrue(!actual.hasNext());
     }
 }

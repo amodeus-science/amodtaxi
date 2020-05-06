@@ -1,11 +1,14 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.tripmodif;
 
-import ch.ethz.idsc.tensor.io.StringScalarQ;
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class ChicagoAirportBoundaryLinksTest extends TestCase {
+import ch.ethz.idsc.tensor.io.StringScalarQ;
+
+public class ChicagoAirportBoundaryLinksTest {
+    @Test
     public void testSimple() {
-        assertFalse(StringScalarQ.any(ChicagoAirportBoundaryLinks.locations()));
+        Assert.assertFalse(StringScalarQ.any(ChicagoAirportBoundaryLinks.locations()));
     }
 }
