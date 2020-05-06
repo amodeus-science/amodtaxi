@@ -111,20 +111,17 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         File destinDir = new File(workingDir, "CreatedScenario");
         List<TaxiTrip> finalTrips;
 
-        { // prepare final scenario
-            TripFleetConverter converter = //
-                    new ChicagoOnlineTripFleetConverter(scenarioOptions, network, tripModifier, //
-                            new ChicagoFormatModifier(), taxiTripFilterCollection, tripsReader, tripFile, new File(processingDir, "tripData"));
-            File finalTripsFile = Objects.requireNonNull(Scenario.create(workingDir, tripFile, converter, processingDir, simulationDate, TIME_CONVERT));
+        // prepare final scenario
+        TripFleetConverter converter = //
+                new ChicagoOnlineTripFleetConverter(scenarioOptions, network, tripModifier, //
+                        new ChicagoFormatModifier(), taxiTripFilterCollection, tripsReader, tripFile, new File(processingDir, "tripData"));
+        File finalTripsFile = Objects.requireNonNull(Scenario.create(workingDir, tripFile, converter, processingDir, simulationDate, TIME_CONVERT));
 
-            System.out.println("The final trips file is: " + finalTripsFile.getAbsolutePath());
+        System.out.println("The final trips file is: " + finalTripsFile.getAbsolutePath());
 
-            /** loading final trips */
-            finalTrips = ImportTaxiTrips.fromFile(finalTripsFile);
+        /** loading final trips */
+        finalTrips = ImportTaxiTrips.fromFile(finalTripsFile);
 
-            /** loading final trips */
-            finalTrips = ImportTaxiTrips.fromFile(finalTripsFile);
-        }
         if (MAX_ITER > 0)
             new IterativeLinkSpeedEstimator(MAX_ITER, RANDOM).compute(processingDir, network, db, finalTrips);
 

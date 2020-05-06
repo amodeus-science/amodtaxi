@@ -17,6 +17,9 @@ import org.junit.Test;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.pt2matsim.run.Osm2MultimodalNetwork;
+
+import com.google.common.io.Files;
 
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
 import ch.ethz.idsc.amodeus.net.FastLinkLookup;
@@ -33,13 +36,11 @@ import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodtaxi.fleetconvert.ChicagoOnlineTripFleetConverter;
 import ch.ethz.idsc.amodtaxi.fleetconvert.TripFleetConverter;
 import ch.ethz.idsc.amodtaxi.linkspeed.iterative.IterativeLinkSpeedEstimator;
-import ch.ethz.idsc.amodtaxi.osm.StaticMapCreator;
 import ch.ethz.idsc.amodtaxi.scenario.FinishedScenario;
 import ch.ethz.idsc.amodtaxi.scenario.Pt2MatsimXML;
 import ch.ethz.idsc.amodtaxi.scenario.Scenario;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioBasicNetworkPreparer;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
-import ch.ethz.idsc.amodtaxi.scenario.ScenarioSetup;
 import ch.ethz.idsc.amodtaxi.scenario.TaxiTripsReader;
 import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
 import ch.ethz.idsc.amodtaxi.tripfilter.TripNetworkFilter;
@@ -60,10 +61,9 @@ public class CreateChicagoScenarioTest {
     public void test() throws Exception {
         /* Init */
         File workingDir = new File(Locate.repoFolder(Pt2MatsimXML.class, "amodtaxi"), "test");
-        File resourcesDir = new File(Locate.repoFolder(Pt2MatsimXML.class, "amodtaxi"), "resources/chicagoScenario");
+        File osmFile = new File(Locate.repoFolder(Pt2MatsimXML.class, "amodtaxi"), "resources/testScenario/mapChicago.osm");
         Assert.assertTrue(workingDir.exists() || workingDir.mkdir());
-        ChicagoGeoInformation.setup();
-        ScenarioSetup.in(workingDir, resourcesDir);
+        ChicagoSetup.in(workingDir);
 
         /* Reduce population size in Properties */
         String smallProp = ScenarioLabels.amodeusFile;
@@ -78,7 +78,8 @@ public class CreateChicagoScenarioTest {
         out.close();
 
         /* Download of open street map data to create scenario */
-        StaticMapCreator.now(workingDir);
+        Files.copy(osmFile, new File(workingDir, ScenarioLabels.osmData)); // from boundingBox={-87.7034, 41.8997, -87.6989, 41.9041}
+        Osm2MultimodalNetwork.run(new File(workingDir, ScenarioLabels.pt2MatSettings).getAbsolutePath());
 
         /* Prepare the network */
         ScenarioBasicNetworkPreparer.run(workingDir);
@@ -89,7 +90,7 @@ public class CreateChicagoScenarioTest {
         /* Create empty scenario folder */
         File processingDir = new File(workingDir, "Scenario");
         if (processingDir.isDirectory())
-            DeleteDirectory.of(processingDir, 2, 100);
+            DeleteDirectory.of(processingDir, 3, 100);
         if (!processingDir.isDirectory())
             processingDir.mkdir();
 
@@ -165,7 +166,7 @@ public class CreateChicagoScenarioTest {
 
         /* Clean up */
         Assert.assertTrue(workingDir.exists());
-        DeleteDirectory.of(workingDir, 4, 200);
+        DeleteDirectory.of(workingDir, 3, 100);
         Assert.assertFalse(workingDir.exists());
     }
 }
