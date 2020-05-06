@@ -51,8 +51,7 @@ import ch.ethz.idsc.amodtaxi.tripmodif.TripStartTimeShiftResampling;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
-/** Tests if data for the creation of the Chicago taxi scenario is accessible from the
- * web API. */
+/** Tests if data for the creation of the Chicago taxi scenario is accessible from the web API. */
 public class CreateChicagoScenarioTest {
     private static final AmodeusTimeConvert timeConvert = new AmodeusTimeConvert(ZoneId.of("America/Chicago"));
     private static final Random RANDOM = new Random(123);
@@ -70,7 +69,9 @@ public class CreateChicagoScenarioTest {
         String smallProp = ScenarioLabels.amodeusFile;
         File smallPropFile = new File(workingDir, smallProp);
         Properties properties = new Properties();
-        properties.load(new FileInputStream(new File(workingDir, ScenarioLabels.amodeusFile)));
+        try (FileInputStream fis = new FileInputStream(new File(workingDir, ScenarioLabels.amodeusFile))) {
+            properties.load(fis);
+        }
         properties.setProperty(ScenarioOptionsBase.MAXPOPULATIONSIZEIDENTIFIER, "100");
         FileOutputStream out = new FileOutputStream(smallPropFile);
         properties.store(out, null);
@@ -128,7 +129,7 @@ public class CreateChicagoScenarioTest {
         TaxiTripFilterCollection taxiTripFilterCollection = new TaxiTripFilterCollection();
         /** trips which are faster than the network freeflow speeds would allow are removed */
         taxiTripFilterCollection.addFilter(new TripNetworkFilter(network, db, //
-                Quantity.of(2.235200008, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m"), true));
+                Quantity.of(2.235200008, SI.VELOCITY), Quantity.of(3600, SI.SECOND), Quantity.of(200, SI.METER), true));
 
         // TODO eventually remove, this did not improve the fit.
         // finalFilters.addFilter(new TripMaxSpeedFilter(network, db, ScenarioConstants.maxAllowedSpeed));

@@ -16,6 +16,7 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
 public enum ChicagoDataLoader {
     ;
+
     public static File from(String propertiesName, File dir) throws Exception {
         GlobalAssert.that(dir.isDirectory());
         File propertiesFile = new File(dir, propertiesName);
@@ -23,7 +24,9 @@ public enum ChicagoDataLoader {
 
         /* Load properties */
         Properties properties = new Properties();
-        properties.load(new FileInputStream(propertiesFile));
+        try (FileInputStream fis = new FileInputStream(propertiesFile)) {
+            properties.load(fis);
+        }
 
         return from(properties, dir, Integer.valueOf(properties.getProperty(ScenarioOptionsBase.MAXPOPULATIONSIZEIDENTIFIER)));
     }

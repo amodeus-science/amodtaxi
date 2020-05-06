@@ -6,8 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Properties;
 
-import org.junit.Assert;
-import org.junit.Test;
+import junit.framework.TestCase;
 
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.io.Locate;
@@ -15,9 +14,7 @@ import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
 
 /** Tests if data for the creation of the Chicago taxi scenario is accessible from the
  * web API. */
-public class ChicagoDataLoaderTest {
-
-    @Test
+public class ChicagoDataLoaderTest extends TestCase {
     public void test() throws Exception {
         File settingsDir = new File(Locate.repoFolder(CreateChicagoScenario.class, "amodtaxi"), "resources/chicagoScenario");
 
@@ -25,18 +22,20 @@ public class ChicagoDataLoaderTest {
         String smallProp = "Manipulated_" + ScenarioLabels.amodeusFile;
         File smallPropFile = new File(settingsDir, smallProp);
         Properties properties = new Properties();
-        properties.load(new FileInputStream(new File(settingsDir, ScenarioLabels.amodeusFile)));
+        try (FileInputStream fis = new FileInputStream(new File(settingsDir, ScenarioLabels.amodeusFile))) {
+            properties.load(fis);
+        }
         properties.setProperty(ScenarioOptionsBase.MAXPOPULATIONSIZEIDENTIFIER, "100");
-        FileOutputStream out = new FileOutputStream(smallPropFile);
-        properties.store(out, null);
-        out.close();
+        try (FileOutputStream out = new FileOutputStream(smallPropFile)) {
+            properties.store(out, null);
+        }
 
         /* Check ChicagoDataLoader */
         File tripFile = ChicagoDataLoader.from(smallProp, settingsDir);
-        Assert.assertTrue(tripFile.exists());
+        assertTrue(tripFile.exists());
 
         /* Clean up */
-        Assert.assertTrue(tripFile.delete());
-        Assert.assertTrue(smallPropFile.delete());
+        assertTrue(tripFile.delete());
+        assertTrue(smallPropFile.delete());
     }
 }

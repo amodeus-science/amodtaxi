@@ -8,33 +8,32 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.util.Properties;
 
-import org.junit.Assert;
-import org.junit.Test;
+import junit.framework.TestCase;
 
 import ch.ethz.idsc.amodeus.util.io.Locate;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
-public class OsmLoaderTest {
-
-    @Test
+public class OsmLoaderTest extends TestCase {
     public void test() throws Exception {
         /* Init */
         File workingDir = new File(Locate.repoFolder(OsmLoader.class, "amodtaxi"), "test");
         File resourcesDir = new File(Locate.repoFolder(OsmLoader.class, "amodtaxi"), "resources/chicagoScenario");
         File amodeusFile = new File(workingDir, ScenarioLabels.amodeusFile);
-        Assert.assertTrue(workingDir.exists() || workingDir.mkdir());
+        assertTrue(workingDir.exists() || workingDir.mkdir());
         File osmFile = new File(workingDir, ScenarioLabels.osmData);
-        Assert.assertFalse(osmFile.exists());
+        assertFalse(osmFile.exists());
 
         /* Reduce boundingbox size in Properties */
         Properties properties = new Properties();
-        properties.load(new FileInputStream(new File(resourcesDir, ScenarioLabels.amodeusFile)));
+        try (FileInputStream fis = new FileInputStream(new File(resourcesDir, ScenarioLabels.amodeusFile))) {
+            properties.load(fis);
+        }
         properties.setProperty("boundingBox", "{8.54773, 47.37697, 8.54952, 47.37916}"); // test box with area of ETH
-        FileOutputStream out = new FileOutputStream(amodeusFile);
-        properties.store(out, null);
-        out.close();
-        Assert.assertTrue(amodeusFile.exists());
+        try (FileOutputStream out = new FileOutputStream(amodeusFile)) {
+            properties.store(out, null);
+        }
+        assertTrue(amodeusFile.exists());
 
         /* Run function of interest */
         OsmLoader osmLoader = OsmLoader.of(new File(workingDir, ScenarioLabels.amodeusFile));
@@ -44,12 +43,12 @@ public class OsmLoaderTest {
         try ( //
                 FileReader fileReader = new FileReader(osmFile);
                 BufferedReader bufferedReader = new BufferedReader(fileReader)) {
-            Assert.assertTrue(bufferedReader.lines().anyMatch(line -> line.contains("ETH/Universitätsspital")));
+            assertTrue(bufferedReader.lines().anyMatch(line -> line.contains("ETH/Universitätsspital")));
         }
 
         /* Clean up */
-        Assert.assertTrue(workingDir.exists());
+        assertTrue(workingDir.exists());
         DeleteDirectory.of(workingDir, 2, 14);
-        Assert.assertFalse(workingDir.exists());
+        assertFalse(workingDir.exists());
     }
 }

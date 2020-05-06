@@ -17,10 +17,8 @@ import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodtaxi.fleetconvert.TripFleetConverter;
-import ch.ethz.idsc.amodtaxi.osm.StaticMapCreator;
 import ch.ethz.idsc.amodtaxi.scenario.FinishedScenario;
 import ch.ethz.idsc.amodtaxi.scenario.Scenario;
-import ch.ethz.idsc.amodtaxi.scenario.ScenarioBasicNetworkPreparer;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
 import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
 import ch.ethz.idsc.amodtaxi.trace.ReadTraceFiles;
@@ -46,9 +44,7 @@ public class SanFranciscoScenarioTest {
     @BeforeClass
     public static void setup() throws Exception {
         GlobalAssert.that(DIRECTORY.mkdirs());
-
-        SanFranciscoSetup.in(DIRECTORY); // TODO solve osm file issues: long download, too may retries, too large for github
-        StaticMapCreator.now(DIRECTORY);
+        SanFranciscoTestSetup.in(DIRECTORY);
     }
 
     @Test
@@ -57,7 +53,6 @@ public class SanFranciscoScenarioTest {
         Assert.assertTrue(!traceFiles.isEmpty());
 
         /** prepare the network */
-        ScenarioBasicNetworkPreparer.run(DIRECTORY);
         File processingDir = new File(DIRECTORY, "Scenario");
         processingDir.mkdir();
 
@@ -72,7 +67,7 @@ public class SanFranciscoScenarioTest {
         Assert.assertTrue(configFile.exists());
         Config configFull = ConfigUtils.loadConfig(configFile.toString());
         final Network network = NetworkLoader.fromNetworkFile(new File(processingDir, configFull.network().getInputFile()));
-        Assert.assertTrue(!network.getLinks().isEmpty()); // 161'496
+        Assert.assertTrue(!network.getLinks().isEmpty()); // 16'882
 
         /** get dayTaxiRecord from trace files */
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, scenarioOptions.getLocationSpec().referenceFrame());
@@ -105,8 +100,8 @@ public class SanFranciscoScenarioTest {
         Network createdNetwork = ScenarioUtils.loadScenario(createdConfig).getNetwork();
         Population createdPopulation = ScenarioUtils.loadScenario(createdConfig).getPopulation();
 
-        Assert.assertTrue(!createdNetwork.getLinks().isEmpty()); // 161'496
-        Assert.assertTrue(!createdPopulation.getPersons().isEmpty()); // 20
+        Assert.assertTrue(!createdNetwork.getLinks().isEmpty()); // 16'882
+        Assert.assertTrue(!createdPopulation.getPersons().isEmpty()); // 25
     }
 
     @AfterClass
