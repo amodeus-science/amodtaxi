@@ -13,7 +13,6 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.io.CopyFiles;
-import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodtaxi.fleetconvert.SanFranciscoTripFleetConverter;
@@ -21,6 +20,7 @@ import ch.ethz.idsc.amodtaxi.fleetconvert.TripFleetConverter;
 import ch.ethz.idsc.amodtaxi.scenario.FinishedScenario;
 import ch.ethz.idsc.amodtaxi.scenario.Scenario;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
+import ch.ethz.idsc.amodtaxi.scenario.TestDirectories;
 import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
 import ch.ethz.idsc.amodtaxi.trace.ReadTraceFiles;
 import ch.ethz.idsc.amodtaxi.tripfilter.TaxiTripFilterCollection;
@@ -41,12 +41,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class SanFranciscoScenarioTest {
     private static final int NUM_TAXIS = 2;
     private static final AmodeusTimeConvert TIME_CONVERT = new AmodeusTimeConvert(ZoneId.of("America/Los_Angeles"));
-    private static final File DIRECTORY = new File(MultiFileTools.getDefaultWorkingDirectory(), "test-scenario");
 
     @BeforeClass
     public static void setup() throws Exception {
-        GlobalAssert.that(DIRECTORY.mkdirs());
-        SanFranciscoTestSetup.in(DIRECTORY);
+        GlobalAssert.that(TestDirectories.WORKING.mkdirs());
+        SanFranciscoTestSetup.in(TestDirectories.WORKING);
     }
 
     @Test
@@ -55,10 +54,10 @@ public class SanFranciscoScenarioTest {
         Assert.assertFalse(traceFiles.isEmpty());
 
         /** prepare the network */
-        File processingDir = new File(DIRECTORY, "Scenario");
+        File processingDir = new File(TestDirectories.WORKING, "Scenario");
         processingDir.mkdir();
 
-        CopyFiles.now(DIRECTORY.getAbsolutePath(), processingDir.getAbsolutePath(), //
+        CopyFiles.now(TestDirectories.WORKING.getAbsolutePath(), processingDir.getAbsolutePath(), //
                 Arrays.asList(ScenarioLabels.amodeusFile, ScenarioLabels.config, ScenarioLabels.network, ScenarioLabels.networkGz, ScenarioLabels.LPFile));
         Assert.assertTrue(new File(processingDir, ScenarioLabels.network).exists());
         Assert.assertTrue(new File(processingDir, ScenarioLabels.networkGz).exists());
@@ -85,10 +84,10 @@ public class SanFranciscoScenarioTest {
                 Quantity.of(2.235200008, SI.VELOCITY), Quantity.of(3600, SI.SECOND), Quantity.of(200, SI.METER), true));
 
         /** prepare final scenario */
-        File outputDirectory = new File(DIRECTORY, simulationDate.toString());
+        File outputDirectory = new File(TestDirectories.WORKING, simulationDate.toString());
         TripFleetConverter converter = new SanFranciscoTripFleetConverter( //
                 scenarioOptions, network, dayTaxiRecord, simulationDate, NullModifier.INSTANCE, tripFilter, outputDirectory);
-        File finalTripsFile = Scenario.create(DIRECTORY, converter, processingDir, simulationDate, TIME_CONVERT);
+        File finalTripsFile = Scenario.create(TestDirectories.WORKING, converter, processingDir, simulationDate, TIME_CONVERT);
 
         /** loading final trips */
         // List<TaxiTrip> finalTrips = ImportTaxiTrips.fromFile(finalTripsFile);
@@ -110,6 +109,6 @@ public class SanFranciscoScenarioTest {
 
     @AfterClass
     public static void cleanUp() throws Exception {
-        DeleteDirectory.of(DIRECTORY, 3, 100);
+        DeleteDirectory.of(TestDirectories.WORKING, 3, 100);
     }
 }

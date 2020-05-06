@@ -12,24 +12,20 @@ import org.junit.Test;
 import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
-import ch.ethz.idsc.amodeus.util.io.Locate;
 import ch.ethz.idsc.amodeus.util.network.LinkModes;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
 public class NetworkCutterUtilTest {
-    private static final File WORKING_DIR = new File(Locate.repoFolder(NetworkCutterUtils.class, "amodtaxi"), "test-scenario");
-    private static final File RESOURCE_DIR = new File(Locate.repoFolder(NetworkCutterUtils.class, "amodtaxi"), "resources/test/miniScenario");
-
     @BeforeClass
     public static void setup() throws Exception {
-        WORKING_DIR.mkdir();
-        CopyFiles.now(RESOURCE_DIR.getAbsolutePath(), WORKING_DIR.getAbsolutePath(), //
+        TestDirectories.WORKING.mkdir();
+        CopyFiles.now(TestDirectories.MINI.getAbsolutePath(), TestDirectories.WORKING.getAbsolutePath(), //
                 Collections.singletonList("networkPt2Matsim.xml.gz"), true);
     }
 
     @Test
     public void test() {
-        Network networkpt2Matsim = NetworkLoader.fromNetworkFile(new File(WORKING_DIR, "networkPt2Matsim.xml.gz"));
+        Network networkpt2Matsim = NetworkLoader.fromNetworkFile(new File(TestDirectories.WORKING, "networkPt2Matsim.xml.gz"));
         int allLinks = networkpt2Matsim.getLinks().size();
 
         /* Run function of interest */
@@ -44,6 +40,6 @@ public class NetworkCutterUtilTest {
 
     @AfterClass
     public static void cleanUp() throws Exception {
-        DeleteDirectory.of(WORKING_DIR, 2, 2);
+        DeleteDirectory.of(TestDirectories.WORKING, 2, 2);
     }
 }

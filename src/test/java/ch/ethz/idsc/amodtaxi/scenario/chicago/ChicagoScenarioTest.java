@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
-import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
+import ch.ethz.idsc.amodtaxi.scenario.TestDirectories;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -51,24 +51,23 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 public class ChicagoScenarioTest {
     private static final Random RANDOM = new Random(123);
     private static final AmodeusTimeConvert TIME_CONVERT = new AmodeusTimeConvert(ZoneId.of("America/Chicago"));
-    private static final File DIRECTORY = new File(MultiFileTools.getDefaultWorkingDirectory(), "test-scenario");
 
     @BeforeClass
     public static void setUp() throws Exception {
-        GlobalAssert.that(DIRECTORY.mkdirs());
-        ChicagoTestSetup.in(DIRECTORY);
+        GlobalAssert.that(TestDirectories.WORKING.mkdirs());
+        ChicagoTestSetup.in(TestDirectories.WORKING);
     }
 
     @Test
     public void creationTest() throws Exception {
         /* Load taxi data for the city of Chicago */
-        File tripFile = ChicagoDataLoader.from(ScenarioLabels.amodeusFile, DIRECTORY);
+        File tripFile = ChicagoDataLoader.from(ScenarioLabels.amodeusFile, TestDirectories.WORKING);
 
         /* Create empty scenario folder */
-        File processingDir = new File(DIRECTORY, "Scenario");
+        File processingDir = new File(TestDirectories.WORKING, "Scenario");
         processingDir.mkdir();
 
-        CopyFiles.now(DIRECTORY.getAbsolutePath(), processingDir.getAbsolutePath(), Arrays.asList(//
+        CopyFiles.now(TestDirectories.WORKING.getAbsolutePath(), processingDir.getAbsolutePath(), Arrays.asList(//
                 ScenarioLabels.amodeusFile, ScenarioLabels.config, ScenarioLabels.network, ScenarioLabels.networkGz, ScenarioLabels.LPFile));
         Assert.assertTrue(new File(processingDir, ScenarioLabels.network).exists());
         Assert.assertTrue(new File(processingDir, ScenarioLabels.networkGz).exists());
@@ -105,11 +104,11 @@ public class ChicagoScenarioTest {
         // taxiTripFilterCollection.addFilter(new TripMaxSpeedFilter(network, db, ScenarioConstants.maxAllowedSpeed));
 
         /** prepare final scenario */
-        File destinDir = new File(DIRECTORY, "CreatedScenario");
+        File destinDir = new File(TestDirectories.WORKING, "CreatedScenario");
         TripFleetConverter converter = //
                 new ChicagoOnlineTripFleetConverter(scenarioOptions, network, taxiDataModifierCollection, //
                         new ChicagoFormatModifier(), taxiTripFilterCollection, tripsReader, tripFile, new File(processingDir, "tripData"));
-        File finalTripsFile = Scenario.create(DIRECTORY, tripFile, converter, processingDir, simulationDate, TIME_CONVERT);
+        File finalTripsFile = Scenario.create(TestDirectories.WORKING, tripFile, converter, processingDir, simulationDate, TIME_CONVERT);
 
         Objects.requireNonNull(finalTripsFile);
 
@@ -137,6 +136,6 @@ public class ChicagoScenarioTest {
 
     @AfterClass
     public static void cleanUp() throws Exception {
-        DeleteDirectory.of(DIRECTORY, 3, 100);
+        DeleteDirectory.of(TestDirectories.WORKING, 3, 100);
     }
 }
