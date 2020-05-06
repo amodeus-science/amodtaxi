@@ -40,6 +40,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class SanFranciscoScenarioTest {
     private static final int NUM_TAXIS = 2;
+    private static final AmodeusTimeConvert TIME_CONVERT = new AmodeusTimeConvert(ZoneId.of("America/Los_Angeles"));
     private static final File DIRECTORY = new File(MultiFileTools.getDefaultWorkingDirectory(), "test-scenario");
 
     @BeforeClass
@@ -49,9 +50,9 @@ public class SanFranciscoScenarioTest {
     }
 
     @Test
-    public void testPipeLineNew() throws Exception {
+    public void creationTest() throws Exception {
         List<File> traceFiles = TraceFileChoice.getDefault().random(NUM_TAXIS);
-        Assert.assertTrue(!traceFiles.isEmpty());
+        Assert.assertFalse(traceFiles.isEmpty());
 
         /** prepare the network */
         File processingDir = new File(DIRECTORY, "Scenario");
@@ -68,11 +69,11 @@ public class SanFranciscoScenarioTest {
         Assert.assertTrue(configFile.exists());
         Config configFull = ConfigUtils.loadConfig(configFile.toString());
         final Network network = NetworkLoader.fromNetworkFile(new File(processingDir, configFull.network().getInputFile()));
-        Assert.assertTrue(!network.getLinks().isEmpty()); // 16'882
-
-        /** get dayTaxiRecord from trace files */
+        Assert.assertFalse(network.getLinks().isEmpty()); // 16'882
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, scenarioOptions.getLocationSpec().referenceFrame());
         FastLinkLookup fll = new FastLinkLookup(network, db);
+
+        /** get dayTaxiRecord from trace files */
         CsvFleetReaderSF reader = new CsvFleetReaderSF(new DayTaxiRecordSF(fll));
         DayTaxiRecord dayTaxiRecord = ReadTraceFiles.in(traceFiles, reader);
         Assert.assertEquals(NUM_TAXIS, dayTaxiRecord.numTaxis());
@@ -83,11 +84,13 @@ public class SanFranciscoScenarioTest {
         tripFilter.addFilter(new TripNetworkFilter(network, db, //
                 Quantity.of(2.235200008, SI.VELOCITY), Quantity.of(3600, SI.SECOND), Quantity.of(200, SI.METER), true));
 
+        /** prepare final scenario */
         File outputDirectory = new File(DIRECTORY, simulationDate.toString());
         TripFleetConverter converter = new SanFranciscoTripFleetConverter( //
                 scenarioOptions, network, dayTaxiRecord, simulationDate, NullModifier.INSTANCE, tripFilter, outputDirectory);
-        File finalTripsFile = Scenario.create(DIRECTORY, converter, processingDir, simulationDate, new AmodeusTimeConvert(ZoneId.of("America/Los_Angeles")));
+        File finalTripsFile = Scenario.create(DIRECTORY, converter, processingDir, simulationDate, TIME_CONVERT);
 
+        /** loading final trips */
         // List<TaxiTrip> finalTrips = ImportTaxiTrips.fromFile(finalTripsFile);
         // final int maxIter = 100;
         // new IterativeLinkSpeedEstimator(maxIter).compute(processingDir, network, db, finalTrips);
@@ -101,12 +104,12 @@ public class SanFranciscoScenarioTest {
         Network createdNetwork = ScenarioUtils.loadScenario(createdConfig).getNetwork();
         Population createdPopulation = ScenarioUtils.loadScenario(createdConfig).getPopulation();
 
-        Assert.assertTrue(!createdNetwork.getLinks().isEmpty()); // 16'882
-        Assert.assertTrue(!createdPopulation.getPersons().isEmpty()); // 25
+        Assert.assertFalse(createdNetwork.getLinks().isEmpty()); // 16'882
+        Assert.assertFalse(createdPopulation.getPersons().isEmpty()); // 25
     }
 
     @AfterClass
     public static void cleanUp() throws Exception {
-        DeleteDirectory.of(DIRECTORY, 6, 10_000);
+        DeleteDirectory.of(DIRECTORY, 3, 100);
     }
 }
