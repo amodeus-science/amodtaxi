@@ -1,5 +1,5 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
-package ch.ethz.idsc.amodtaxi.scenario;
+package ch.ethz.idsc.amodtaxi.scenario.data;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -8,16 +8,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.SortedMap;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
+import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.utils.collections.QuadTree;
 
 import ch.ethz.idsc.amodeus.analysis.SaveUtils;
-import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.math.SI;
-import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.data.NumberOfRequests;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
@@ -45,9 +41,8 @@ public class FileAnalysis {
 
     private Tensor plotWaitingTimes = null;
 
-    public FileAnalysis(SortedMap<LocalDateTime, TaxiStamp> sortedEntries, MatsimAmodeusDatabase db, //
-            Network network, LeastCostPathCalculator leastCostPathCalculator, QuadTree<Link> quadTree, String fileName, //
-            Map<LocalDate, Tensor> dateSplitUp) throws Exception {
+    public FileAnalysis(SortedMap<LocalDateTime, TaxiStamp> sortedEntries, FastLinkLookup fastLinkLookup, //
+            LeastCostPathCalculator leastCostPathCalculator, String fileName, Map<LocalDate, Tensor> dateSplitUp) throws Exception {
         this.fileName = fileName;
         this.dateSplitUp = dateSplitUp;
         this.sortedEntries = sortedEntries;
@@ -58,9 +53,9 @@ public class FileAnalysis {
                 tracesInTimeFrame = true;
                 this.minTime = sortedEntries.firstKey();
                 this.maxTime = sortedEntries.lastKey();
-                mapBounds = LongLatRange.in(sortedEntries);
+                mapBounds = LongLatRange.in(sortedEntries.values());
                 journeyTimes = JourneyTimes.in(sortedEntries);
-                NetworkDistanceHelper dh = new NetworkDistanceHelper(sortedEntries, db, leastCostPathCalculator, quadTree);
+                NetworkDistanceHelper dh = new NetworkDistanceHelper(sortedEntries, fastLinkLookup, leastCostPathCalculator);
                 custrDistance = dh.getCustrDistance();
                 totalDistance = dh.getTotlDistance();
                 emptyDistance = dh.getEmptyDistance();
@@ -72,9 +67,7 @@ public class FileAnalysis {
     }
 
     public int getNumRequests() {
-        if (tracesInTimeFrame)
-            return numRequests;
-        return 0;
+        return tracesInTimeFrame ? numRequests : 0;
     }
 
     public LocalDateTime getMinTime() {

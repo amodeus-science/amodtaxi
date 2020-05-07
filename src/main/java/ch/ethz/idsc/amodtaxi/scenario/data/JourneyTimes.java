@@ -1,5 +1,5 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
-package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.data;
+package ch.ethz.idsc.amodtaxi.scenario.data;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -9,10 +9,9 @@ import ch.ethz.idsc.amodeus.util.Duration;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 import ch.ethz.idsc.tensor.Scalar;
-import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import ch.ethz.idsc.tensor.qty.Quantity;
+import ch.ethz.idsc.tensor.sca.Sign;
 
 /* package */ enum JourneyTimes {
     ;
@@ -29,24 +28,22 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         LocalDateTime timePrev = sortedEntries.firstKey();
         for (LocalDateTime time : sortedEntries.keySet()) {
             boolean occ = sortedEntries.get(time).occupied;
-            if (occ && !occPrev) /** journey has started */
+            if (occ && !occPrev) // journey has started
                 journeyStart = timePrev;
-            if (!occ && occPrev) { /** journey has ended */
+            if (!occ && occPrev) { // journey has ended
                 GlobalAssert.that(Objects.nonNull(journeyStart));
                 GlobalAssert.that(!occ);
                 GlobalAssert.that(occPrev);
                 Scalar journeyTime = !timePrev.equals(journeyStart) ? //
                         Duration.between(journeyStart, timePrev) : //
                         Duration.between(journeyStart, time);
-                GlobalAssert.that(Scalars.lessEquals(Quantity.of(0, "s"), journeyTime));
-                journeyTimes.append(journeyTime);
+                journeyTimes.append(Sign.requirePositive(journeyTime));
                 journeyStart = null;
             }
-            if (occ && time == sortedEntries.lastKey()) {/** recordings end */
+            if (occ && time == sortedEntries.lastKey()) { // recordings end
                 GlobalAssert.that(Objects.nonNull(journeyStart));
                 Scalar journeyTime = Duration.between(journeyStart, time);
-                GlobalAssert.that(Scalars.lessEquals(Quantity.of(0, "s"), journeyTime));
-                journeyTimes.append(journeyTime);
+                journeyTimes.append(Sign.requirePositive(journeyTime));
                 journeyStart = null;
             }
             occPrev = occ;

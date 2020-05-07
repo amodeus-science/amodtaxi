@@ -1,5 +1,5 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
-package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.data;
+package ch.ethz.idsc.amodtaxi.scenario.data;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DistanceAsTravelDisutility;
@@ -21,10 +22,8 @@ import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.geo.FastQuadTree;
 
-// TODO is this generic? if yes, move to super package
 public class TaxiData {
-
-    public Map<LocalDate, Integer> reqPerDay = new HashMap<>();
+    private final Map<LocalDate, Integer> reqPerDay = new HashMap<>();
 
     public static TaxiData staticAnalyze(List<File> traceFiles, MatsimAmodeusDatabase db, //
             Network network, File saveDirectory, AmodeusTimeConvert timeConvert) //
@@ -49,17 +48,15 @@ public class TaxiData {
         readers.values().forEach(tfr -> localDates.addAll(tfr.getLocalDates()));
 
         System.out.println("found local dates in data:");
-        localDates.stream().sorted().filter(ld -> !ld.equals(LocalDate.MAX))//
-                .forEach(ld -> System.out.println(ld));
+        localDates.stream().sorted().filter(ld -> !ld.equals(LocalDate.MAX)).forEach(System.out::println);
 
         /** analysis of the files per local date */
-        LeastCostPathCalculator leastCostPathCalculator = new FastAStarLandmarksFactory(Runtime.getRuntime().availableProcessors())//
-                .createPathCalculator(network, new DistanceAsTravelDisutility(), //
-                        new FreeSpeedTravelTime());
+        LeastCostPathCalculator leastCostPathCalculator = new FastAStarLandmarksFactory(Runtime.getRuntime().availableProcessors()) //
+                .createPathCalculator(network, new DistanceAsTravelDisutility(), new FreeSpeedTravelTime());
         QuadTree<Link> quadTree = FastQuadTree.of(network);
         for (LocalDate localDate : localDates) {
             Integer totReq = ScenarioDataHelper.processLocalDate(localDate, readers.values(), //
-                    saveDirectory, db, network, leastCostPathCalculator, quadTree, timeConvert);
+                    saveDirectory, new FastLinkLookup(network, db), leastCostPathCalculator, timeConvert);
             reqPerDay.put(localDate, totReq);
         }
     }

@@ -1,5 +1,5 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
-package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.data;
+package ch.ethz.idsc.amodtaxi.scenario.data;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -10,33 +10,21 @@ import java.util.Map;
 import java.util.Objects;
 
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
-import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.qty.Quantity;
 
 /* package */ enum SaveInfo {
     ;
 
     public static void of(Collection<FileAnalysis> filesAnalysis, BufferedWriter out, //
             File saveSubDir, AmodeusTimeConvert timeConvert) throws Exception {
-
         /** number of requests */
-        int numRequests = 0;
-        for (FileAnalysis fileAnalysis : filesAnalysis) {
-            numRequests += fileAnalysis.getNumRequests();
-        }
+        int numRequests = filesAnalysis.stream().mapToInt(FileAnalysis::getNumRequests).sum();
 
         /** distances */
-        Scalar custrDistance = Quantity.of(0, SI.METER);
-        Scalar totalDistance = Quantity.of(0, SI.METER);
-        Scalar emptyDistance = Quantity.of(0, SI.METER);
-        for (FileAnalysis fileAnalysis : filesAnalysis) {
-            emptyDistance = emptyDistance.add(fileAnalysis.distances().Get(0));
-            custrDistance = custrDistance.add(fileAnalysis.distances().Get(1));
-            totalDistance = totalDistance.add(fileAnalysis.distances().Get(2));
-
-        }
+        Scalar custrDistance = filesAnalysis.stream().map(FileAnalysis::distances).map(vector -> vector.Get(0)).reduce(Scalar::add).orElseThrow();
+        Scalar totalDistance = filesAnalysis.stream().map(FileAnalysis::distances).map(vector -> vector.Get(1)).reduce(Scalar::add).orElseThrow();
+        Scalar emptyDistance = filesAnalysis.stream().map(FileAnalysis::distances).map(vector -> vector.Get(2)).reduce(Scalar::add).orElseThrow();
 
         /** min and max time */
         LocalDateTime minTime = StaticHelper.getMinVal(filesAnalysis, FileAnalysis::getMinTime);
@@ -99,9 +87,8 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
         /** printout per file */
         out.write("=========================\n");
-        for (FileAnalysis fileAnalysis : filesAnalysis) {
+        for (FileAnalysis fileAnalysis : filesAnalysis)
             SaveInfo.ofSingle(fileAnalysis, out, timeConvert);
-        }
 
         // /** save data */
         // if (journeyTimes.length() > 0)
