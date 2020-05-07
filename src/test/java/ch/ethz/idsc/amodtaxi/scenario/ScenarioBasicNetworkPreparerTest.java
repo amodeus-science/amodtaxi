@@ -2,36 +2,43 @@
 package ch.ethz.idsc.amodtaxi.scenario;
 
 import java.io.File;
+import java.util.Arrays;
 
+import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
+import ch.ethz.idsc.amodeus.util.io.CopyFiles;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.google.common.io.Files;
-
-import ch.ethz.idsc.amodeus.util.io.Locate;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
+import org.matsim.api.core.v01.network.Network;
 
 public class ScenarioBasicNetworkPreparerTest {
+    @BeforeClass
+    public static void setup() throws Exception {
+        TestDirectories.WORKING.mkdir();
+        CopyFiles.now(TestDirectories.MINI.getAbsolutePath(), TestDirectories.WORKING.getAbsolutePath(), //
+                Arrays.asList(ScenarioLabels.pt2MatSettings, "networkPt2Matsim.xml.gz"), true);
+        /** change pt2Matsim settings to local file system */
+        Pt2MatsimXML.toLocalFileSystem(new File(TestDirectories.WORKING, ScenarioLabels.pt2MatSettings), TestDirectories.WORKING.getAbsolutePath());
+    }
 
     @Test
-    public void test() throws Exception {
-        /* Init */
-        File workingDir = new File(Locate.repoFolder(Pt2MatsimXML.class, "amodtaxi"), "test");
-        File resourcesDir = new File(Locate.repoFolder(Pt2MatsimXML.class, "amodtaxi"), "resources/testScenario");
-        Assert.assertTrue(workingDir.exists() || workingDir.mkdir());
-        ScenarioSetup.in(workingDir, resourcesDir);
-        Files.copy(new File(resourcesDir, "networkPt2Matsim.xml.gz"), new File(workingDir, "networkPt2Matsim.xml.gz"));
-
+    public void test() {
         /* Run function of interest */
-        ScenarioBasicNetworkPreparer.run(workingDir);
+        ScenarioBasicNetworkPreparer.run(TestDirectories.WORKING);
 
         /* Check functionality */
-        Assert.assertTrue(new File(workingDir, ScenarioLabels.network).exists());
-        Assert.assertTrue(new File(workingDir, ScenarioLabels.networkGz).exists());
+        Assert.assertTrue(new File(TestDirectories.WORKING, ScenarioLabels.network).exists());
+        Assert.assertTrue(new File(TestDirectories.WORKING, ScenarioLabels.networkGz).exists());
 
-        /* Clean up */
-        Assert.assertTrue(workingDir.exists());
-        DeleteDirectory.of(workingDir, 2, 14);
-        Assert.assertFalse(workingDir.exists());
+        Network network = NetworkLoader.fromNetworkFile(new File(TestDirectories.WORKING, ScenarioLabels.networkGz));
+        Assert.assertFalse(network.getLinks().isEmpty());
+    }
+
+    @AfterClass
+    public static void cleanUp() throws Exception {
+        DeleteDirectory.of(TestDirectories.WORKING, 2, 5);
     }
 }

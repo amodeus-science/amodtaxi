@@ -6,36 +6,45 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Properties;
 
-import junit.framework.TestCase;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
-import ch.ethz.idsc.amodeus.util.io.Locate;
+import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
+import ch.ethz.idsc.amodtaxi.scenario.TestDirectories;
+import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
 /** Tests if data for the creation of the Chicago taxi scenario is accessible from the
  * web API. */
-public class ChicagoDataLoaderTest extends TestCase {
-    public void test() throws Exception {
-        File settingsDir = new File(Locate.repoFolder(CreateChicagoScenario.class, "amodtaxi"), "resources/chicagoScenario");
+public class ChicagoDataLoaderTest {
+    @BeforeClass
+    public static void setUp() throws Exception {
+        GlobalAssert.that(TestDirectories.WORKING.mkdirs());
+        GlobalAssert.that(new File(TestDirectories.CHICAGO, ScenarioLabels.amodeusFile).exists());
 
         /* Reduce population size in Properties */
-        String smallProp = "Manipulated_" + ScenarioLabels.amodeusFile;
-        File smallPropFile = new File(settingsDir, smallProp);
         Properties properties = new Properties();
-        try (FileInputStream fis = new FileInputStream(new File(settingsDir, ScenarioLabels.amodeusFile))) {
+        try (FileInputStream fis = new FileInputStream(new File(TestDirectories.CHICAGO, ScenarioLabels.amodeusFile))) {
             properties.load(fis);
         }
         properties.setProperty(ScenarioOptionsBase.MAXPOPULATIONSIZEIDENTIFIER, "100");
-        try (FileOutputStream out = new FileOutputStream(smallPropFile)) {
+        try (FileOutputStream out = new FileOutputStream(new File(TestDirectories.WORKING, ScenarioLabels.amodeusFile))) {
             properties.store(out, null);
         }
+    }
 
+    @Test
+    public void test() throws Exception {
         /* Check ChicagoDataLoader */
-        File tripFile = ChicagoDataLoader.from(smallProp, settingsDir);
-        assertTrue(tripFile.exists());
+        File tripFile = ChicagoDataLoader.from(ScenarioLabels.amodeusFile, TestDirectories.WORKING);
+        Assert.assertTrue(tripFile.exists());
+    }
 
-        /* Clean up */
-        assertTrue(tripFile.delete());
-        assertTrue(smallPropFile.delete());
+    @AfterClass
+    public static void cleanUp() throws Exception {
+        DeleteDirectory.of(TestDirectories.WORKING, 2, 5);
     }
 }

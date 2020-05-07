@@ -2,37 +2,42 @@
 package ch.ethz.idsc.amodtaxi.scenario;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.google.common.io.Files;
-
 import ch.ethz.idsc.amodeus.matsim.xml.XmlCustomModifier;
-import ch.ethz.idsc.amodeus.util.io.Locate;
+import ch.ethz.idsc.amodeus.util.io.CopyFiles;
+import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
 public class Pt2MatsimXMLTest {
+    File PT_FILE = new File(TestDirectories.WORKING, ScenarioLabels.pt2MatSettings);
+
+    @BeforeClass
+    public static void setUp() throws Exception {
+        GlobalAssert.that(TestDirectories.WORKING.mkdirs());
+        GlobalAssert.that(new File(TestDirectories.MINI, ScenarioLabels.pt2MatSettings).exists());
+        /* Init */
+        CopyFiles.now(TestDirectories.MINI.getAbsolutePath(), //
+                TestDirectories.WORKING.getAbsolutePath(), Collections.singletonList(ScenarioLabels.pt2MatSettings));
+    }
 
     @Test
     public void testLocalFileSystem() throws Exception {
-        /* Init */
-        File workingDir = new File(Locate.repoFolder(Pt2MatsimXML.class, "amodtaxi"), "test");
-        File resourcesDir = new File(Locate.repoFolder(Pt2MatsimXML.class, "amodtaxi"), "resources/chicagoScenario");
-        File ptFile = new File(workingDir, ScenarioLabels.pt2MatSettings);
-        Assert.assertTrue(workingDir.exists() || workingDir.mkdir());
-        Files.copy(new File(resourcesDir, ScenarioLabels.pt2MatSettings), ptFile);
-        Assert.assertTrue(ptFile.exists());
 
         /* Run function of interest */
-        Pt2MatsimXML.toLocalFileSystem(ptFile, workingDir.getAbsolutePath());
+        Pt2MatsimXML.toLocalFileSystem(PT_FILE, TestDirectories.WORKING.getAbsolutePath());
 
         /* Check functionality */
-        try (XmlCustomModifier xmlModifier = new XmlCustomModifier(ptFile)) {
+        try (XmlCustomModifier xmlModifier = new XmlCustomModifier(PT_FILE)) {
             Document doc = xmlModifier.getDocument();
             Element rootNode = doc.getRootElement();
             Element module = rootNode.getChild("module");
@@ -42,38 +47,24 @@ public class Pt2MatsimXMLTest {
                 if (nameValue == null)
                     continue;
                 if (nameValue.equals("osmFile")) {
-                    Assert.assertTrue(element.getAttributeValue("value").contains(workingDir.getAbsolutePath()));
+                    Assert.assertTrue(element.getAttributeValue("value").contains(TestDirectories.WORKING.getAbsolutePath()));
                 }
                 if (nameValue.equals("outputNetworkFile")) {
-                    Assert.assertTrue(element.getAttributeValue("value").contains(workingDir.getAbsolutePath()));
+                    Assert.assertTrue(element.getAttributeValue("value").contains(TestDirectories.WORKING.getAbsolutePath()));
                 }
             }
         }
-
-        /* Clean up */
-        Assert.assertTrue(workingDir.exists());
-        DeleteDirectory.of(workingDir, 2, 14);
-        Assert.assertFalse(workingDir.exists());
     }
 
     @Test
     public void testChangeAttribute() throws Exception {
-        /* Init */
-        File workingDir = new File(Locate.repoFolder(Pt2MatsimXML.class, "amodtaxi"), "test");
-        File resourcesDir = new File(Locate.repoFolder(Pt2MatsimXML.class, "amodtaxi"), "resources/chicagoScenario");
-        File ptFile = new File(workingDir, ScenarioLabels.pt2MatSettings);
-        Assert.assertTrue(workingDir.exists() || workingDir.mkdir());
-        Files.copy(new File(resourcesDir, ScenarioLabels.pt2MatSettings), ptFile);
-        Assert.assertTrue(ptFile.exists());
-
         /* Run function of interest */
-        Assert.assertTrue(ptFile.exists());
         Map<String, String> map = new HashMap<String, String>();
-        map.put("outputCoordinateSystem", "EPSG:21781");
-        Pt2MatsimXML.changeAttributes(ptFile, map);
+        map.put("outputCoordinateSystem", "EPSG:XXX");
+        Pt2MatsimXML.changeAttributes(PT_FILE, map);
 
         /* Check functionality */
-        try (XmlCustomModifier xmlModifier = new XmlCustomModifier(ptFile)) {
+        try (XmlCustomModifier xmlModifier = new XmlCustomModifier(PT_FILE)) {
             Document doc = xmlModifier.getDocument();
             Element rootNode = doc.getRootElement();
             Element module = rootNode.getChild("module");
@@ -83,14 +74,14 @@ public class Pt2MatsimXMLTest {
                 if (nameValue == null)
                     continue;
                 if (nameValue.equals("outputCoordinateSystem")) {
-                    Assert.assertTrue(element.getAttributeValue("value").equals("EPSG:21781"));
+                    Assert.assertTrue(element.getAttributeValue("value").equals("EPSG:XXX"));
                 }
             }
         }
+    }
 
-        /* Clean up */
-        Assert.assertTrue(workingDir.exists());
-        DeleteDirectory.of(workingDir, 2, 14);
-        Assert.assertFalse(workingDir.exists());
+    @AfterClass
+    public static void cleanUp() throws Exception {
+        DeleteDirectory.of(TestDirectories.WORKING, 2, 14);
     }
 }

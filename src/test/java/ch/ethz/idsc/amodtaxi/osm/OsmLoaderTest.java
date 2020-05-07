@@ -8,47 +8,50 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.util.Properties;
 
-import junit.framework.TestCase;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
-import ch.ethz.idsc.amodeus.util.io.Locate;
+import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.scenario.ScenarioLabels;
+import ch.ethz.idsc.amodtaxi.scenario.TestDirectories;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
-public class OsmLoaderTest extends TestCase {
-    public void test() throws Exception {
-        /* Init */
-        File workingDir = new File(Locate.repoFolder(OsmLoader.class, "amodtaxi"), "test");
-        File resourcesDir = new File(Locate.repoFolder(OsmLoader.class, "amodtaxi"), "resources/chicagoScenario");
-        File amodeusFile = new File(workingDir, ScenarioLabels.amodeusFile);
-        assertTrue(workingDir.exists() || workingDir.mkdir());
-        File osmFile = new File(workingDir, ScenarioLabels.osmData);
-        assertFalse(osmFile.exists());
+public class OsmLoaderTest {
+    @BeforeClass
+    public static void setUp() throws Exception {
+        GlobalAssert.that(TestDirectories.WORKING.mkdirs());
 
-        /* Reduce boundingbox size in Properties */
         Properties properties = new Properties();
-        try (FileInputStream fis = new FileInputStream(new File(resourcesDir, ScenarioLabels.amodeusFile))) {
+        try (FileInputStream fis = new FileInputStream(new File(TestDirectories.MINI, ScenarioLabels.amodeusFile))) {
             properties.load(fis);
         }
         properties.setProperty("boundingBox", "{8.54773, 47.37697, 8.54952, 47.37916}"); // test box with area of ETH
-        try (FileOutputStream out = new FileOutputStream(amodeusFile)) {
+        try (FileOutputStream out = new FileOutputStream(new File(TestDirectories.WORKING, ScenarioLabels.amodeusFile))) {
             properties.store(out, null);
         }
-        assertTrue(amodeusFile.exists());
+    }
+
+    @Test
+    public void test() throws Exception {
+        File osmFile = new File(TestDirectories.WORKING, ScenarioLabels.osmData);
 
         /* Run function of interest */
-        OsmLoader osmLoader = OsmLoader.of(new File(workingDir, ScenarioLabels.amodeusFile));
+        OsmLoader osmLoader = OsmLoader.of(new File(TestDirectories.WORKING, ScenarioLabels.amodeusFile));
         osmLoader.saveIfNotAlreadyExists(osmFile);
 
         /* Check functionality */
         try ( //
                 FileReader fileReader = new FileReader(osmFile);
                 BufferedReader bufferedReader = new BufferedReader(fileReader)) {
-            assertTrue(bufferedReader.lines().anyMatch(line -> line.contains("ETH/Universitätsspital")));
+            Assert.assertTrue(bufferedReader.lines().anyMatch(line -> line.contains("ETH/Universitätsspital")));
         }
 
-        /* Clean up */
-        assertTrue(workingDir.exists());
-        DeleteDirectory.of(workingDir, 2, 14);
-        assertFalse(workingDir.exists());
+    }
+
+    @AfterClass
+    public static void cleanUp() throws Exception {
+        DeleteDirectory.of(TestDirectories.WORKING, 2, 14);
     }
 }
