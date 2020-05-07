@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
 import ch.ethz.idsc.amodeus.util.io.CopyFiles;
+import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.osm.StaticMapCreator;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
 import org.junit.AfterClass;
@@ -18,7 +19,7 @@ import org.matsim.api.core.v01.network.Network;
 public class StaticMapCreatorTest {
     @BeforeClass
     public static void setup() throws Exception {
-        TestDirectories.WORKING.mkdir();
+        GlobalAssert.that(TestDirectories.WORKING.mkdirs());
 
         CopyFiles.now(TestDirectories.MINI.getAbsolutePath(), TestDirectories.WORKING.getAbsolutePath(), //
                 Arrays.asList(ScenarioLabels.osmData, ScenarioLabels.amodeusFile, ScenarioLabels.pt2MatSettings), true);

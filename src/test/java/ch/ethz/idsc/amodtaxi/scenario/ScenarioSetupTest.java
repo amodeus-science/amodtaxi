@@ -13,7 +13,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
 public class ScenarioSetupTest {
     @BeforeClass
-    public static void setUp() throws Exception {
+    public static void setUp() {
         GlobalAssert.that(TestDirectories.WORKING.mkdirs());
     }
 
