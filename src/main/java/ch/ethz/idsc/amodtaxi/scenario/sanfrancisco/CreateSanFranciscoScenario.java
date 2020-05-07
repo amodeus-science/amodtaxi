@@ -93,36 +93,6 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
         /** create scenario */
         for (LocalDate localDate : DATES) {
-            // try {
-            // /** compute scenario */
-            //
-            // TaxiTripFilterCollection speedEstimationTripFilter = new TaxiTripFilterCollection();
-            // /** trips which are faster than the network freeflow speeds would allow are removed */
-            // speedEstimationTripFilter.addFilter(new TripNetworkFilter(network, db, //
-            // Quantity.of(2.235200008, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m"), true));
-            //
-            // TaxiTripFilterCollection finalPopulationTripFilter = new TaxiTripFilterCollection();
-            // /** trips which are faster than the network freeflow speeds would allow are removed */
-            // finalPopulationTripFilter.addFilter(new TripNetworkFilter(network, db, //
-            // Quantity.of(2.235200008, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m"), false));
-            //
-            // StandaloneFleetConverterSF sfc = new StandaloneFleetConverterSF(processingDir, //
-            // dayTaxiRecord, db, network, timeStep, TIME_CONVERT, speedEstimationTripFilter, //
-            // finalPopulationTripFilter);
-            // sfc.run(localDate);
-            //
-            // /** copy scenario to new location */
-            // File destinDirDay = new File(destinDir, localDate.toString());
-            // destinDirDay.mkdirs();
-            // try {
-            // ScenarioAssemblerSF.copyFinishedScenario(processingDir.getAbsolutePath(), destinDirDay);
-            // } catch (Exception e) {
-            // System.err.println("Failed to copy scenario for " + localDate);
-            // }
-            // } catch (Exception e) {
-            // System.err.println("Failed to create scenario for localDate " + localDate);
-            // e.printStackTrace();
-            // }
             /** prepare for creation of scenario */
             TaxiDataModifier tripModifier;
             {

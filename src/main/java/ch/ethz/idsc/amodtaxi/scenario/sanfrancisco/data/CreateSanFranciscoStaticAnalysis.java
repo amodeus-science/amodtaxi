@@ -17,8 +17,7 @@ import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.SanFranciscoReferenceFrames;
 import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.TraceFileChoice;
 
 /* package */ class CreateSanFranciscoStaticAnalysis {
-
-    private static final int numTraceFiles = 536;// 536;
+    private static final int numTraceFiles = 536; // 536;
     private static final AmodeusTimeConvert timeConvert = new AmodeusTimeConvert(ZoneId.of("America/Los_Angeles"));
     private static final ReferenceFrame referenceFrame = SanFranciscoReferenceFrames.SANFRANCISCO;
 
@@ -46,16 +45,6 @@ import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.TraceFileChoice;
         List<File> taxiFiles = new MultiFileReader(new File(dataDir, "cabspottingdata"), "new_").getFolderFiles();
         System.out.println("Found Taxi files: " + taxiFiles.size());
         List<File> traceFiles = (new TraceFileChoice(taxiFiles)).random(numTraceFiles);
-
-        // TODO remove these comments...
-        // List<File> traceFiles = (new TraceFileChoice(taxiFiles)).specified("equioc", "onvahe", "epkiapme", "ippfeip");
-
-        /** copy other scenario files */
-        // File settingsDir = new File(Locate.repoFolder(CreateSanFranciscoStaticAnalysis.class, "amodeus"), "resources/sanFranciscoScenario");
-        // CopyFiles.now(settingsDir.getAbsolutePath(), processingDir.getAbsolutePath(), //
-        // Arrays.asList(new String[] { "AmodeusOptions.properties", "av.xml", "config_full.xml", "config.xml", //
-        // "config_fullPublish.xml", "pt2matsim_settings.xml" }),
-        // true);
 
         /** remove all links except car from network */
         Network network = ScenarioBasicNetworkPreparer.run(dataDir);
