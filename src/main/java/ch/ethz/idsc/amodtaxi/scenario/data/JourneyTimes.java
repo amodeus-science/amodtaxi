@@ -23,6 +23,9 @@ import ch.ethz.idsc.tensor.sca.Sign;
      * @throws Exception */
     public static Tensor in(SortedMap<LocalDateTime, TaxiStamp> sortedEntries) throws Exception {
         Tensor journeyTimes = Tensors.empty();
+        if (sortedEntries.values().stream().noneMatch(taxiStamp -> taxiStamp.occupied))
+            return journeyTimes;
+
         LocalDateTime journeyStart = null;
         boolean occPrev = false;
         LocalDateTime timePrev = sortedEntries.firstKey();

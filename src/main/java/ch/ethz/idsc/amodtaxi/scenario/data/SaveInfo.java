@@ -18,6 +18,12 @@ import ch.ethz.idsc.tensor.Tensor;
 
     public static void of(Collection<FileAnalysis> filesAnalysis, BufferedWriter out, //
             File saveSubDir, AmodeusTimeConvert timeConvert) throws Exception {
+        if (filesAnalysis.stream().allMatch(FileAnalysis::isEmpty)) {
+            out.write("no data present in time frame");
+            return;
+        }
+
+
         /** number of requests */
         int numRequests = filesAnalysis.stream().mapToInt(FileAnalysis::getNumRequests).sum();
 
@@ -27,16 +33,16 @@ import ch.ethz.idsc.tensor.Tensor;
         Scalar emptyDistance = filesAnalysis.stream().map(FileAnalysis::distances).map(vector -> vector.Get(2)).reduce(Scalar::add).orElseThrow();
 
         /** min and max time */
-        LocalDateTime minTime = StaticHelper.getMinVal(filesAnalysis, FileAnalysis::getMinTime);
-        LocalDateTime maxTime = StaticHelper.getMaxVal(filesAnalysis, FileAnalysis::getMaxTime);
+        LocalDateTime minTime = StaticHelper.getMinVal(filesAnalysis, FileAnalysis::getMinTime).orElse(null);
+        LocalDateTime maxTime = StaticHelper.getMaxVal(filesAnalysis, FileAnalysis::getMaxTime).orElse(null);
 
         /** {minLat,maxLat,minLng,maxLng} */
-        Double minLat = StaticHelper.getMinVal(filesAnalysis, FileAnalysis::getMinLat);
-        Double maxLat = StaticHelper.getMaxVal(filesAnalysis, FileAnalysis::getMaxLat);
+        Double minLat = StaticHelper.getMinVal(filesAnalysis, FileAnalysis::getMinLat).orElse(null);
+        Double maxLat = StaticHelper.getMaxVal(filesAnalysis, FileAnalysis::getMaxLat).orElse(null);
 
         /** min and max lng */
-        Double minLng = StaticHelper.getMinVal(filesAnalysis, FileAnalysis::getMinLng);
-        Double maxLng = StaticHelper.getMaxVal(filesAnalysis, FileAnalysis::getMaxLng);
+        Double minLng = StaticHelper.getMinVal(filesAnalysis, FileAnalysis::getMinLng).orElse(null);
+        Double maxLng = StaticHelper.getMaxVal(filesAnalysis, FileAnalysis::getMaxLng).orElse(null);
 
         // /** journey Times */
         // Tensor journeyTimes = Tensors.empty();
@@ -57,8 +63,8 @@ import ch.ethz.idsc.tensor.Tensor;
         // GlobalAssert.that(minWaitingTimes.length() == numRequests);
 
         /** min and max journeyTime */
-        Integer minJourneyTime = StaticHelper.getMinVal(filesAnalysis, FileAnalysis::getMinJourneyTime);
-        Integer maxJourneyTime = StaticHelper.getMaxVal(filesAnalysis, FileAnalysis::getMaxJourneyTime);
+        Integer minJourneyTime = StaticHelper.getMinVal(filesAnalysis, FileAnalysis::getMinJourneyTime).orElse(null);
+        Integer maxJourneyTime = StaticHelper.getMaxVal(filesAnalysis, FileAnalysis::getMaxJourneyTime).orElse(null);
 
         /** printout general */
         out.write("requests: " + numRequests + "\n");
@@ -128,9 +134,9 @@ import ch.ethz.idsc.tensor.Tensor;
         out.write("total distance:    " + fileAnalysis.distances().Get(2) + "\n");
 
         Map<LocalDate, Tensor> dateSplitUp = fileAnalysis.getDateSplitUp(); // TODO Claudio
-        for (LocalDate localDate : dateSplitUp.keySet()) {
+        for (LocalDate localDate : dateSplitUp.keySet())
             out.write(localDate + ":  from " + dateSplitUp.get(localDate).Get(0) + " to " + dateSplitUp.get(localDate).Get(0) + "\n");
-        }
+
         out.write("=======\n");
     }
 }

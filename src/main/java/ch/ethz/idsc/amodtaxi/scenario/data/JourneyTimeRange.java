@@ -7,6 +7,7 @@ import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.red.Max;
 import ch.ethz.idsc.tensor.red.Min;
 
+@Deprecated /** use {@link ch.ethz.idsc.amodtaxi.trace.TaxiStampHelpers} instead */
 /* package */ enum JourneyTimeRange {
     ;
 

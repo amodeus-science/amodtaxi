@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.network.Network;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
-import ch.ethz.idsc.amodeus.util.io.MultiFileReader;
 
 /* package */ class CreateSanFranciscoStaticAnalysis {
     private static final int numTraceFiles = 536; // 536;
@@ -40,9 +39,9 @@ import ch.ethz.idsc.amodeus.util.io.MultiFileReader;
 
         /** copy taxi trace files */
         System.out.println("dataDir: " + dataDir.getAbsolutePath());
-        List<File> taxiFiles = new MultiFileReader(new File(dataDir, "cabspottingdata"), "new_").getFolderFiles();
-        System.out.println("Found Taxi files: " + taxiFiles.size());
-        List<File> traceFiles = (new TraceFileChoice(taxiFiles)).random(numTraceFiles);
+        // List<File> taxiFiles = new MultiFileReader(new File(dataDir, "cabspottingdata"), "new_").getFolderFiles();
+        // System.out.println("Found Taxi files: " + taxiFiles.size());
+        List<File> traceFiles = TraceFileChoice.getOrDefault(new File(dataDir, "cabspottingdata"), "new_").random(numTraceFiles);
 
         /** remove all links except car from network */
         Network network = ScenarioBasicNetworkPreparer.run(dataDir);
@@ -55,6 +54,6 @@ import ch.ethz.idsc.amodeus.util.io.MultiFileReader;
         /** test consistency of created scenarios with independent analysis */
         File staticAnalysis = new File(destinDir + "/staticAnalysis");
         staticAnalysis.mkdirs();
-        return TaxiData.staticAnalyze(traceFiles, db, network, staticAnalysis, timeConvert);
+        return TaxiData.staticAnalyze(traceFiles, db, network, staticAnalysis, TaxiStampReaderSF.INSTANCE);
     }
 }

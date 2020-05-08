@@ -10,6 +10,7 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import org.matsim.api.core.v01.Coord;
 
+@Deprecated /** use {@link ch.ethz.idsc.amodtaxi.trace.TaxiStampHelpers} instead */
 /* package */ enum LongLatRange {
     ;
 

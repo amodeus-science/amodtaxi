@@ -2,10 +2,12 @@
 package ch.ethz.idsc.amodtaxi.scenario.data;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.SortedMap;
 
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 
+@Deprecated /** use {@link ch.ethz.idsc.amodtaxi.trace.TaxiStampHelpers#numberOfRequests(Collection)} instead */
 public enum NumberOfRequests {
     ;
 

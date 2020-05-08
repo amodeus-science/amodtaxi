@@ -13,12 +13,9 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
-import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.TaxiStampConvertedSF;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 import ch.ethz.idsc.amodtaxi.util.CSVUtils;
 import ch.ethz.idsc.amodtaxi.util.ReverseLineInputStream;
@@ -29,10 +26,10 @@ import ch.ethz.idsc.tensor.Tensor;
     private Set<LocalDate> localDates = new HashSet<>();
     private final String fileName;
     private HashMap<LocalDate, Tensor> dateSplitUp = new HashMap<>();
-    private final AmodeusTimeConvert timeConvert;
+    private final TaxiStampReader stampReader;
 
-    public TrailFileReader(File trailFile, AmodeusTimeConvert timeConvert) throws Exception {
-        this.timeConvert = timeConvert;
+    public TrailFileReader(File trailFile, TaxiStampReader stampReader) throws Exception {
+        this.stampReader = stampReader;
         read(trailFile);
         fileName = trailFile.getName();
     }
@@ -42,11 +39,11 @@ import ch.ethz.idsc.tensor.Tensor;
         try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new ReverseLineInputStream(trailFile)))) {
             bufferedReader.lines().forEach(line -> {
                 List<String> csvRow = CSVUtils.csvLineToList(line, " ");
-                TaxiStamp stamp = TaxiStampConvertedSF.INSTANCE.from(csvRow, timeConvert);
+                TaxiStamp stamp = stampReader.read(csvRow);
 
                 // int time = Integer.parseInt(csvRow.get(3));
                 sortedStamps.put(stamp.globalTime, stamp);
-                localDates.add(timeConvert.toLocalDate(csvRow.get(3)));
+                localDates.add(stamp.globalTime.toLocalDate());
             });
         }
     }
@@ -55,7 +52,7 @@ import ch.ethz.idsc.tensor.Tensor;
         return sortedStamps;
     }
 
-    public SortedMap<LocalDateTime, TaxiStamp> getEntriesFor(LocalDate localDate) {
+    public NavigableMap<LocalDateTime, TaxiStamp> getEntriesFor(LocalDate localDate) {
         return sortedStamps.entrySet().stream() //
                 .filter(e -> e.getKey().toLocalDate().equals(localDate)) //
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> v2, TreeMap::new));
@@ -68,7 +65,7 @@ import ch.ethz.idsc.tensor.Tensor;
         LocalDateTime startKey = sortedStamps.floorKey(minTime);
         if (Objects.isNull(startKey)) {
             LocalDateTime upper = sortedStamps.ceilingKey(minTime);
-            if (upper.isBefore(timeConvert.endOf(localDate)))
+            if (upper.isBefore(stampReader.timeConvert().endOf(localDate)))
                 startKey = upper;
             else
                 return null;
