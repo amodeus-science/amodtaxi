@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.Collections;
 
 import ch.ethz.idsc.amodeus.util.io.CopyFiles;
+import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -18,7 +19,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
 public class NetworkCutterUtilTest {
     @BeforeClass
     public static void setup() throws Exception {
-        TestDirectories.WORKING.mkdir();
+        GlobalAssert.that(TestDirectories.WORKING.mkdirs());
         CopyFiles.now(TestDirectories.MINI.getAbsolutePath(), TestDirectories.WORKING.getAbsolutePath(), //
                 Collections.singletonList("networkPt2Matsim.xml.gz"), true);
     }

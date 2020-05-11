@@ -19,7 +19,7 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
 public class Pt2MatsimXMLTest {
-    File PT_FILE = new File(TestDirectories.WORKING, ScenarioLabels.pt2MatSettings);
+    private File PT_FILE = new File(TestDirectories.WORKING, ScenarioLabels.pt2MatSettings);
 
     @BeforeClass
     public static void setUp() throws Exception {

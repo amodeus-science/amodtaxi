@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
 import ch.ethz.idsc.amodeus.util.io.CopyFiles;
+import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -17,7 +18,7 @@ import org.matsim.api.core.v01.network.Network;
 public class ScenarioBasicNetworkPreparerTest {
     @BeforeClass
     public static void setup() throws Exception {
-        TestDirectories.WORKING.mkdir();
+        GlobalAssert.that(TestDirectories.WORKING.mkdirs());
         CopyFiles.now(TestDirectories.MINI.getAbsolutePath(), TestDirectories.WORKING.getAbsolutePath(), //
                 Arrays.asList(ScenarioLabels.pt2MatSettings, "networkPt2Matsim.xml.gz"), true);
         /** change pt2Matsim settings to local file system */

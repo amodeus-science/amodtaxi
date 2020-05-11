@@ -3,19 +3,16 @@ package ch.ethz.idsc.amodtaxi.nominatim;
 
 import java.net.URI;
 
+import junit.framework.TestCase;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.junit.Assert;
-import org.junit.Test;
 
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 
-public class NominatimQueryTester {
-
-    @Test
-    public void detailedPrintTest() throws Exception {
+public class NominatimQueryTester extends TestCase {
+    public void testDetailedPrint() throws Exception {
         // creating it
         String https_url = "https://nominatim.openstreetmap.org/search?q="//
                 + "135+pilkington+avenue,+birmingham"//
@@ -57,13 +54,10 @@ public class NominatimQueryTester {
         System.out.println(t1);
         System.out.println("---");
 
-        Assert.assertEquals(Tensors.fromString("{-1.8164308339635031, 52.5487921}"), t1);
-
+        assertEquals(Tensors.fromString("{-1.8164308339635031, 52.5487921}"), t1);
     }
 
-    @Test
-    public void simpleTest() throws Exception {
-
+    public void testSimple() throws Exception {
         // creating it
         String https_url = "https://nominatim.openstreetmap.org/search?q="//
                 + "1+bundesplatz+bern"//
@@ -77,8 +71,6 @@ public class NominatimQueryTester {
         // check lat long
         Tensor latLong = NominatimJSON.toCoordinates(queryJSON);
 
-        Assert.assertEquals(Tensors.fromString("{7.445040196816667, 46.94707525}"), latLong);
-
+        assertEquals(Tensors.fromString("{7.445040196816667, 46.94707525}"), latLong);
     }
-
 }
