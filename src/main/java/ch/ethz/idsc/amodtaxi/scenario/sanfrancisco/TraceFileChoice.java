@@ -45,7 +45,7 @@ public class TraceFileChoice {
 
     private final List<File> taxiFiles;
 
-    public TraceFileChoice(List<File> taxiFiles) {
+    private TraceFileChoice(List<File> taxiFiles) {
         GlobalAssert.that(taxiFiles.size() > 0);
         this.taxiFiles = taxiFiles;
     }

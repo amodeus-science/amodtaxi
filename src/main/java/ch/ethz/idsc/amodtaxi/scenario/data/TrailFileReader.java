@@ -1,5 +1,5 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
-package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.data;
+package ch.ethz.idsc.amodtaxi.scenario.data;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,52 +9,42 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
-import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
-import ch.ethz.idsc.amodeus.util.LocalDateTimes;
-import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.TaxiStampConvertedSF;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 import ch.ethz.idsc.amodtaxi.util.CSVUtils;
 import ch.ethz.idsc.amodtaxi.util.ReverseLineInputStream;
 import ch.ethz.idsc.tensor.Tensor;
 
 /* package */ class TrailFileReader {
-
     private final NavigableMap<LocalDateTime, TaxiStamp> sortedStamps = new TreeMap<>();
     private Set<LocalDate> localDates = new HashSet<>();
     private final String fileName;
-    // private LocalDateTime beginKey;
-    // private LocalDateTime endKey;
     private HashMap<LocalDate, Tensor> dateSplitUp = new HashMap<>();
-    private final AmodeusTimeConvert timeConvert;
+    private final TaxiStampReader stampReader;
 
-    public TrailFileReader(File trailFile, AmodeusTimeConvert timeConvert) throws Exception {
-        this.timeConvert = timeConvert;
+    public TrailFileReader(File trailFile, TaxiStampReader stampReader) throws Exception {
+        this.stampReader = stampReader;
         read(trailFile);
         fileName = trailFile.getName();
     }
 
     private void read(File trailFile) throws Exception {
-
         /** read file */
         try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new ReverseLineInputStream(trailFile)))) {
-
-            String line = null;
-            while ((line = bufferedReader.readLine()) != null) {
+            bufferedReader.lines().forEach(line -> {
                 List<String> csvRow = CSVUtils.csvLineToList(line, " ");
-                TaxiStamp stamp = TaxiStampConvertedSF.INSTANCE.from(csvRow, timeConvert);
+                TaxiStamp stamp = stampReader.read(csvRow);
 
                 // int time = Integer.parseInt(csvRow.get(3));
                 sortedStamps.put(stamp.globalTime, stamp);
-                localDates.add(timeConvert.toLocalDate(csvRow.get(3)));
-            }
-
+                localDates.add(stamp.globalTime.toLocalDate());
+            });
         }
     }
 
@@ -62,42 +52,10 @@ import ch.ethz.idsc.tensor.Tensor;
         return sortedStamps;
     }
 
-    public SortedMap<LocalDateTime, TaxiStamp> getEntriesFor(LocalDate localDate) {
-        SortedMap<LocalDateTime, TaxiStamp> map = new TreeMap<>();
-        sortedStamps.entrySet().stream()//
-                .filter(e -> e.getKey().toLocalDate().equals(localDate))//
-                .forEach(e -> map.put(e.getKey(), e.getValue()));
-        return map;
-
-        // return (SortedMap<LocalDateTime, TaxiStamp>) sortedStamps.entrySet().stream()//
-        // .filter(e -> e.getKey().toLocalDate().equals(localDate))//
-        // .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-
-        // old implementation, TODO delete
-        // if (localDate.equals(LocalDate.MAX))
-        // return getAllEntries();
-        // LocalDateTime minTime = timeConvert.beginOf(localDate);
-        // LocalDateTime maxTime = timeConvert.endOf(localDate);
-        //
-        // beginKey = beginEntry(minTime, localDate);
-        // endKey = endEntry(maxTime);
-        //
-        // if (Objects.nonNull(beginKey) && Objects.nonNull(endKey)) {
-        // dateSplitUp.put(localDate, Tensors.vector(beginKey, endKey));
-        // } else {
-        // Tensor append = Tensors.vector(-1, -1);
-        // if (Objects.nonNull(beginKey))
-        // append.set(RealScalar.of(beginKey), 0);
-        //
-        // if (Objects.nonNull(beginKey))
-        // append.set(RealScalar.of(endKey), 1);
-        //
-        // dateSplitUp.put(localDate, append);
-        // }
-        //
-        // if (Objects.isNull(beginKey) || Objects.isNull(endKey))
-        // return null;
-        // return sortedStamps.subMap(beginKey, endKey);
+    public NavigableMap<LocalDateTime, TaxiStamp> getEntriesFor(LocalDate localDate) {
+        return sortedStamps.entrySet().stream() //
+                .filter(e -> e.getKey().toLocalDate().equals(localDate)) //
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> v2, TreeMap::new));
     }
 
     /** @param minTime belonging to certain LocalDate
@@ -107,14 +65,14 @@ import ch.ethz.idsc.tensor.Tensor;
         LocalDateTime startKey = sortedStamps.floorKey(minTime);
         if (Objects.isNull(startKey)) {
             LocalDateTime upper = sortedStamps.ceilingKey(minTime);
-            if (LocalDateTimes.lessThan(upper, timeConvert.endOf(localDate)))
+            if (upper.isBefore(stampReader.timeConvert().endOf(localDate)))
                 startKey = upper;
             else
                 return null;
         }
 
         boolean occ = sortedStamps.get(startKey).occupied;
-        while (occ && LocalDateTimes.lessThan(startKey, sortedStamps.lastKey())) {
+        while (occ && startKey.isBefore(sortedStamps.lastKey())) {
             startKey = sortedStamps.higherKey(startKey);
             occ = sortedStamps.get(startKey).occupied;// Integer.parseInt(sortedEntries.get(current).get(2));
         }
@@ -129,11 +87,10 @@ import ch.ethz.idsc.tensor.Tensor;
         if (Objects.isNull(current))
             return null;
         boolean occ = sortedStamps.get(current).occupied;
-        while (occ && LocalDateTimes.lessThan(current, sortedStamps.lastKey())) {
+        while (occ && current.isBefore(sortedStamps.lastKey())) {
             current = sortedStamps.higherKey(current);
-            if (Objects.isNull(current)) {
-                GlobalAssert.that(false);
-            }
+            if (Objects.isNull(current))
+                throw new RuntimeException();
             occ = sortedStamps.get(current).occupied;// Integer.parseInt(sortedEntries.get(current).get(2));
         }
         return current;
@@ -144,7 +101,7 @@ import ch.ethz.idsc.tensor.Tensor;
     }
 
     public void printLocalDates() {
-        localDates.stream().sorted().forEach(ld -> System.out.println(ld));
+        localDates.stream().sorted().forEach(System.out::println);
     }
 
     public String getFileName() {

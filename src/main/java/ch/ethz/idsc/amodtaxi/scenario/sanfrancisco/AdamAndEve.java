@@ -17,6 +17,7 @@ import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.io.GZHandler;
 
+@Deprecated
 /* package */ enum AdamAndEve {
     ;
 

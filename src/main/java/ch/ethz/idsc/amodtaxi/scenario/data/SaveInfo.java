@@ -1,5 +1,5 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
-package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.data;
+package ch.ethz.idsc.amodtaxi.scenario.data;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -10,45 +10,39 @@ import java.util.Map;
 import java.util.Objects;
 
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
-import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.qty.Quantity;
 
 /* package */ enum SaveInfo {
     ;
 
     public static void of(Collection<FileAnalysis> filesAnalysis, BufferedWriter out, //
             File saveSubDir, AmodeusTimeConvert timeConvert) throws Exception {
+        if (filesAnalysis.stream().allMatch(FileAnalysis::isEmpty)) {
+            out.write("no data present in time frame");
+            return;
+        }
+
 
         /** number of requests */
-        int numRequests = 0;
-        for (FileAnalysis fileAnalysis : filesAnalysis) {
-            numRequests += fileAnalysis.getNumRequests();
-        }
+        int numRequests = filesAnalysis.stream().mapToInt(FileAnalysis::getNumRequests).sum();
 
         /** distances */
-        Scalar custrDistance = Quantity.of(0, SI.METER);
-        Scalar totalDistance = Quantity.of(0, SI.METER);
-        Scalar emptyDistance = Quantity.of(0, SI.METER);
-        for (FileAnalysis fileAnalysis : filesAnalysis) {
-            emptyDistance = emptyDistance.add(fileAnalysis.distances().Get(0));
-            custrDistance = custrDistance.add(fileAnalysis.distances().Get(1));
-            totalDistance = totalDistance.add(fileAnalysis.distances().Get(2));
-
-        }
+        Scalar custrDistance = filesAnalysis.stream().map(FileAnalysis::distances).map(vector -> vector.Get(0)).reduce(Scalar::add).orElseThrow();
+        Scalar totalDistance = filesAnalysis.stream().map(FileAnalysis::distances).map(vector -> vector.Get(1)).reduce(Scalar::add).orElseThrow();
+        Scalar emptyDistance = filesAnalysis.stream().map(FileAnalysis::distances).map(vector -> vector.Get(2)).reduce(Scalar::add).orElseThrow();
 
         /** min and max time */
-        LocalDateTime minTime = StaticHelper.getMinVal(filesAnalysis, FileAnalysis::getMinTime);
-        LocalDateTime maxTime = StaticHelper.getMaxVal(filesAnalysis, FileAnalysis::getMaxTime);
+        LocalDateTime minTime = StaticHelper.getMinVal(filesAnalysis, FileAnalysis::getMinTime).orElse(null);
+        LocalDateTime maxTime = StaticHelper.getMaxVal(filesAnalysis, FileAnalysis::getMaxTime).orElse(null);
 
         /** {minLat,maxLat,minLng,maxLng} */
-        Double minLat = StaticHelper.getMinVal(filesAnalysis, FileAnalysis::getMinLat);
-        Double maxLat = StaticHelper.getMaxVal(filesAnalysis, FileAnalysis::getMaxLat);
+        Double minLat = StaticHelper.getMinVal(filesAnalysis, FileAnalysis::getMinLat).orElse(null);
+        Double maxLat = StaticHelper.getMaxVal(filesAnalysis, FileAnalysis::getMaxLat).orElse(null);
 
         /** min and max lng */
-        Double minLng = StaticHelper.getMinVal(filesAnalysis, FileAnalysis::getMinLng);
-        Double maxLng = StaticHelper.getMaxVal(filesAnalysis, FileAnalysis::getMaxLng);
+        Double minLng = StaticHelper.getMinVal(filesAnalysis, FileAnalysis::getMinLng).orElse(null);
+        Double maxLng = StaticHelper.getMaxVal(filesAnalysis, FileAnalysis::getMaxLng).orElse(null);
 
         // /** journey Times */
         // Tensor journeyTimes = Tensors.empty();
@@ -69,8 +63,8 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         // GlobalAssert.that(minWaitingTimes.length() == numRequests);
 
         /** min and max journeyTime */
-        Integer minJourneyTime = StaticHelper.getMinVal(filesAnalysis, FileAnalysis::getMinJourneyTime);
-        Integer maxJourneyTime = StaticHelper.getMaxVal(filesAnalysis, FileAnalysis::getMaxJourneyTime);
+        Integer minJourneyTime = StaticHelper.getMinVal(filesAnalysis, FileAnalysis::getMinJourneyTime).orElse(null);
+        Integer maxJourneyTime = StaticHelper.getMaxVal(filesAnalysis, FileAnalysis::getMaxJourneyTime).orElse(null);
 
         /** printout general */
         out.write("requests: " + numRequests + "\n");
@@ -99,9 +93,8 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
         /** printout per file */
         out.write("=========================\n");
-        for (FileAnalysis fileAnalysis : filesAnalysis) {
+        for (FileAnalysis fileAnalysis : filesAnalysis)
             SaveInfo.ofSingle(fileAnalysis, out, timeConvert);
-        }
 
         // /** save data */
         // if (journeyTimes.length() > 0)
@@ -141,9 +134,9 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         out.write("total distance:    " + fileAnalysis.distances().Get(2) + "\n");
 
         Map<LocalDate, Tensor> dateSplitUp = fileAnalysis.getDateSplitUp(); // TODO Claudio
-        for (LocalDate localDate : dateSplitUp.keySet()) {
+        for (LocalDate localDate : dateSplitUp.keySet())
             out.write(localDate + ":  from " + dateSplitUp.get(localDate).Get(0) + " to " + dateSplitUp.get(localDate).Get(0) + "\n");
-        }
+
         out.write("=======\n");
     }
 }

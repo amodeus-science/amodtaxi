@@ -12,7 +12,7 @@ import ch.ethz.idsc.amodtaxi.scenario.TestDirectories;
 
     public static void in(File workingDir) throws Exception {
         SanFranciscoGeoInformation.setup();
-        ScenarioSetup.in(workingDir, TestDirectories.SAN_FRANCISCO, "config_fullPublish.xml", ScenarioLabels.networkGz);
+        ScenarioSetup.in(workingDir, TestDirectories.SAN_FRANCISCO, ScenarioLabels.networkGz);
         GZHandler.extract(new File(workingDir, ScenarioLabels.networkGz), new File(workingDir, ScenarioLabels.network));
     }
 }

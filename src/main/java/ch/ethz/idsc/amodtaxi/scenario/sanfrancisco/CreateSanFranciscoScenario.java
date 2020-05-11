@@ -51,7 +51,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
     private static final int MAX_ITER = 100_000;
 
     public static void main(String[] args) throws Exception {
-        File dataDir = new File(args[0]);
+        File dataDir = args.length > 0 ? new File(args[0]) : null;
         run(dataDir, MultiFileTools.getDefaultWorkingDirectory());
     }
 
@@ -62,10 +62,15 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         StaticMapCreator.now(workingDir);
 
         /** copy taxi trace files */
-        System.out.println("dataDir: " + dataDir.getAbsolutePath());
-        List<File> traceFiles = TraceFileChoice.getOrDefault(new File(dataDir, "cabspottingdata"), "new_").random(NUM_TRACE_FILES);
-        // List<File> traceFiles = //
-        // TraceFileChoice.getOrDefault(new File(dataDir, "cabspottingdata"), "new_").specified("equioc", "onvahe", "epkiapme", "ippfeip");
+        List<File> traceFiles;
+        if (Objects.nonNull(dataDir)) {
+            System.out.println("data directory: " + dataDir.getAbsolutePath());
+            traceFiles = TraceFileChoice.getOrDefault(new File(dataDir, "cabspottingdata"), "new_").random(NUM_TRACE_FILES);
+            // traceFiles = TraceFileChoice.getOrDefault(new File(dataDir, "cabspottingdata"), "new_").specified("equioc", "onvahe", "epkiapme", "ippfeip");
+        } else {
+            System.out.println("no data directory provided");
+            traceFiles = TraceFileChoice.getDefault().random(NUM_TRACE_FILES);
+        }
 
         /** prepare the network */
         ScenarioBasicNetworkPreparer.run(workingDir);
@@ -93,36 +98,6 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
         /** create scenario */
         for (LocalDate localDate : DATES) {
-            // try {
-            // /** compute scenario */
-            //
-            // TaxiTripFilterCollection speedEstimationTripFilter = new TaxiTripFilterCollection();
-            // /** trips which are faster than the network freeflow speeds would allow are removed */
-            // speedEstimationTripFilter.addFilter(new TripNetworkFilter(network, db, //
-            // Quantity.of(2.235200008, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m"), true));
-            //
-            // TaxiTripFilterCollection finalPopulationTripFilter = new TaxiTripFilterCollection();
-            // /** trips which are faster than the network freeflow speeds would allow are removed */
-            // finalPopulationTripFilter.addFilter(new TripNetworkFilter(network, db, //
-            // Quantity.of(2.235200008, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m"), false));
-            //
-            // StandaloneFleetConverterSF sfc = new StandaloneFleetConverterSF(processingDir, //
-            // dayTaxiRecord, db, network, timeStep, TIME_CONVERT, speedEstimationTripFilter, //
-            // finalPopulationTripFilter);
-            // sfc.run(localDate);
-            //
-            // /** copy scenario to new location */
-            // File destinDirDay = new File(destinDir, localDate.toString());
-            // destinDirDay.mkdirs();
-            // try {
-            // ScenarioAssemblerSF.copyFinishedScenario(processingDir.getAbsolutePath(), destinDirDay);
-            // } catch (Exception e) {
-            // System.err.println("Failed to copy scenario for " + localDate);
-            // }
-            // } catch (Exception e) {
-            // System.err.println("Failed to create scenario for localDate " + localDate);
-            // e.printStackTrace();
-            // }
             /** prepare for creation of scenario */
             TaxiDataModifier tripModifier;
             {

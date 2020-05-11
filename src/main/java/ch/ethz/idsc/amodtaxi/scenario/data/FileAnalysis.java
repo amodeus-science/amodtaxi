@@ -1,23 +1,21 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
-package ch.ethz.idsc.amodtaxi.scenario;
+package ch.ethz.idsc.amodtaxi.scenario.data;
 
 import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.SortedMap;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
+import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.utils.collections.QuadTree;
 
 import ch.ethz.idsc.amodeus.analysis.SaveUtils;
-import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.math.SI;
-import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.data.NumberOfRequests;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
@@ -28,16 +26,14 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 public class FileAnalysis {
     private final String fileName;
     private final SortedMap<LocalDateTime, TaxiStamp> sortedEntries;
-    private boolean tracesInTimeFrame = false;
     private final Map<LocalDate, Tensor> dateSplitUp;
 
     /** analysis results */
-    private int numRequests;
+    private int numRequests = 0;
     private LocalDateTime minTime = null;
     private LocalDateTime maxTime = null;
     private Tensor journeyTimes = null;
     private Tensor mapBounds = null;
-    private Tensor minMaxJourneyTime = null;
 
     private Scalar custrDistance = Quantity.of(0, SI.METER);
     private Scalar totalDistance = Quantity.of(0, SI.METER);
@@ -45,72 +41,76 @@ public class FileAnalysis {
 
     private Tensor plotWaitingTimes = null;
 
-    public FileAnalysis(SortedMap<LocalDateTime, TaxiStamp> sortedEntries, MatsimAmodeusDatabase db, //
-            Network network, LeastCostPathCalculator leastCostPathCalculator, QuadTree<Link> quadTree, String fileName, //
-            Map<LocalDate, Tensor> dateSplitUp) throws Exception {
+    public FileAnalysis(NavigableMap<LocalDateTime, TaxiStamp> sortedEntries, FastLinkLookup fastLinkLookup, //
+            LeastCostPathCalculator leastCostPathCalculator, String fileName, Map<LocalDate, Tensor> dateSplitUp) throws Exception {
         this.fileName = fileName;
         this.dateSplitUp = dateSplitUp;
         this.sortedEntries = sortedEntries;
-        this.numRequests = 0;
         if (Objects.nonNull(sortedEntries)) {
-            this.numRequests = NumberOfRequests.in(sortedEntries);
-            if (sortedEntries.size() > 0) {
-                tracesInTimeFrame = true;
-                this.minTime = sortedEntries.firstKey();
-                this.maxTime = sortedEntries.lastKey();
-                mapBounds = LongLatRange.in(sortedEntries);
+            numRequests = NumberOfRequests.in(sortedEntries);
+            if (!sortedEntries.isEmpty()) {
+                minTime = sortedEntries.firstKey();
+                maxTime = sortedEntries.lastKey();
+                mapBounds = LongLatRange.in(sortedEntries.values());
                 journeyTimes = JourneyTimes.in(sortedEntries);
-                NetworkDistanceHelper dh = new NetworkDistanceHelper(sortedEntries, db, leastCostPathCalculator, quadTree);
+                GlobalAssert.that(journeyTimes.length() == numRequests);
+
+                plotWaitingTimes = Tensors.empty(); // PlotWaitingTimes.in(sortedEntries);
+
+                NetworkDistanceHelper dh = new NetworkDistanceHelper(sortedEntries, fastLinkLookup, leastCostPathCalculator);
                 custrDistance = dh.getCustrDistance();
                 totalDistance = dh.getTotlDistance();
                 emptyDistance = dh.getEmptyDistance();
-                plotWaitingTimes = Tensors.empty(); // PlotWaitingTimes.in(sortedEntries);
-                GlobalAssert.that(journeyTimes.length() == numRequests);
-                minMaxJourneyTime = JourneyTimeRange.in(journeyTimes);
             }
         }
     }
 
+    public boolean isEmpty() {
+        return sortedEntries.isEmpty();
+    }
+
     public int getNumRequests() {
-        if (tracesInTimeFrame)
-            return numRequests;
-        return 0;
+        return sortedEntries.isEmpty() ? 0 : numRequests;
     }
 
-    public LocalDateTime getMinTime() {
-        return minTime;
+    public Optional<LocalDateTime> getMinTime() {
+        return Optional.ofNullable(minTime);
     }
 
-    public LocalDateTime getMaxTime() {
-        return maxTime;
+    public Optional<LocalDateTime> getMaxTime() {
+        return Optional.ofNullable(maxTime);
     }
 
-    public Double getMinLat() {
-        return Objects.isNull(mapBounds) ? null : mapBounds.Get(0).number().doubleValue();
+    public Optional<Double> getMinLat() {
+        return getMapDimension(0);
     }
 
-    public Double getMaxLat() {
-        return Objects.isNull(mapBounds) ? null : mapBounds.Get(1).number().doubleValue();
+    public Optional<Double> getMaxLat() {
+        return getMapDimension(1);
     }
 
-    public Double getMinLng() {
-        return Objects.isNull(mapBounds) ? null : mapBounds.Get(2).number().doubleValue();
+    public Optional<Double> getMinLng() {
+        return getMapDimension(2);
     }
 
-    public Double getMaxLng() {
-        return Objects.isNull(mapBounds) ? null : mapBounds.Get(3).number().doubleValue();
+    public Optional<Double> getMaxLng() {
+        return getMapDimension(3);
     }
 
-    public Tensor getJourneyTimes() {
-        return journeyTimes;
+    private Optional<Double> getMapDimension(int dim) {
+        return Optional.ofNullable(mapBounds).map(vector -> vector.Get(dim).number().doubleValue());
     }
 
-    public Integer getMinJourneyTime() {
-        return Objects.isNull(minMaxJourneyTime) ? null : minMaxJourneyTime.Get(0).number().intValue();
+    public Optional<Tensor> getJourneyTimes() {
+        return Optional.ofNullable(journeyTimes);
     }
 
-    public Integer getMaxJourneyTime() {
-        return Objects.isNull(minMaxJourneyTime) ? null : minMaxJourneyTime.Get(1).number().intValue();
+    public Optional<Integer> getMinJourneyTime() {
+        return Optional.ofNullable(journeyTimes).map(JourneyTimeRange::min).map(Scalar::number).map(Number::intValue);
+    }
+
+    public Optional<Integer> getMaxJourneyTime() {
+        return Optional.ofNullable(journeyTimes).map(JourneyTimeRange::max).map(Scalar::number).map(Number::intValue);
     }
 
     /** @return {empty distance, customer distance, total distance} */
@@ -130,7 +130,7 @@ public class FileAnalysis {
         Tensor profile = Tensors.empty();
         for (LocalDateTime time : sortedEntries.keySet()) {
             Tensor row = Tensors.empty();
-            boolean occ = sortedEntries.get(time).occupied;// Integer.parseInt(sortedEntries.get(time).get(2));
+            boolean occ = sortedEntries.get(time).occupied; // Integer.parseInt(sortedEntries.get(time).get(2));
             row.append(Tensors.fromString(time.toString()));
             row.append(Boole.of(occ));
             profile.append(row);

@@ -13,6 +13,6 @@ import ch.ethz.idsc.amodtaxi.scenario.ScenarioSetup;
         SanFranciscoGeoInformation.setup();
         File resourcesDir = new File(Locate.repoFolder(CreateSanFranciscoScenario.class, "amodtaxi"), //
                 "resources/sanFranciscoScenario");
-        ScenarioSetup.in(workingDir, resourcesDir, "config_fullPublish.xml");
+        ScenarioSetup.in(workingDir, resourcesDir);
     }
 }

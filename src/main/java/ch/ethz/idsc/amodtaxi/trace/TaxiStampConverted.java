@@ -5,6 +5,7 @@ import java.util.List;
 
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 
+@Deprecated
 @FunctionalInterface
 public interface TaxiStampConverted {
     // TODO doc
