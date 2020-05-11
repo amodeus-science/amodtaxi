@@ -51,7 +51,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
     private static final int MAX_ITER = 100_000;
 
     public static void main(String[] args) throws Exception {
-        File dataDir = new File(args[0]);
+        File dataDir = args.length > 0 ? new File(args[0]) : null;
         run(dataDir, MultiFileTools.getDefaultWorkingDirectory());
     }
 
@@ -62,10 +62,15 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         StaticMapCreator.now(workingDir);
 
         /** copy taxi trace files */
-        System.out.println("dataDir: " + dataDir.getAbsolutePath());
-        List<File> traceFiles = TraceFileChoice.getOrDefault(new File(dataDir, "cabspottingdata"), "new_").random(NUM_TRACE_FILES);
-        // List<File> traceFiles = //
-        // TraceFileChoice.getOrDefault(new File(dataDir, "cabspottingdata"), "new_").specified("equioc", "onvahe", "epkiapme", "ippfeip");
+        List<File> traceFiles;
+        if (Objects.nonNull(dataDir)) {
+            System.out.println("data directory: " + dataDir.getAbsolutePath());
+            traceFiles = TraceFileChoice.getOrDefault(new File(dataDir, "cabspottingdata"), "new_").random(NUM_TRACE_FILES);
+            // traceFiles = TraceFileChoice.getOrDefault(new File(dataDir, "cabspottingdata"), "new_").specified("equioc", "onvahe", "epkiapme", "ippfeip");
+        } else {
+            System.out.println("no data directory provided");
+            traceFiles = TraceFileChoice.getDefault().random(NUM_TRACE_FILES);
+        }
 
         /** prepare the network */
         ScenarioBasicNetworkPreparer.run(workingDir);

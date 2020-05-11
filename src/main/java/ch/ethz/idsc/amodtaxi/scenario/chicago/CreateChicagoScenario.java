@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
+import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -48,6 +49,15 @@ import ch.ethz.idsc.tensor.qty.Quantity;
     // TODO load random with a seed over scenarioOptions
     private static final Random RANDOM = new Random(123);
     private static final int MAX_ITER = 100_000;
+
+    /** This main function will create an AMoDeus scenario based on the Chicago taxi
+     * dataset available online in the current working directory. Settings can afterwards
+     * be changed in the AmodeusOptions.properties file located in the directory.
+     *
+     * @throws Exception */
+    public static void main(String[] args) throws Exception {
+        createScenario(MultiFileTools.getDefaultWorkingDirectory());
+    }
 
     private static void createScenario(File workingDir) throws Exception {
         ChicagoSetup.in(workingDir);
@@ -141,16 +151,5 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         // DeleteDirectory.of(new File(workingDir, ScenarioLabels.config), 0, 1);
         // DeleteDirectory.of(new File(workingDir, ScenarioLabels.pt2MatSettings), 0, 1);
         // DeleteDirectory.of(new File(workingDir, ScenarioLabels.network), 0, 1);
-    }
-
-    /** in @param args[0] working directory (empty directory), this main function will create
-     * an AMoDeus scenario based on the Chicago taxi dataset available online.
-     * Settings can afterwards be changed in the AmodeusOptions.properties file located
-     * in the directory.
-     * 
-     * @throws Exception */
-    public static void main(String[] args) throws Exception {
-        File workingDir = new File(args[0]);
-        createScenario(workingDir);
     }
 }
