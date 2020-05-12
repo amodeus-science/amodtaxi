@@ -15,10 +15,12 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import ch.ethz.idsc.amodeus.net.FastLinkLookup;
+import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStampHelpers;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.qty.Quantity;
 import ch.ethz.idsc.tensor.red.Max;
 import ch.ethz.idsc.tensor.red.Min;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -38,15 +40,15 @@ public abstract class Summary {
 
     // ---
 
+    private final Set<File> sources;
     protected final NavigableMap<LocalDate, List<TaxiStamp>> stampsByDay;
-    protected final Set<File> sources;
 
     protected Summary(Collection<TaxiStamp> taxiStamps, Set<File> sources) {
+        this.sources = sources;
         stampsByDay = taxiStamps.stream().collect(Collectors.groupingBy(
                 taxiStamp -> taxiStamp.globalTime.toLocalDate(), //
                 TreeMap::new, //
                 Collectors.toList()));
-        this.sources = sources;
     }
 
     public NavigableSet<LocalDate> dates() {
@@ -55,6 +57,10 @@ public abstract class Summary {
 
     public Collection<TaxiStamp> stamps() {
         return stampsByDay.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    public Set<File> sources() {
+        return Set.copyOf(sources);
     }
 
     public Optional<Tensor> boundaries() {
@@ -105,13 +111,9 @@ public abstract class Summary {
 
     public abstract Scalar customerDistance();
 
-    protected Scalar totalDistance(LocalDate date) {
-        return emptyDistance(date).add(customerDistance(date));
-    }
+    protected abstract Optional<Scalar> emptyDistance(LocalDate date);
 
-    protected abstract Scalar emptyDistance(LocalDate date);
-
-    protected abstract Scalar customerDistance(LocalDate date);
+    protected abstract Optional<Scalar> customerDistance(LocalDate date);
 
     protected abstract Tensor journeyTimes();
 
@@ -129,22 +131,22 @@ public abstract class Summary {
         return new Summary(stampsByDay.get(date), sources) {
             @Override
             public Scalar emptyDistance() {
-                return Summary.this.emptyDistance(date);
+                return Summary.this.emptyDistance(date).orElse(Quantity.of(0, SI.METER));
             }
 
             @Override
             public Scalar customerDistance() {
-                return Summary.this.customerDistance(date);
+                return Summary.this.customerDistance(date).orElse(Quantity.of(0, SI.METER));
             }
 
             @Override
-            protected Scalar emptyDistance(LocalDate date) {
-                return emptyDistance();
+            protected Optional<Scalar> emptyDistance(LocalDate date) {
+                return Optional.of(emptyDistance());
             }
 
             @Override
-            protected Scalar customerDistance(LocalDate date) {
-                return customerDistance();
+            protected Optional<Scalar> customerDistance(LocalDate date) {
+                return Optional.of(customerDistance());
             }
 
             @Override
@@ -165,12 +167,12 @@ public abstract class Summary {
         string += "for dates: {" + dates().stream().map(LocalDate::toString).collect(Collectors.joining(", ")) + "}\n\n";
         string += "requests: " + numberOfRequests() + "\n\n";
         string += "times: " + minTime().map(minTime -> minTime + " - " + maxTime().orElseThrow()).orElse("N/A") + "\n";
-        string += "pickup times: " + minPickupTime().map(minTime -> minPickupTime() + " - " + maxPickupTime().orElseThrow()).orElse("N/A") + "\n\n";
+        string += "pickup times: " + minPickupTime().map(minTime -> minTime + " - " + maxPickupTime().orElseThrow()).orElse("N/A") + "\n\n";
         string += "latitude: ";
         OptionalDouble optLat = minLat();
         if (optLat.isPresent()) {
-            string += "latitude: " + optLat.getAsDouble() + " - " + maxLat().getAsDouble();
-            string += "longitude: " + minLng().getAsDouble() + " - " + maxLng().getAsDouble();
+            string += "latitude: " + optLat.getAsDouble() + " - " + maxLat().getAsDouble() + "\n";
+            string += "longitude: " + minLng().getAsDouble() + " - " + maxLng().getAsDouble() + "\n\n";
         } else {
             string += "latitude: N/A\n";
             string += "longitude: N/A\n\n";
@@ -178,7 +180,7 @@ public abstract class Summary {
         string += "journey times: " + minJourneyTime().map(minTime -> minTime + " - " + maxJourneyTime().orElseThrow()).orElse("N/A") + "\n\n";
         string += "empty distance: " + emptyDistance() + "\n";
         string += "customer distance: " + customerDistance() + "\n";
-        string += "total distance: " + totalDistance() + "\n";
+        string += "total distance: " + totalDistance();
         return string;
     }
 }

@@ -2,6 +2,7 @@ package ch.ethz.idsc.amodtaxi.scenario.data;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import ch.ethz.idsc.tensor.Scalar;
@@ -14,7 +15,7 @@ import ch.ethz.idsc.tensor.alg.Join;
 
     protected CollectedSummary(Collection<Summary> summaries) {
         super(summaries.stream().map(Summary::stamps).flatMap(Collection::stream).collect(Collectors.toList()), //
-                summaries.stream().map(summary -> summary.sources).flatMap(Collection::stream).collect(Collectors.toSet()));
+                summaries.stream().map(Summary::sources).flatMap(Collection::stream).collect(Collectors.toSet()));
         this.summaries = summaries;
     }
 
@@ -29,13 +30,13 @@ import ch.ethz.idsc.tensor.alg.Join;
     }
 
     @Override // from Summary
-    protected Scalar emptyDistance(LocalDate date) {
-        return summaries.stream().map(summary -> summary.emptyDistance(date)).reduce(Scalar::add).orElseThrow();
+    protected Optional<Scalar> emptyDistance(LocalDate date) {
+        return summaries.stream().map(summary -> summary.emptyDistance(date)).filter(Optional::isPresent).map(Optional::get).reduce(Scalar::add);
     }
 
     @Override // from Summary
-    protected Scalar customerDistance(LocalDate date) {
-        return summaries.stream().map(summary -> summary.customerDistance(date)).reduce(Scalar::add).orElseThrow();
+    protected Optional<Scalar> customerDistance(LocalDate date) {
+        return summaries.stream().map(summary -> summary.customerDistance(date)).filter(Optional::isPresent).map(Optional::get).reduce(Scalar::add);
     }
 
     @Override // from Summary

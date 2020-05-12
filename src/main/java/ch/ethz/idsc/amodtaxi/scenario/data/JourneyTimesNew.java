@@ -4,7 +4,6 @@ package ch.ethz.idsc.amodtaxi.scenario.data;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -36,29 +35,32 @@ import ch.ethz.idsc.tensor.sca.Sign;
 
         LocalDateTime journeyStart = null;
         boolean occPrev = false;
-        Iterator<TaxiStamp> iterator = taxiStampsSorted.iterator();
-        TaxiStamp taxiStamp = iterator.next();
-        LocalDateTime timePrev = taxiStamp.globalTime;
-        do {
-            if (taxiStamp.occupied && !occPrev) // journey has started
+        LocalDateTime timePrev = taxiStampsSorted.peekFirst().globalTime;
+        for (TaxiStamp taxiStamp : taxiStampsSorted) {
+            LocalDateTime time = taxiStamp.globalTime;
+            boolean occ = taxiStamp.occupied;
+            if (occ && !occPrev) // journey has started
                 journeyStart = timePrev;
-            else if (!taxiStamp.occupied && occPrev) { // journey has ended
+            if (!occ && occPrev) { // journey has ended
                 GlobalAssert.that(Objects.nonNull(journeyStart));
+                GlobalAssert.that(!occ);
+                GlobalAssert.that(occPrev);
                 Scalar journeyTime = !timePrev.equals(journeyStart) ? //
                         Duration.between(journeyStart, timePrev) : //
-                        Duration.between(journeyStart, taxiStamp.globalTime);
+                        Duration.between(journeyStart, time);
                 journeyTimes.append(Sign.requirePositive(journeyTime));
                 journeyStart = null;
             }
-            occPrev = taxiStamp.occupied;
-            timePrev = taxiStamp.globalTime;
-            taxiStamp = iterator.next();
-        } while (iterator.hasNext());
-        if (taxiStamp.occupied) { // recordings end
-            GlobalAssert.that(Objects.nonNull(journeyStart));
-            Scalar journeyTime = Duration.between(journeyStart, taxiStamp.globalTime);
-            journeyTimes.append(Sign.requirePositive(journeyTime));
+            if (occ && time == taxiStampsSorted.peekLast().globalTime) { // recordings end
+                GlobalAssert.that(Objects.nonNull(journeyStart));
+                Scalar journeyTime = Duration.between(journeyStart, time);
+                journeyTimes.append(Sign.requirePositive(journeyTime));
+                journeyStart = null;
+            }
+            occPrev = occ;
+            timePrev = time;
         }
+
         return journeyTimes;
     }
 }

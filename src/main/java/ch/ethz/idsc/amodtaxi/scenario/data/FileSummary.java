@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
@@ -50,6 +51,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
                     try {
                         return JourneyTimesNew.in(e.getValue());
                     } catch (Exception ex) {
+                        ex.printStackTrace();
                         throw new RuntimeException();
                     }
                 }, //
@@ -68,13 +70,13 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
     }
 
     @Override // from Summary
-    protected Scalar emptyDistance(LocalDate date) {
-        return distances.get(date).stream().map(vector -> vector.Get(0)).reduce(Scalar::add).orElseThrow();
+    protected Optional<Scalar> emptyDistance(LocalDate date) {
+        return Optional.ofNullable(distances.get(date)).map(vector -> vector.Get(0));
     }
 
     @Override // from Summary
-    protected Scalar customerDistance(LocalDate date) {
-        return distances.get(date).stream().map(vector -> vector.Get(1)).reduce(Scalar::add).orElseThrow();
+    protected Optional<Scalar> customerDistance(LocalDate date) {
+        return Optional.ofNullable(distances.get(date)).map(vector -> vector.Get(1));
     }
 
     @Override // from Summary
@@ -84,6 +86,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 
     @Override // from Summary
     protected Tensor journeyTimes(LocalDate date) {
-        return journeyTimes.get(date);
+        return journeyTimes.getOrDefault(date, Tensors.empty());
     }
 }
