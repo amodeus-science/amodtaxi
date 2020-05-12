@@ -66,7 +66,7 @@ public class StaticAnalysis {
         }).filter(Objects::nonNull).collect(Collectors.toList()));
         summaries.put(ALL, summaryAll);
 
-        summaryAll.dates().forEach(date -> summaries.put(date.toString(), summaryAll.of(date)));
+        summaryAll.dates().forEach(date -> summaries.put(date.toString(), summaryAll.on(date)));
     }
 
     public void saveTo(File directory) {
@@ -84,17 +84,11 @@ public class StaticAnalysis {
         });
     }
 
-    @Override
-    public String toString() {
-        Summary summaryAll = summaries.get(ALL);
-        if (Objects.isNull(summaryAll))
-            return "no files analyzed yet";
+    public Summary getSummary() {
+        return summaries.get(ALL);
+    }
 
-        String string = summaryAll.toString();
-        for (LocalDate date : summaryAll.dates()) {
-            string += "\n------------------------------------------------------------\n";
-            string += Objects.requireNonNull(summaries.get(date.toString())).toString();
-        }
-        return string;
+    public Summary getSummary(LocalDate date) {
+        return summaries.get(date.toString());
     }
 }

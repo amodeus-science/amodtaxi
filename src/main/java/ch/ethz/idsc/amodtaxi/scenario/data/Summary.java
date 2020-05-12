@@ -15,12 +15,10 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import ch.ethz.idsc.amodeus.net.FastLinkLookup;
-import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStampHelpers;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.qty.Quantity;
 import ch.ethz.idsc.tensor.red.Max;
 import ch.ethz.idsc.tensor.red.Min;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -99,9 +97,7 @@ public abstract class Summary {
         return TaxiStampHelpers.maxPickupTime(stamps());
     }
 
-    public long numberOfRequests() {
-        return TaxiStampHelpers.numberOfRequests(stamps());
-    }
+    public abstract long numberOfRequests();
 
     public Scalar totalDistance() {
         return emptyDistance().add(customerDistance());
@@ -127,39 +123,7 @@ public abstract class Summary {
         return journeyTimes().stream().reduce(Max::of).map(Scalar.class::cast);
     }
 
-    public Summary of(LocalDate date) {
-        return new Summary(stampsByDay.get(date), sources) {
-            @Override
-            public Scalar emptyDistance() {
-                return Summary.this.emptyDistance(date).orElse(Quantity.of(0, SI.METER));
-            }
-
-            @Override
-            public Scalar customerDistance() {
-                return Summary.this.customerDistance(date).orElse(Quantity.of(0, SI.METER));
-            }
-
-            @Override
-            protected Optional<Scalar> emptyDistance(LocalDate date) {
-                return Optional.of(emptyDistance());
-            }
-
-            @Override
-            protected Optional<Scalar> customerDistance(LocalDate date) {
-                return Optional.of(customerDistance());
-            }
-
-            @Override
-            public Tensor journeyTimes() {
-                return Summary.this.journeyTimes(date);
-            }
-
-            @Override
-            protected Tensor journeyTimes(LocalDate date) {
-                return journeyTimes();
-            }
-        };
-    }
+    public abstract Summary on(LocalDate date);
 
     @Override
     public String toString() {

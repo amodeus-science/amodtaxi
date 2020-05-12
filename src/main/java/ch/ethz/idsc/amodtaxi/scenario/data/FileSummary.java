@@ -8,18 +8,23 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.NavigableSet;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import ch.ethz.idsc.amodeus.net.FastLinkLookup;
+import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
+import ch.ethz.idsc.amodtaxi.trace.TaxiStampHelpers;
 import ch.ethz.idsc.amodtaxi.util.CSVUtils;
 import ch.ethz.idsc.amodtaxi.util.ReverseLineInputStream;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Join;
+import ch.ethz.idsc.tensor.qty.Quantity;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
 /* package */ class FileSummary extends Summary {
@@ -60,6 +65,11 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
     }
 
     @Override // from Summary
+    public long numberOfRequests() {
+        return TaxiStampHelpers.numberOfRequests(stamps());
+    }
+
+    @Override // from Summary
     public Scalar emptyDistance() {
         return distances.values().stream().map(vector -> vector.Get(0)).reduce(Scalar::add).orElseThrow();
     }
@@ -87,5 +97,55 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
     @Override // from Summary
     protected Tensor journeyTimes(LocalDate date) {
         return journeyTimes.getOrDefault(date, Tensors.empty());
+    }
+
+    @Override // from Summary
+    public Summary on(LocalDate date) {
+        return new Summary(stampsByDay.getOrDefault(date, Collections.emptyList()), sources()) {
+            @Override
+            public NavigableSet<LocalDate> dates() {
+                return new TreeSet<>(Collections.singleton(date));
+            }
+
+            @Override
+            public long numberOfRequests() {
+                return TaxiStampHelpers.numberOfRequests(stamps());
+            }
+
+            @Override
+            public Scalar emptyDistance() {
+                return FileSummary.this.emptyDistance(date).orElse(Quantity.of(0, SI.METER));
+            }
+
+            @Override
+            public Scalar customerDistance() {
+                return FileSummary.this.customerDistance(date).orElse(Quantity.of(0, SI.METER));
+            }
+
+            @Override
+            protected Optional<Scalar> emptyDistance(LocalDate date) {
+                return Optional.of(emptyDistance());
+            }
+
+            @Override
+            protected Optional<Scalar> customerDistance(LocalDate date) {
+                return Optional.of(customerDistance());
+            }
+
+            @Override
+            public Tensor journeyTimes() {
+                return FileSummary.this.journeyTimes(date);
+            }
+
+            @Override
+            protected Tensor journeyTimes(LocalDate date) {
+                return journeyTimes();
+            }
+
+            @Override
+            public Summary on(LocalDate date) {
+                return FileSummary.this.on(date);
+            }
+        };
     }
 }

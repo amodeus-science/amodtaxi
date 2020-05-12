@@ -134,10 +134,9 @@ import ch.ethz.idsc.tensor.qty.Quantity;
                             ScenarioLabels.LPFile, ScenarioLabels.config, ScenarioLabels.linkSpeedData });
         }
 
-        // /** test consistency of created scenarios with independent analysis */
+        /** test consistency of created scenarios with independent analysis */
         StaticAnalysis staticAnalysis = new StaticAnalysis(fll, network, TaxiStampReaderSF.INSTANCE);
         staticAnalysis.of(traceFiles);
-        // System.out.println(staticAnalysis);
         staticAnalysis.saveTo(new File(workingDir, "static_analysis"));
     }
 }
