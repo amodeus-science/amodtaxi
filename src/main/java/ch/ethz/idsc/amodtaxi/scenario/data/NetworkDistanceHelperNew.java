@@ -15,7 +15,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
-// TODO rename and replace NetworkDistanceHelper
 /* package */ class NetworkDistanceHelperNew {
     private Scalar custrDistance = Quantity.of(0, SI.METER);
     private Scalar emptyDistance = Quantity.of(0, SI.METER);

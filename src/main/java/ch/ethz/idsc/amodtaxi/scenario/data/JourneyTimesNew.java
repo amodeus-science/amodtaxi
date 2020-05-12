@@ -16,7 +16,6 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.sca.Sign;
 
-// TODO rename and replace JourneyTimes
 /* package */ enum JourneyTimesNew {
     ;
 
