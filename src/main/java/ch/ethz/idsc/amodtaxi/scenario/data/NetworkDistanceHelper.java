@@ -15,11 +15,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
-/* package */ class NetworkDistanceHelperNew {
+/* package */ class NetworkDistanceHelper {
     private Scalar custrDistance = Quantity.of(0, SI.METER);
     private Scalar emptyDistance = Quantity.of(0, SI.METER);
 
-    public NetworkDistanceHelperNew(Collection<TaxiStamp> taxiStamps, FastLinkLookup fastLinkLookup, LeastCostPathCalculator leastCostPathCalculator) {
+    public NetworkDistanceHelper(Collection<TaxiStamp> taxiStamps, FastLinkLookup fastLinkLookup, LeastCostPathCalculator leastCostPathCalculator) {
         /** compute */
         LinkedList<TaxiStamp> taxiStampsSorted = taxiStamps.stream().sorted(Comparator.comparing(taxiStamp -> taxiStamp.globalTime)) //
                 .collect(Collectors.toCollection(LinkedList::new));

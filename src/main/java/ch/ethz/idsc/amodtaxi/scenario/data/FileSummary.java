@@ -45,7 +45,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
         distances = stampsByDay.entrySet().stream().collect(Collectors.toMap( //
                 Map.Entry::getKey, //
                 e -> {
-                    NetworkDistanceHelperNew distanceHelper = new NetworkDistanceHelperNew(e.getValue(), fastLinkLookup, leastCostPathCalculator);
+                    NetworkDistanceHelper distanceHelper = new NetworkDistanceHelper(e.getValue(), fastLinkLookup, leastCostPathCalculator);
                     return Tensors.of(distanceHelper.getEmptyDistance(), distanceHelper.getCustomerDistance());
                 }, //
                 (v1, v2) -> { throw new RuntimeException(); }, //
@@ -54,7 +54,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
                 Map.Entry::getKey, //
                 e -> {
                     try {
-                        return JourneyTimesNew.in(e.getValue());
+                        return JourneyTimes.in(e.getValue());
                     } catch (Exception ex) {
                         ex.printStackTrace();
                         throw new RuntimeException();

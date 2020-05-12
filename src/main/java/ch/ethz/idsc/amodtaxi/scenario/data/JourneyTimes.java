@@ -16,7 +16,7 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.sca.Sign;
 
-/* package */ enum JourneyTimesNew {
+/* package */ enum JourneyTimes {
     ;
 
     /** @return a {@link Tensor} containing all the journey times visible in the
