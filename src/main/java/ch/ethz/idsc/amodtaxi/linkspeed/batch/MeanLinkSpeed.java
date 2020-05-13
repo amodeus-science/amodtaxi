@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.network.Link;
 
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedTimeSeries;
-import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
@@ -22,8 +21,7 @@ import ch.ethz.idsc.tensor.red.Mean;
     /** @return mean speed for a {@link Link} @param link with neighboring {@link Link}s @param neighbors
      *         at a certain @param time. The rationale of the approach is that the reduction / increase of the link
      *         speed is the sage as the average of its neighbors. */
-    public static Scalar ofNeighbors(Collection<Link> neighbors, Integer time, Link link, //
-            MatsimAmodeusDatabase db, LinkSpeedDataContainer lsData) {
+    public static Scalar ofNeighbors(Collection<Link> neighbors, Integer time, Link link, LinkSpeedDataContainer lsData) {
         Tensor changes = Tensors.empty();
         for (Link neighbor : neighbors) {
 

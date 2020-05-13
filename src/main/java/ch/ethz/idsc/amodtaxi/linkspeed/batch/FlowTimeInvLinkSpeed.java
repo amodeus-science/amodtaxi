@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
-import ch.ethz.idsc.amodeus.linkspeed.LinkIndex;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.taxitrip.ShortestDurationCalculator;
@@ -111,7 +110,6 @@ public class FlowTimeInvLinkSpeed implements TaxiLinkSpeedEstimator {
             Link link = localIndexLink.get(i);
             Objects.requireNonNull(link);
             GlobalAssert.that(network.getLinks().values().contains(link));
-            Integer linkID = LinkIndex.fromLink(db, link);
 
             /** calculate the link speed */
             double length = link.getLength();
@@ -151,7 +149,7 @@ public class FlowTimeInvLinkSpeed implements TaxiLinkSpeedEstimator {
                 GlobalAssert.that(time >= 0);
                 if (trafficTravelTime >= 0) {
                     GlobalAssert.that(speed - link.getFreespeed() <= 0.01);
-                    lsData.addData(linkID, time, speed);
+                    lsData.addData(link, time, speed);
                 } else
                     ++numNegSpeed;
             }
@@ -165,7 +163,7 @@ public class FlowTimeInvLinkSpeed implements TaxiLinkSpeedEstimator {
 
         /** Apply moving average filter to modify every link not solved in the previous step */
         ProximityNeighborKernel filterKernel = new ProximityNeighborKernel(network, Quantity.of(2000, "m"));
-        new LinkSpeedDataInterpolation(network, filterKernel, lsData, db);
+        new LinkSpeedDataInterpolation(network, filterKernel, lsData);
     }
 
     @Override

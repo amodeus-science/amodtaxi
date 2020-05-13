@@ -8,10 +8,8 @@ import java.util.Set;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
-import ch.ethz.idsc.amodeus.linkspeed.LinkIndex;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedTimeSeries;
-import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodtaxi.linkspeed.NeighborKernel;
 import ch.ethz.idsc.tensor.Scalar;
 
@@ -24,22 +22,19 @@ import ch.ethz.idsc.tensor.Scalar;
 public class LinkSpeedDataInterpolation {
 
     // TODO JPH AMODTAXI 186 make constructor obsolete
-    public static void apply(Network network, NeighborKernel filterKernel, //
-            LinkSpeedDataContainer lsData, MatsimAmodeusDatabase db) {
-        new LinkSpeedDataInterpolation(network, filterKernel, lsData, db);
+    public static void apply(Network network, NeighborKernel filterKernel, LinkSpeedDataContainer lsData) {
+        new LinkSpeedDataInterpolation(network, filterKernel, lsData);
     }
 
     private final NeighborKernel kernel;
     private final Network network;
     private final LinkSpeedDataContainer lsData;
-    private final MatsimAmodeusDatabase db;
 
     public LinkSpeedDataInterpolation(Network network, NeighborKernel filterKernel, //
-            LinkSpeedDataContainer lsData, MatsimAmodeusDatabase db) {
+            LinkSpeedDataContainer lsData) {
         this.network = network;
         this.kernel = filterKernel;
         this.lsData = lsData;
-        this.db = db;
         completeSpeeds();
     }
 
@@ -58,35 +53,33 @@ public class LinkSpeedDataInterpolation {
             if (completed % 10000 == 0)
                 System.out.println(completed + " / " + network.getLinks().size());
             Objects.requireNonNull(link);
-            Integer linkID = LinkIndex.fromLink(db, link);
 
             // /** same blocking for all links */
             // if (!lsData.getLinkSet().containsKey(db.getLinkIndex(link))) {
             // for (Integer time : recordedTimes) {
-            // lsData.addData(linkID, time, 0.0001);
+            // lsData.addData(link, time, 0.0001);
             // }
             // }
 
             /** some recordings exist for link */
-            if (lsData.getLinkMap().containsKey(linkID)) {
-                LinkSpeedTimeSeries timeSeries = lsData.getLinkMap().get(linkID);
+            LinkSpeedTimeSeries timeSeries = lsData.get(link);
+            if (Objects.nonNull(timeSeries)) {
                 for (Integer time : recordedTimes)
-                    if (!timeSeries.getRecordedTimes().contains(time)) {
+                    if (!timeSeries.getRecordedTimes().contains(time)) { // recordings exist for link but not for time
                         System.out.println("Are we ever here?... ");
                         System.exit(1); // TODO is this still needed?
-                        Scalar speed = MeanLinkSpeed.ofNeighbors(kernel.getNeighbors(link), time, link, db, lsData);
+                        Scalar speed = MeanLinkSpeed.ofNeighbors(kernel.getNeighbors(link), time, link, lsData);
                         if (Objects.nonNull(speed)) {
-                            lsData.addData(linkID, time, speed.number().doubleValue());
+                            lsData.addData(link, time, speed.number().doubleValue());
                             interpolatedLinks.add(link);
                         }
-
                     }
             } else
                 /** no recordings exist for link */
                 for (Integer time : recordedTimes) {
-                    Scalar speed = MeanLinkSpeed.ofNeighbors(kernel.getNeighbors(link), time, link, db, lsData);
+                    Scalar speed = MeanLinkSpeed.ofNeighbors(kernel.getNeighbors(link), time, link, lsData);
                     if (Objects.nonNull(speed)) {
-                        lsData.addData(linkID, time, speed.number().doubleValue());
+                        lsData.addData(link, time, speed.number().doubleValue());
                         interpolatedLinks.add(link);
                     }
                 }
