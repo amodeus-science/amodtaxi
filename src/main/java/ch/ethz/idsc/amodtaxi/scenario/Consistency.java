@@ -1,7 +1,7 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.scenario;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Objects;
 
 import org.matsim.api.core.v01.population.Leg;
@@ -17,7 +17,7 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
 public enum Consistency {
     ;
 
-    public static void checkTrail(List<TaxiTrail> trails) {
+    public static void checkTrail(Collection<TaxiTrail> trails) {
         /** are all values recorded properly */
         for (TaxiTrail taxiTrail : trails)
             for (TaxiStamp taxiStamp : taxiTrail.getTaxiStamps().values()) {

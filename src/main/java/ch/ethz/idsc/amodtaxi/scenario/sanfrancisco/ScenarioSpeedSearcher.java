@@ -20,22 +20,19 @@ import ch.ethz.idsc.tensor.io.HomeDirectory;
         Network network = NetworkLoader.fromNetworkFile(HomeDirectory.file("data/TaxiComparison_SFScenario/network.xml"));
 
         Map<Double, Link> speeds = new HashMap<>();
-
         network.getLinks().values().forEach(l -> {
             speeds.put(l.getFreespeed(), l);
 
             String attrb = (String) l.getAttributes().getAsMap().get("osm:way:highway");
 
-            if (attrb.contains("motorway")) {
+            if (attrb.contains("motorway"))
                 System.out.println(attrb + ", " + l.getFreespeed());
-            }
-
         });
 
         System.out.println("Speeds:");
-        speeds.entrySet().forEach(e -> {
-            System.out.println("speed: " + e.getKey());
-            System.out.println("link:  " + e.getValue().toString());
+        speeds.forEach((k, v) -> {
+            System.out.println("speed: " + k);
+            System.out.println("link:  " + v);
         });
     }
 

@@ -15,6 +15,7 @@ import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxiStatus;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.trace.TaxiStamp;
 
+@Deprecated
 /* package */ enum StaticHelper1 {
     ;
 

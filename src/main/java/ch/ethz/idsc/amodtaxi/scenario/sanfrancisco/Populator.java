@@ -14,6 +14,7 @@ import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
+@Deprecated
 /* package */ class Populator {
     private long globalId = 0;
     private final Population population;
