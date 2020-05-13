@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedUtils;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -22,7 +23,6 @@ import ch.ethz.idsc.amodeus.taxitrip.ExportTaxiTrips;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.idsc.amodtaxi.linkspeed.LinkSpeedsExport;
 import ch.ethz.idsc.amodtaxi.linkspeed.iterative.IterativeLinkSpeedEstimator;
 import ch.ethz.idsc.amodtaxi.scenario.AllTaxiTrips;
 import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
@@ -124,7 +124,7 @@ import ch.ethz.idsc.tensor.Scalar;
             lsCalc.compute(workingDirectory, network, db, tripsSpeedEstimation);
 
             File linkSpeedsFile = new File(simOptions.getLinkSpeedDataName() + "");
-            LinkSpeedsExport.using(linkSpeedsFile, lsCalc);//
+            LinkSpeedUtils.writeLinkSpeedData(linkSpeedsFile, lsCalc.getLsData());
         } catch (Exception exception) {
             System.err.println("could not generate link speed data...");
             exception.printStackTrace();
