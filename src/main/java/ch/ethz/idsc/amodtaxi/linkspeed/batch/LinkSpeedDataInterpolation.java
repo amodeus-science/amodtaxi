@@ -70,10 +70,10 @@ public class LinkSpeedDataInterpolation {
             /** some recordings exist for link */
             if (lsData.getLinkMap().containsKey(linkID)) {
                 LinkSpeedTimeSeries timeSeries = lsData.getLinkMap().get(linkID);
-                for (Integer time : recordedTimes) {
+                for (Integer time : recordedTimes)
                     if (!timeSeries.getRecordedTimes().contains(time)) {
                         System.out.println("Are we ever here?... ");
-                        System.exit(1);
+                        System.exit(1); // TODO is this still needed?
                         Scalar speed = MeanLinkSpeed.ofNeighbors(kernel.getNeighbors(link), time, link, db, lsData);
                         if (Objects.nonNull(speed)) {
                             lsData.addData(linkID, time, speed.number().doubleValue());
@@ -81,8 +81,7 @@ public class LinkSpeedDataInterpolation {
                         }
 
                     }
-                }
-            } else {
+            } else
                 /** no recordings exist for link */
                 for (Integer time : recordedTimes) {
                     Scalar speed = MeanLinkSpeed.ofNeighbors(kernel.getNeighbors(link), time, link, db, lsData);
@@ -91,7 +90,6 @@ public class LinkSpeedDataInterpolation {
                         interpolatedLinks.add(link);
                     }
                 }
-            }
         }
         System.err.println("Total number of unsuccessful link speed estimations: " //
                 + interpolatedLinks.size() + "(" + interpolatedLinks.size() / ((double) network.getLinks().size()) + ")");

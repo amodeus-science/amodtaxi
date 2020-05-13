@@ -1,9 +1,9 @@
 /* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.linkspeed.iterative;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -39,19 +39,15 @@ import ch.ethz.idsc.tensor.Scalar;
                 // lsData.addData(linkId, time, freeSpeed);
                 // }
                 // TODO remove magic const. really necessary all day?
-                for (int time = 0; time <= 108000; time += dt) {
+                for (int time = 0; time <= 108000; time += dt)
                     lsData.addData(linkId, time, freeSpeed);
-                }
             }
             lsTime = lsData.getLinkMap().get(linkId);
             Objects.requireNonNull(lsTime);
 
-            List<Integer> relevantTimes = new ArrayList<>();
-            for (int time : lsTime.getRecordedTimes()) {
-                if (tripStart <= time && time <= tripEnd) {
-                    relevantTimes.add(time);
-                }
-            }
+            List<Integer> relevantTimes = lsTime.getRecordedTimes().stream() //
+                    .filter(time -> tripStart <= time && time <= tripEnd).collect(Collectors.toList());
+
             if (relevantTimes.size() == 0) // must have at least one entry for convergence
                 relevantTimes.add(lsTime.getTimeFloor(tripStart));
 

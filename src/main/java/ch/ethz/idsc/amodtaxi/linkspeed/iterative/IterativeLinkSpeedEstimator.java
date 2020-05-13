@@ -26,7 +26,6 @@ import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.io.HomeDirectory;
 
 public class IterativeLinkSpeedEstimator implements TaxiLinkSpeedEstimator {
-
     private LinkSpeedDataContainer lsData;
 
     private final int maxIter;
@@ -47,7 +46,6 @@ public class IterativeLinkSpeedEstimator implements TaxiLinkSpeedEstimator {
     }
 
     public void compute(File processingDir, Network network, MatsimAmodeusDatabase db, List<TaxiTrip> trips) {
-
         // // network and database
         // ScenarioOptions scenarioOptions = new ScenarioOptions(processingDir, //
         // ScenarioOptionsBase.getDefault());
@@ -63,14 +61,12 @@ public class IterativeLinkSpeedEstimator implements TaxiLinkSpeedEstimator {
         lsData = new LinkSpeedDataContainer();
 
         /** load initial trips */
-
         System.out.println("Number of trips: " + trips.size());
         new FindCongestionIterative(network, db, processingDir, lsData, trips, maxIter, //
                 tolerance, epsilon1, epsilon2, random, dt, Cost::max, trips.size());
 
         /** final export */
         StaticHelper.export(processingDir, lsData, "");
-
     }
 
     @Override
@@ -81,15 +77,13 @@ public class IterativeLinkSpeedEstimator implements TaxiLinkSpeedEstimator {
     // -------
 
     public static void main(String[] args) throws IOException {
-
         File processingDir = HomeDirectory.file("data/TaxiComparison_ChicagoScCr/Scenario");
         File finalTripsFile = HomeDirectory.file("data/TaxiComparison_ChicagoScCr/Scenario/"//
                 + "tripData/Taxi_Trips_2019_07_19_prepared_filtered_modified_final.csv");
 
         /** creating finding network and Matsimamodeusdatabase */
         // network and database
-        ScenarioOptions scenarioOptions = new ScenarioOptions(processingDir, //
-                ScenarioOptionsBase.getDefault());
+        ScenarioOptions scenarioOptions = new ScenarioOptions(processingDir, ScenarioOptionsBase.getDefault());
         File configFile = new File(scenarioOptions.getPreparerConfigName());
         System.out.println(configFile.getAbsolutePath());
         GlobalAssert.that(configFile.exists());
@@ -104,5 +98,4 @@ public class IterativeLinkSpeedEstimator implements TaxiLinkSpeedEstimator {
         List<TaxiTrip> trips = new ArrayList<>(ImportTaxiTrips.fromFile(finalTripsFile));
         new IterativeLinkSpeedEstimator(200000, new Random(123)).compute(processingDir, network, db, trips);
     }
-
 }

@@ -3,6 +3,7 @@ package ch.ethz.idsc.amodtaxi.linkspeed.batch;
 
 import java.util.Collection;
 
+import ch.ethz.idsc.amodeus.util.math.SI;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.collections.QuadTree;
@@ -15,7 +16,6 @@ import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
 public class ProximityNeighborKernel implements NeighborKernel {
-
     private final QuadTree<Link> quadTree;
     private final Scalar radius;
 
@@ -24,7 +24,7 @@ public class ProximityNeighborKernel implements NeighborKernel {
      * where the @param radius is a {@link Quantity} in [m] */
     public ProximityNeighborKernel(Network network, Scalar radius) {
         this.radius = radius;
-        GlobalAssert.that(Scalars.lessThan(Quantity.of(0, "m"), radius));
+        GlobalAssert.that(Scalars.lessThan(Quantity.of(0, SI.METER), radius));
         this.quadTree = FastQuadTree.of(network);
     }
 
