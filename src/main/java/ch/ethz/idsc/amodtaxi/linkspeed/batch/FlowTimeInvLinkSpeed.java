@@ -1,18 +1,16 @@
 /* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.linkspeed.batch;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
-import ch.ethz.idsc.amodeus.linkspeed.LinkIndex;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.taxitrip.ShortestDurationCalculator;
@@ -29,13 +27,12 @@ import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
 public class FlowTimeInvLinkSpeed implements TaxiLinkSpeedEstimator {
-
+    private final boolean verbose = false;
     private final LinkSpeedDataContainer lsData;
     // TODO hourDt?
     public final static Scalar dayDt = Quantity.of(3600, SI.SECOND);
 
-    public FlowTimeInvLinkSpeed(Collection<TaxiTrip> records, Network network, //
-            MatsimAmodeusDatabase db, TrafficDelayEstimate delayCalculator) throws Exception {
+    public FlowTimeInvLinkSpeed(Collection<TaxiTrip> records, Network network, MatsimAmodeusDatabase db, TrafficDelayEstimate delayCalculator) {
 
         /** ensure {@link TaxiTrip}s contain all required information */
         GlobalAssert.that(records.stream().filter(TaxiTripCheck::isOfMinimalScope).count() == records.size());
@@ -44,30 +41,22 @@ public class FlowTimeInvLinkSpeed implements TaxiLinkSpeedEstimator {
          * is as in the {@link TaxiTrip}, then break into parts as time
          * steps of recording */
         ShortestDurationCalculator calc = new ShortestDurationCalculator(network, db);
-        Collection<PathHandlerTimeInv> pathes = new ArrayList<>();
-        records.stream().forEach(tt -> //
-        pathes.add(new PathHandlerTimeInv(tt, calc)));
-        System.out.println("Totally found " + pathes.size() + " paths for flow link speed computation.");
+        Collection<PathHandlerTimeInv> paths = records.stream().map(tt -> new PathHandlerTimeInv(tt, calc)).collect(Collectors.toList());
+
+        System.out.println("Totally found " + paths.size() + " paths for flow link speed computation.");
 
         /** remove paths which trip duration > free flow duration */
-        Collection<PathHandlerTimeInv> remove = new ArrayList<>();
-        pathes.stream().filter(p -> !p.isValid()).forEach(p -> remove.add(p));
-        pathes.removeAll(remove);
+        paths.removeIf(p -> !p.isValid());
 
         /** record traveled links */
-        Set<Link> travelledLinks = new HashSet<>();
-        pathes.forEach(p -> {
-            p.travelledLinks.forEach(l -> {
-                travelledLinks.add(l);
-            });
-        });
+        Set<Link> travelledLinks = paths.stream().flatMap(p -> p.travelledLinks.stream()).collect(Collectors.toSet());
 
         HashMap<Integer, Link> localIndexLink = new HashMap<>();
-        HashMap<Link, Integer> localIndexLink2 = new HashMap<>();
+        HashMap<Link, Integer> localLinkIndex = new HashMap<>();
         int j = 0;
         for (Link link : travelledLinks) {
             localIndexLink.put(j, link);
-            localIndexLink2.put(link, j);
+            localLinkIndex.put(link, j);
             ++j;
         }
         GlobalAssert.that(travelledLinks.size() == localIndexLink.size());
@@ -81,9 +70,9 @@ public class FlowTimeInvLinkSpeed implements TaxiLinkSpeedEstimator {
         Tensor trafficTripDuration = Array.zeros(numEq, 1);
 
         int k = 0;
-        for (PathHandlerTimeInv ph : pathes) {
+        for (PathHandlerTimeInv ph : paths) {
             for (Link link : ph.travelledLinks) {
-                int index = localIndexLink2.get(link);
+                int index = localLinkIndex.get(link);
                 flowMatrix.set(RealScalar.ONE, k, index);
             }
             freeflowTripDuration.set(RealScalar.of(ph.freeflowDuation.number()), k, 0);
@@ -95,7 +84,7 @@ public class FlowTimeInvLinkSpeed implements TaxiLinkSpeedEstimator {
         FlowTrafficEstimation estimation = //
                 FlowTrafficEstimation.of(flowMatrix, freeflowTripDuration, trafficTripDuration, delayCalculator);
 
-        Tensor estimateTravelTimeLinkDelays = estimation.trafficDelays;// trafficTravelTimeEstimates();
+        Tensor estimateTravelTimeLinkDelays = Objects.requireNonNull(estimation).trafficDelays; // trafficTravelTimeEstimates();
 
         int nwLinks = network.getLinks().size();
         System.out.println("Number of network links:       " + nwLinks);
@@ -103,15 +92,13 @@ public class FlowTimeInvLinkSpeed implements TaxiLinkSpeedEstimator {
         System.out.println("Number of covered links:       " + dims.get(1) + "(" + dims.get(1) / ((double) nwLinks) + ")");
         System.out.println("Trips used for calculation:    " + dims.get(0));
 
-        boolean verbose = false;
         if (verbose) { // enabling these prints will result in very substantial workload...
             System.out.println("trafficDelays:              " + Dimensions.of(estimation.trafficDelays));
             System.out.println("trafficTravelTimeEstimates: " + Dimensions.of(estimation.trafficTravelTimeEstimates()));
             System.out.println("error:                      " + Dimensions.of(estimation.getError()));
         }
 
-        /** take solution xij and assign to LinkSpeedDataContainer
-         * (necessary to transfer to deviations from freeflow speed) */
+        /** take solution xij and assign to LinkSpeedDataContainer (necessary to transfer to deviations from freeflow speed) */
         this.lsData = new LinkSpeedDataContainer();
         int numNegSpeed = 0;
 
@@ -123,7 +110,6 @@ public class FlowTimeInvLinkSpeed implements TaxiLinkSpeedEstimator {
             Link link = localIndexLink.get(i);
             Objects.requireNonNull(link);
             GlobalAssert.that(network.getLinks().values().contains(link));
-            Integer linkID = LinkIndex.fromLink(db, link);
 
             /** calculate the link speed */
             double length = link.getLength();
@@ -163,10 +149,9 @@ public class FlowTimeInvLinkSpeed implements TaxiLinkSpeedEstimator {
                 GlobalAssert.that(time >= 0);
                 if (trafficTravelTime >= 0) {
                     GlobalAssert.that(speed - link.getFreespeed() <= 0.01);
-                    lsData.addData(linkID, time, speed);
-                } else {
+                    lsData.addData(link, time, speed);
+                } else
                     ++numNegSpeed;
-                }
             }
         }
 
@@ -178,7 +163,7 @@ public class FlowTimeInvLinkSpeed implements TaxiLinkSpeedEstimator {
 
         /** Apply moving average filter to modify every link not solved in the previous step */
         ProximityNeighborKernel filterKernel = new ProximityNeighborKernel(network, Quantity.of(2000, "m"));
-        new LinkSpeedDataInterpolation(network, filterKernel, lsData, db);
+        new LinkSpeedDataInterpolation(network, filterKernel, lsData);
     }
 
     @Override

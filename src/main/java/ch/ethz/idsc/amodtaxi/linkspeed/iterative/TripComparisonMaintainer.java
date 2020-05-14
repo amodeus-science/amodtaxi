@@ -17,10 +17,9 @@ import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 
 /* package */ class TripComparisonMaintainer {
-
     // TODO can maintain same size more pretty?
     private final Map<TaxiTrip, Scalar> ratioLookupMap = new HashMap<>();
-    private NavigableMap<Scalar, TaxiTrip> ratioSortedMap = new TreeMap<>();
+    private final NavigableMap<Scalar, TaxiTrip> ratioSortedMap = new TreeMap<>();
 
     public TripComparisonMaintainer(RandomTripMaintainer randomTrips, Network network, //
             MatsimAmodeusDatabase db) {
@@ -49,13 +48,7 @@ import ch.ethz.idsc.tensor.Scalar;
             // GlobalAssert.that(false); // TODO To check why should this happen?
             System.out.println("Cleansing sorted map...");
             // if not removed successfully, remove all values associated to this trip.
-            NavigableMap<Scalar, TaxiTrip> ratioSortedMapOld = ratioSortedMap;
-            ratioSortedMap = new TreeMap<>();
-            ratioSortedMapOld.entrySet().forEach(e -> {
-                if (!e.getValue().equals(trip)) {
-                    ratioSortedMap.put(e.getKey(), e.getValue());
-                }
-            });
+            ratioSortedMap.entrySet().removeIf(e -> e.getValue().equals(trip));
         }
         ratioSortedMap.put(pathDurationratio.subtract(RealScalar.ONE).abs(), trip);
         // update lookupMap
@@ -74,5 +67,4 @@ import ch.ethz.idsc.tensor.Scalar;
     public Map<TaxiTrip, Scalar> getLookupMap() {
         return Collections.unmodifiableMap(ratioLookupMap);
     }
-
 }

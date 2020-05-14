@@ -15,10 +15,9 @@ import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
 /* package */ class PathHandlerTimeInv {
-
     public final Scalar duration;
     public final Scalar freeflowDuation;
-    public final List<Link> travelledLinks = new ArrayList<>();
+    public final List<Link> travelledLinks;
     private final boolean isValid;
 
     public PathHandlerTimeInv(TaxiTrip taxiTrip, ShortestDurationCalculator calc) {
@@ -31,7 +30,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         /** extract data from free flow shortest path */
         this.freeflowDuation = Quantity.of(fastest.travelTime, SI.SECOND);
 
-        fastest.links.forEach(l -> travelledLinks.add(l));
+        travelledLinks = new ArrayList<>(fastest.links);
 
         isValid = Scalars.lessEquals(freeflowDuation, duration);
 
@@ -40,5 +39,4 @@ import ch.ethz.idsc.tensor.qty.Quantity;
     public boolean isValid() {
         return isValid;
     }
-
 }

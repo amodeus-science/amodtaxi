@@ -19,7 +19,6 @@ import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 
 /* package */ class FindCongestionIterative {
-
     private final TripComparisonMaintainer tripMaintainer;
     private final RandomTripMaintainer randomTrips;
     private final File processingDir;
@@ -77,7 +76,6 @@ import ch.ethz.idsc.tensor.Scalars;
     }
 
     private void runTripIterations() {
-
         int iterationCount = 0;
         lastCost = randomTrips.getRatioCost();
         System.out.println("Last cost before start: " + lastCost);
@@ -88,12 +86,9 @@ import ch.ethz.idsc.tensor.Scalars;
 
             /** taking random trip */
             boolean isRandomTrip = random.nextDouble() <= epsilon2.number().doubleValue();
-            TaxiTrip trip = null;
-            if (isRandomTrip) {
-                trip = randomTrips.nextRandom();
-            } else { /** take currently worst trip */
-                trip = tripMaintainer.getWorst();
-            }
+            TaxiTrip trip = isRandomTrip //
+                    ? randomTrips.nextRandom() //
+                    : tripMaintainer.getWorst(); // take currently worst trip
 
             /** create the shortest duration calculator using the linkSpeed data,
              * must be done again to take into account newest updates */
@@ -109,11 +104,11 @@ import ch.ethz.idsc.tensor.Scalars;
             lastCost = randomTrips.getRatioCost();
 
             /** rescale factor such that epsilon in [0,1] maps to [f,1] */
-            Scalar rescaleFactor = RealScalar.ONE.subtract(//
+            Scalar rescaleFactor = RealScalar.ONE.subtract( //
                     (RealScalar.ONE.subtract(pathDurationratio)).multiply(epsilon1));
 
             /** rescale links to approach desired link speed */
-            ApplyScaling.to(lsData, db, trip, compare.path, rescaleFactor, dt);
+            ApplyScaling.to(lsData, trip, compare.path, rescaleFactor, dt);
 
             compare = getPathDurationRatio(trip);
             pathDurationratio = compare.nwPathDurationRatio;
@@ -156,9 +151,8 @@ import ch.ethz.idsc.tensor.Scalars;
             // DEBUGGING END
 
             /** intermediate export */
-            if (iterationCount % 30000 == 0) {
+            if (iterationCount % 30000 == 0)
                 StaticHelper.export(processingDir, lsData, "_" + Integer.toString(iterationCount));
-            }
         }
         System.out.println("---- " + iterationCount + " ----");
     }
@@ -166,12 +160,10 @@ import ch.ethz.idsc.tensor.Scalars;
     private DurationCompare getPathDurationRatio(TaxiTrip trip) {
         /** create the shortest duration calculator using the linkSpeed data,
          * must be done again to take into account newest updates */
-        LeastCostPathCalculator lcpc = LinkSpeedLeastPathCalculator.from(network, db, lsData);
+        LeastCostPathCalculator lcpc = LinkSpeedLeastPathCalculator.from(network, lsData);
         ShortestDurationCalculator calc = new ShortestDurationCalculator(lcpc, network, db);
 
         /** compute ratio of network path and trip duration f */
-        DurationCompare comp = new DurationCompare(trip, calc);
-        return comp;
+        return new DurationCompare(trip, calc);
     }
-
 }

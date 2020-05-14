@@ -1,6 +1,7 @@
 /* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amodtaxi.linkspeed.iterative;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 import ch.ethz.idsc.amodeus.taxitrip.ShortestDurationCalculator;
@@ -13,7 +14,6 @@ import ch.ethz.idsc.tensor.qty.Quantity;
  * and a network path. If the nwPathdurationRatio is larger than 1,
  * the trip is slower in the simulatio network than in the original data. */
 public class DurationCompare {
-
     public final Path path;
     public final Scalar duration;
     public final Scalar pathTime;
@@ -26,7 +26,7 @@ public class DurationCompare {
     public DurationCompare(TaxiTrip trip, ShortestDurationCalculator calc) {
         path = calc.computePath(trip);
         pathTime = Quantity.of(path.travelTime, SI.SECOND);
-        pathDist = Quantity.of(path.links.stream().mapToDouble(l -> l.getLength()).sum(), SI.METER);
+        pathDist = Quantity.of(path.links.stream().mapToDouble(Link::getLength).sum(), SI.METER);
         duration = trip.driveTime;
         nwPathDurationRatio = pathTime.divide(duration);
     }

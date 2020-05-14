@@ -9,14 +9,12 @@ import org.matsim.core.router.util.TravelTime;
 
 import ch.ethz.idsc.amodeus.linkspeed.LSDataTravelTime;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
-import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 
 public enum LinkSpeedLeastPathCalculator {
     ;
 
-    public static LeastCostPathCalculator from(Network network, //
-            MatsimAmodeusDatabase db, LinkSpeedDataContainer lsData) {
-        TravelTime travelTime = new LSDataTravelTime(lsData, db);
+    public static LeastCostPathCalculator from(Network network, LinkSpeedDataContainer lsData) {
+        TravelTime travelTime = new LSDataTravelTime(lsData);
         return new DijkstraFactory().createPathCalculator(network, //
                 new OnlyTimeDependentTravelDisutility(travelTime), travelTime);
     }

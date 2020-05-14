@@ -15,10 +15,8 @@ import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.Tensors;
 
 public class RandomTripMaintainer {
-
     /** random generator */
     private final Random random;
     /** maintaining a list of last recorded ratios */
@@ -45,8 +43,9 @@ public class RandomTripMaintainer {
         GlobalAssert.that(allTrips.size() == queryMap.firstEntry().getValue().size());
     }
 
-    // queries next trip, trip is removed from list with lowest key in querymap(least amount of queries) and put in list with key+1
-    // returns queried taxitrip
+    /** queries next trip, trip is removed from list with lowest key in querymap(least amount of queries) and put in list with key+1
+     *
+     * @return queried {@link TaxiTrip} */
     public TaxiTrip nextRandom() {
         // find set of trips with least checks
         int numChecks = 0;
@@ -59,9 +58,8 @@ public class RandomTripMaintainer {
         TaxiTrip selected = leastChecked.stream().skip(random.nextInt(leastChecked.size())).findFirst().get();
         // move to set with +1 checks
         GlobalAssert.that(leastChecked.remove(selected));
-        if (queryMap.lastKey() == numChecks) {
+        if (queryMap.lastKey() == numChecks)
             queryMap.put(numChecks + 1, new HashSet<>());
-        }
         queryMap.ceilingEntry(numChecks + 1).getValue().add(selected);
 
         // return
@@ -81,8 +79,6 @@ public class RandomTripMaintainer {
     }
 
     public Tensor getRatios() {
-        Tensor ratios = Tensors.empty();
-        lastRatios.getNewest(checkHorizon).stream().forEach(s -> ratios.append(s));
-        return ratios;
+        return Tensor.of(lastRatios.getNewest(checkHorizon).stream());
     }
 }

@@ -22,8 +22,7 @@ public class FlowTrafficEstimation {
      * required.
      * 
      * @throws Exception */
-    public static FlowTrafficEstimation of(Tensor flowMatrix, Tensor freeTimes, Tensor trafficTimes, //
-            TrafficDelayEstimate delayCalculator) {
+    public static FlowTrafficEstimation of(Tensor flowMatrix, Tensor freeTimes, Tensor trafficTimes, TrafficDelayEstimate delayCalculator) {
         try {
             return new FlowTrafficEstimation(flowMatrix, freeTimes, trafficTimes, delayCalculator);
         } catch (Exception e) {
@@ -79,5 +78,4 @@ public class FlowTrafficEstimation {
             trafficTravelTimeEstimates = freeTimes.add(flowMatrix.dot(trafficDelays)).unmodifiable();
         return trafficTravelTimeEstimates;
     }
-
 }
