@@ -26,10 +26,6 @@ public class AllTaxiTrips {
     }
 
     public Collection<TaxiTrip> on(LocalDate simulationDate) {
-        // Collection<TaxiTrip> trips = new ArrayList<>();
-        // for (TaxiTrail taxiTrail : dayTaxiRecord.getTrails())
-        //     trips.addAll(taxiTrail.allTripsBeginningOn(simulationDate));
-        // return trips;
         return dayTaxiRecord.getTrails().stream().flatMap(trail -> trail.allTripsBeginningOn(simulationDate).stream()).collect(Collectors.toList());
     }
 }

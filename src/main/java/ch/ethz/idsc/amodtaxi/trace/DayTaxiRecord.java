@@ -2,6 +2,7 @@
 package ch.ethz.idsc.amodtaxi.trace;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 /** A {@link DayTaxiRecord} contains the {@link TaxiTrail} of all taxis in the dataset, first
@@ -24,5 +25,5 @@ public interface DayTaxiRecord {
     /** @return oldest {@link LocalDateTime} in all {@link TaxiTrail}s of the {@link DayTaxiRecord} */
     LocalDateTime getMaxTime();
 
-    List<TaxiTrail> getTrails();
+    Collection<TaxiTrail> getTrails();
 }

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
+import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAnchor;
 import org.jfree.chart.axis.CategoryLabelPositions;
@@ -16,7 +17,6 @@ import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.io.SaveFormats;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.idsc.amodtaxi.linkspeed.LinkSpeedsExport;
 import ch.ethz.idsc.tensor.RationalScalar;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
@@ -54,7 +54,7 @@ import ch.ethz.idsc.tensor.pdf.BinCounts;
 		/** exporting final link speeds file */
 		File linkSpeedsFile = new File(processingDir, "/linkSpeedData" + nameAdd);
 		try {
-			LinkSpeedsExport.using(linkSpeedsFile, lsData);
+			LinkSpeedUtils.writeLinkSpeedData(linkSpeedsFile, lsData);
 		} catch (IOException e) {
 			System.err.println("Export of LinkSpeedDataContainer failed: ");
 			e.printStackTrace();

@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.Random;
 
 import ch.ethz.idsc.amodtaxi.fleetconvert.SanFranciscoTripFleetConverter;
+import ch.ethz.idsc.amodtaxi.scenario.data.StaticAnalysis;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -52,6 +53,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
     public static void main(String[] args) throws Exception {
         File dataDir = args.length > 0 ? new File(args[0]) : null;
+        dataDir = (Objects.nonNull(dataDir) && dataDir.isDirectory()) ? dataDir : null;
         run(dataDir, MultiFileTools.getDefaultWorkingDirectory());
     }
 
@@ -132,7 +134,9 @@ import ch.ethz.idsc.tensor.qty.Quantity;
                             ScenarioLabels.LPFile, ScenarioLabels.config, ScenarioLabels.linkSpeedData });
         }
 
-        // /** test consistency of created scenarios with independent analysis */
-        // TaxiData scenarioData = CreateSanFranciscoStaticAnalysis.runStaticAnalysis(destinDir, traceFiles, network, db);
+        /** test consistency of created scenarios with independent analysis */
+        StaticAnalysis staticAnalysis = new StaticAnalysis(fll, network, TaxiStampReaderSF.INSTANCE);
+        staticAnalysis.of(traceFiles);
+        staticAnalysis.saveTo(new File(workingDir, "static_analysis"));
     }
 }

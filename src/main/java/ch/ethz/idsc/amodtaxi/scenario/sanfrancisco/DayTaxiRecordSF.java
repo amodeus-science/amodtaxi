@@ -2,18 +2,18 @@
 package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import ch.ethz.idsc.amodeus.net.FastLinkLookup;
-import ch.ethz.idsc.amodeus.net.IdIntegerDatabase;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.trace.DayTaxiRecord;
 import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
 
 /* package */ class DayTaxiRecordSF implements DayTaxiRecord {
-    private final List<TaxiTrail> trails = new ArrayList<>();
-    private final IdIntegerDatabase vehicleIdIntegerDatabase = new IdIntegerDatabase();
+    private final Map<Integer, TaxiTrail> trails = new HashMap<>();
     private final FastLinkLookup fastLinkLookup;
 
     public DayTaxiRecordSF(FastLinkLookup fastLinkLookup) {
@@ -22,19 +22,14 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
 
     @Override
     public void insert(List<String> list, int taxiStampID, String id) {
-        final int taxiStamp_id = vehicleIdIntegerDatabase.getId(Integer.toString(taxiStampID));
-        if (taxiStamp_id == trails.size()) {
-            trails.add(new TaxiTrailSF(id, fastLinkLookup));
-            System.out.println("Trails: " + trails.size());
-        }
-        trails.get(taxiStamp_id).insert(list);
+        trails.computeIfAbsent(taxiStampID, i -> new TaxiTrailSF(id, fastLinkLookup)).insert(list);
     }
 
     @Override
     public void processFilledTrails() throws Exception {
         GlobalAssert.that(trails.size() > 0);
         int requestIndex = 1;
-        for (TaxiTrail taxiTrail : trails) {
+        for (TaxiTrail taxiTrail : trails.values()) {
             taxiTrail.processFilledTrail();
 
             // GlobalAssert.that(taxiTrail instanceof TaxiTrailSF);
@@ -50,7 +45,7 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
     // public void processRoboTaxiStatus() {
     // GlobalAssert.that(trails.size() > 0);
     // int requestIndex = 1;
-    // for (TaxiTrailInterface taxiTrail : trails) {
+    // for (TaxiTrailInterface taxiTrail : trails.values()) {
     // GlobalAssert.that(taxiTrail instanceof TaxiTrailSF);
     // TaxiTrailSF taxiTrailSF = (TaxiTrailSF) taxiTrail;
     // taxiTrailSF.setRoboTaxiStatus();
@@ -60,7 +55,7 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
 
     @Override
     public LocalDateTime getMaxTime() {
-        return trails.stream().map(TaxiTrail::getMaxTime).max(LocalDateTime::compareTo).get();
+        return trails.values().stream().map(TaxiTrail::getMaxTime).max(LocalDateTime::compareTo).get();
     }
 
     @Override
@@ -69,8 +64,8 @@ import ch.ethz.idsc.amodtaxi.trace.TaxiTrail;
     }
 
     @Override
-    public List<TaxiTrail> getTrails() {
-        return trails;
+    public Collection<TaxiTrail> getTrails() {
+        return trails.values();
     }
 
     @Override
