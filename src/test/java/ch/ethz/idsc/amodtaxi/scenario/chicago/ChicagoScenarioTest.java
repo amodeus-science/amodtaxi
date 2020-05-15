@@ -122,9 +122,8 @@ public class ChicagoScenarioTest {
 
         FinishedScenario.copyToDir(processingDir.getAbsolutePath(), //
                 destinDir.getAbsolutePath(), //
-                new String[] { //
-                        ScenarioLabels.amodeusFile, ScenarioLabels.networkGz, ScenarioLabels.populationGz, //
-                        ScenarioLabels.LPFile, ScenarioLabels.config, "virtualNetworkChicago", ScenarioLabels.linkSpeedData });
+                ScenarioLabels.amodeusFile, ScenarioLabels.networkGz, ScenarioLabels.populationGz, //
+                ScenarioLabels.LPFile, ScenarioLabels.config, "virtualNetworkChicago", ScenarioLabels.linkSpeedData);
 
         Config createdConfig = ConfigUtils.loadConfig(new File(destinDir, ScenarioLabels.config).toString());
         Network createdNetwork = ScenarioUtils.loadScenario(createdConfig).getNetwork();

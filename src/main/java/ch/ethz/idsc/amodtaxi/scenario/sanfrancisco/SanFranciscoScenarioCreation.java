@@ -4,13 +4,14 @@ package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 
 import ch.ethz.idsc.amodtaxi.fleetconvert.SanFranciscoTripFleetConverter;
+import ch.ethz.idsc.amodtaxi.scenario.ScenarioCreation;
 import ch.ethz.idsc.amodtaxi.scenario.data.StaticAnalysis;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -21,15 +22,12 @@ import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
-import ch.ethz.idsc.amodeus.taxitrip.ImportTaxiTrips;
-import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.io.CopyFiles;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodtaxi.fleetconvert.TripFleetConverter;
-import ch.ethz.idsc.amodtaxi.linkspeed.iterative.IterativeLinkSpeedEstimator;
 import ch.ethz.idsc.amodtaxi.osm.StaticMapCreator;
 import ch.ethz.idsc.amodtaxi.scenario.FinishedScenario;
 import ch.ethz.idsc.amodtaxi.scenario.Scenario;
@@ -45,43 +43,67 @@ import ch.ethz.idsc.amodtaxi.tripmodif.TaxiDataModifierCollection;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
-/* package */ class CreateSanFranciscoScenario {
+public class SanFranciscoScenarioCreation extends ScenarioCreation {
     private static final Collection<LocalDate> DATES = DateSelectSF.specific(6, 4);
     private static final int NUM_TRACE_FILES = 536; // maximum taxis are: 536;
     private static final AmodeusTimeConvert TIME_CONVERT = new AmodeusTimeConvert(ZoneId.of("America/Los_Angeles"));
-    private static final int MAX_ITER = 100_000;
 
     public static void main(String[] args) throws Exception {
         File dataDir = args.length > 0 ? new File(args[0]) : null;
         dataDir = (Objects.nonNull(dataDir) && dataDir.isDirectory()) ? dataDir : null;
-        run(dataDir, MultiFileTools.getDefaultWorkingDirectory());
+        SanFranciscoScenarioCreation scenario = SanFranciscoScenarioCreation.of(MultiFileTools.getDefaultWorkingDirectory(), dataDir).get(0);
+        // List<File> traceFiles = TraceFileChoice.getOrDefault(new File(dataDir, "cabspottingdata"), "new_") //
+        //         .specified("equioc", "onvahe", "epkiapme", "ippfeip");
+        // SanFranciscoScenarioCreation scenario = SanFranciscoScenarioCreation.of(MultiFileTools.getDefaultWorkingDirectory(), traceFiles, DATES);
+        scenario.linkSpeedData(100_000);
+        StaticAnalysis staticAnalysis = scenario.staticAnalysis();
+        staticAnalysis.saveTo(new File(MultiFileTools.getDefaultWorkingDirectory(), "static_analysis"));
     }
 
-    public static void run(File dataDir, File workingDir) throws Exception {
-        SanFranciscoSetup.in(workingDir);
+    // ---
 
-        /** download of open street map data to create scenario */
-        StaticMapCreator.now(workingDir);
+    public static List<SanFranciscoScenarioCreation> of(File workingDirectory, File dataDirectory) throws Exception {
+        return of(workingDirectory, dataDirectory, NUM_TRACE_FILES, DATES);
+    }
 
-        /** copy taxi trace files */
+    public static List<SanFranciscoScenarioCreation> of(File workingDirectory, File dataDirectory, Collection<LocalDate> dates) throws Exception {
+        return of(workingDirectory, dataDirectory, NUM_TRACE_FILES, dates);
+    }
+
+    public static List<SanFranciscoScenarioCreation> of(File workingDirectory, File dataDirectory, int numTraceFiles) throws Exception {
+        return of(workingDirectory, dataDirectory, numTraceFiles, DATES);
+    }
+
+    public static List<SanFranciscoScenarioCreation> of(File workingDirectory, File dataDirectory, int numTraceFiles, Collection<LocalDate> dates) throws Exception {
         List<File> traceFiles;
-        if (Objects.nonNull(dataDir)) {
-            System.out.println("data directory: " + dataDir.getAbsolutePath());
-            traceFiles = TraceFileChoice.getOrDefault(new File(dataDir, "cabspottingdata"), "new_").random(NUM_TRACE_FILES);
-            // traceFiles = TraceFileChoice.getOrDefault(new File(dataDir, "cabspottingdata"), "new_").specified("equioc", "onvahe", "epkiapme", "ippfeip");
+        if (Objects.nonNull(dataDirectory)) {
+            System.out.println("data directory: " + dataDirectory.getAbsolutePath());
+            traceFiles = TraceFileChoice.getOrDefault(new File(dataDirectory, "cabspottingdata"), "new_").random(numTraceFiles);
         } else {
             System.out.println("no data directory provided");
             traceFiles = TraceFileChoice.getDefault().random(NUM_TRACE_FILES);
         }
+        return of(workingDirectory, traceFiles, dates);
+    }
+
+    public static List<SanFranciscoScenarioCreation> of(File workingDirectory, Collection<File> traceFiles) throws Exception {
+        return of(workingDirectory, traceFiles, DATES);
+    }
+
+    public static List<SanFranciscoScenarioCreation> of(File workingDirectory, Collection<File> traceFiles, Collection<LocalDate> dates) throws Exception {
+        SanFranciscoSetup.in(workingDirectory);
+
+        /** download of open street map data to create scenario */
+        StaticMapCreator.now(workingDirectory);
 
         /** prepare the network */
-        ScenarioBasicNetworkPreparer.run(workingDir);
+        ScenarioBasicNetworkPreparer.run(workingDirectory);
 
-        File processingDir = new File(workingDir, "Scenario");
+        File processingDir = new File(workingDirectory, "Scenario");
         if (processingDir.isDirectory())
             DeleteDirectory.of(processingDir, 2, 25);
         processingDir.mkdir();
-        CopyFiles.now(workingDir.getAbsolutePath(), processingDir.getAbsolutePath(), //
+        CopyFiles.now(workingDirectory.getAbsolutePath(), processingDir.getAbsolutePath(), //
                 Arrays.asList(ScenarioLabels.amodeusFile, ScenarioLabels.config, ScenarioLabels.network, ScenarioLabels.networkGz, ScenarioLabels.LPFile));
 
         /** based on the taxi data, create a population and assemble a AMoDeus scenario */
@@ -99,7 +121,8 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         DayTaxiRecord dayTaxiRecord = ReadTraceFiles.in(traceFiles, reader);
 
         /** create scenario */
-        for (LocalDate localDate : DATES) {
+        List<SanFranciscoScenarioCreation> scenarios = new ArrayList<>();
+        for (LocalDate localDate : dates) {
             /** prepare for creation of scenario */
             TaxiDataModifier tripModifier;
             {
@@ -113,30 +136,41 @@ import ch.ethz.idsc.tensor.qty.Quantity;
             tripFilter.addFilter(new TripNetworkFilter(network, db, //
                     Quantity.of(2.235200008, SI.VELOCITY), Quantity.of(3600, SI.SECOND), Quantity.of(200, SI.METER), true));
 
-            File destinDir = new File(workingDir, localDate.toString());
-            List<TaxiTrip> finalTrips;
+            File destinDir = new File(workingDirectory, localDate.toString());
+            File finalTripsFile;
             { // prepare final scenario
                 TripFleetConverter converter = new SanFranciscoTripFleetConverter( //
                         scenarioOptions, network, dayTaxiRecord, localDate, tripModifier, tripFilter, new File(processingDir, "tripData"));
-                File finalTripsFile = Objects.requireNonNull(Scenario.create(workingDir, converter, processingDir, localDate, TIME_CONVERT));
+                finalTripsFile = Objects.requireNonNull(Scenario.create(workingDirectory, converter, processingDir, localDate, TIME_CONVERT));
 
                 System.out.println("The final trips file is: " + finalTripsFile.getAbsolutePath());
-
-                /** loading final trips */
-                finalTrips = ImportTaxiTrips.fromFile(finalTripsFile);
             }
-            if (MAX_ITER > 0)
-                new IterativeLinkSpeedEstimator(MAX_ITER, new Random()).compute(processingDir, network, db, finalTrips);
 
             FinishedScenario.copyToDir(processingDir.getAbsolutePath(), destinDir.getAbsolutePath(), //
-                    new String[] { //
-                            ScenarioLabels.amodeusFile, ScenarioLabels.networkGz, ScenarioLabels.populationGz, //
-                            ScenarioLabels.LPFile, ScenarioLabels.config, ScenarioLabels.linkSpeedData });
-        }
+                    ScenarioLabels.amodeusFile, ScenarioLabels.networkGz, ScenarioLabels.populationGz, //
+                    ScenarioLabels.LPFile, ScenarioLabels.config);
 
-        /** test consistency of created scenarios with independent analysis */
-        StaticAnalysis staticAnalysis = new StaticAnalysis(fll, network, TaxiStampReaderSF.INSTANCE);
+            scenarios.add(new SanFranciscoScenarioCreation(network, db, fll, traceFiles, finalTripsFile, destinDir));
+        }
+        return scenarios;
+    }
+
+    // ---
+
+    private final FastLinkLookup fastLinkLookup;
+    private final Collection<File> traceFiles;
+
+    private SanFranciscoScenarioCreation(Network network, MatsimAmodeusDatabase db, FastLinkLookup fastLinkLookup, //
+            Collection<File> traceFiles, File taxiTripsFile, File directory) {
+        super(network, db, taxiTripsFile, directory);
+        this.fastLinkLookup = fastLinkLookup;
+        this.traceFiles = traceFiles;
+    }
+
+    /** test consistency of created scenarios with independent analysis */
+    public StaticAnalysis staticAnalysis() {
+        StaticAnalysis staticAnalysis = new StaticAnalysis(fastLinkLookup, network, TaxiStampReaderSF.INSTANCE);
         staticAnalysis.of(traceFiles);
-        staticAnalysis.saveTo(new File(workingDir, "static_analysis"));
+        return staticAnalysis;
     }
 }

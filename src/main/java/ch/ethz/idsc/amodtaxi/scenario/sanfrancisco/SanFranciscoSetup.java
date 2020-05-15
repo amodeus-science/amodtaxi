@@ -11,7 +11,7 @@ import ch.ethz.idsc.amodtaxi.scenario.ScenarioSetup;
 
     public static void in(File workingDir) throws Exception {
         SanFranciscoGeoInformation.setup();
-        File resourcesDir = new File(Locate.repoFolder(CreateSanFranciscoScenario.class, "amodtaxi"), //
+        File resourcesDir = new File(Locate.repoFolder(SanFranciscoScenarioCreation.class, "amodtaxi"), //
                 "resources/sanFranciscoScenario");
         ScenarioSetup.in(workingDir, resourcesDir);
     }

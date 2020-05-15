@@ -96,9 +96,8 @@ public class SanFranciscoScenarioTest {
         // new IterativeLinkSpeedEstimator(maxIter).compute(processingDir, network, db, finalTrips);
 
         FinishedScenario.copyToDir(processingDir.getAbsolutePath(), outputDirectory.getAbsolutePath(), //
-                new String[] { //
-                        ScenarioLabels.amodeusFile, ScenarioLabels.networkGz, ScenarioLabels.populationGz, //
-                        ScenarioLabels.LPFile, ScenarioLabels.config, ScenarioLabels.linkSpeedData });
+                ScenarioLabels.amodeusFile, ScenarioLabels.networkGz, ScenarioLabels.populationGz, //
+                ScenarioLabels.LPFile, ScenarioLabels.config, ScenarioLabels.linkSpeedData);
 
         Config createdConfig = ConfigUtils.loadConfig(new File(outputDirectory, ScenarioLabels.config).toString());
         Network createdNetwork = ScenarioUtils.loadScenario(createdConfig).getNetwork();

@@ -13,7 +13,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
 public enum FinishedScenario {
     ;
 
-    public static void copyToDir(String processingDir, String destinDir, String[] fileNames) throws IOException {
+    public static void copyToDir(String processingDir, String destinDir, String... fileNames) throws IOException {
         System.out.println("Copying scenario from : " + processingDir);
         System.out.println("to :                    " + destinDir);
 
