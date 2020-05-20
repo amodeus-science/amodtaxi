@@ -11,8 +11,11 @@ public enum ChicagoSetup {
 
     public static void in(File workingDir) throws Exception {
         ChicagoGeoInformation.setup();
-        File resourcesDir = new File(Locate.repoFolder(ChicagoScenarioCreation.class, "amodtaxi"), //
-                "resources/chicagoScenario");
-        ScenarioSetup.in(workingDir, resourcesDir);
+        try {
+            File resourcesDir = new File(Locate.repoFolder(ChicagoScenarioCreation.class, "amodtaxi"), "src/main/resources/chicagoScenario");
+            ScenarioSetup.in(workingDir, resourcesDir);
+        } catch (Exception e) {
+            ScenarioSetup.in(workingDir, "chicagoScenario");
+        }
     }
 }

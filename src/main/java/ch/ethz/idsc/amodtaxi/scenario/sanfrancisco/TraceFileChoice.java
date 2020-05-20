@@ -4,6 +4,7 @@ package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,10 +13,14 @@ import java.util.stream.Collectors;
 
 import ch.ethz.idsc.amodeus.util.io.Locate;
 import ch.ethz.idsc.amodeus.util.io.MultiFileReader;
+import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodtaxi.util.RandomElements;
+import ch.ethz.idsc.amodtaxi.util.ResourceHandling;
 
 public class TraceFileChoice {
+    public static final File DEFAULT_DATA = new File(MultiFileTools.getDefaultWorkingDirectory(), "default_cabspottingdata");
+
     public static TraceFileChoice getOrDefault(File directory, String sharedFileName) {
         try {
             return get(directory, sharedFileName);
@@ -32,8 +37,18 @@ public class TraceFileChoice {
     }
 
     public static TraceFileChoice getDefault() {
-        File testScenario = new File(Locate.repoFolder(TraceFileChoice.class, "amodtaxi"), "resources/sanFranciscoScenario");
-        return get(new File(testScenario, "cabspottingdata"), "new_");
+        try {
+            DEFAULT_DATA.mkdirs();
+            ResourceHandling.copy("sanFranciscoScenario/cabspottingdata/new_abboip.txt", Path.of(DEFAULT_DATA.getAbsolutePath(), "new_abboip.txt"), false);
+            ResourceHandling.copy("sanFranciscoScenario/cabspottingdata/new_abcoij.txt", Path.of(DEFAULT_DATA.getAbsolutePath(), "new_abcoij.txt"), false);
+            ResourceHandling.copy("sanFranciscoScenario/cabspottingdata/_cabs.txt", Path.of(DEFAULT_DATA.getAbsolutePath(), "_cabs.txt"), false);
+            ResourceHandling.copy("sanFranciscoScenario/cabspottingdata/README", Path.of(DEFAULT_DATA.getAbsolutePath(), "README"), false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return get(DEFAULT_DATA, "new_");
+        // File testScenario = new File(Locate.repoFolder(TraceFileChoice.class, "amodtaxi"), "resources/sanFranciscoScenario");
+        // return get(new File(testScenario, "cabspottingdata"), "new_");
     }
 
     public static TraceFileChoice get(File directory, String sharedFileName) {

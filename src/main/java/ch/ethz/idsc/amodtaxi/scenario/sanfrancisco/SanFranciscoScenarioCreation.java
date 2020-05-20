@@ -152,6 +152,10 @@ public class SanFranciscoScenarioCreation extends ScenarioCreation {
 
             scenarios.add(new SanFranciscoScenarioCreation(network, db, fll, traceFiles, finalTripsFile, destinDir));
         }
+
+        if (TraceFileChoice.DEFAULT_DATA.exists())
+            DeleteDirectory.of(TraceFileChoice.DEFAULT_DATA, 1, 5);
+
         return scenarios;
     }
 

@@ -1,15 +1,17 @@
 package ch.ethz.idsc.amodtaxi.scenario.sanfrancisco;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
+import ch.ethz.idsc.tensor.io.DeleteDirectory;
 import junit.framework.TestCase;
 
 import ch.ethz.idsc.amodeus.util.io.Locate;
 
 public class TraceFileChoiceTest extends TestCase {
     public void testGet() {
-        File dataFile = new File(Locate.repoFolder(TraceFileChoiceTest.class, "amodtaxi"), "resources/sanFranciscoScenario/cabspottingdata");
+        File dataFile = new File(Locate.repoFolder(TraceFileChoiceTest.class, "amodtaxi"), "src/main/resources/sanFranciscoScenario/cabspottingdata");
         List<File> traceFiles = TraceFileChoice.get(dataFile, "new_").random(2);
         assertEquals(2, traceFiles.size());
     }
@@ -26,5 +28,11 @@ public class TraceFileChoiceTest extends TestCase {
         } catch (RuntimeException e) {
             //
         }
+    }
+
+    @Override
+    public void tearDown() throws IOException {
+        if (TraceFileChoice.DEFAULT_DATA.exists())
+            DeleteDirectory.of(TraceFileChoice.DEFAULT_DATA, 1, 5);
     }
 }

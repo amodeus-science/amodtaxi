@@ -133,7 +133,7 @@ public class ChicagoScenarioCreation extends ScenarioCreation {
         FinishedScenario.copyToDir(processingDir.getAbsolutePath(), //
                 destinDir.getAbsolutePath(), //
                 ScenarioLabels.amodeusFile, ScenarioLabels.networkGz, ScenarioLabels.populationGz, //
-                ScenarioLabels.LPFile, ScenarioLabels.config, "virtualNetworkChicago", ScenarioLabels.linkSpeedData);
+                ScenarioLabels.LPFile, ScenarioLabels.config, "virtualNetworkChicago");
         cleanUp(workingDirectory);
         return new ChicagoScenarioCreation(network, db, finalTripsFile, destinDir);
     }
